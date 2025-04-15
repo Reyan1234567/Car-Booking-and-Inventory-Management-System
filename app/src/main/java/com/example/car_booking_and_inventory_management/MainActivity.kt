@@ -5,16 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.car_booking_and_inventory_management.screens.SignUpScreen
+import com.example.frontend.DataStore.TokenManager
 import com.example.frontend.network.authApi
 import com.example.frontend.repositories.authRepository
 import com.example.frontend.screens.LoginScreen
@@ -25,17 +24,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val api=authApi.create()
+        val tokenManager:TokenManager= TokenManager(context =applicationContext )
+        val api=authApi.provideRetrofit(tokenManager).create(authApi::class.java)
         val repository=authRepository(api)
 
         setContent {
             val navController=rememberNavController()
             NavHost(navController=navController, startDestination="login"){
                 composable(route="login"){
-                    LoginScreen(modifier=Modifier.fillMaxSize(),repository,navController)
+                    LoginScreen(modifier=Modifier.fillMaxSize(),repository,navController,tokenManager)
                 }
                 composable(route="sign_up"){
-
+                    SignUpScreen(modifier = Modifier)
                 }
             }
         }

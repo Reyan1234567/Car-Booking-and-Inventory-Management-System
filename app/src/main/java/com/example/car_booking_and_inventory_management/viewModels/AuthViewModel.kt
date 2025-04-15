@@ -1,11 +1,13 @@
 package com.example.frontend.viewModels
 
+import android.media.session.MediaSession.Token
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.frontend.DataStore.TokenManager
 import com.example.frontend.data.LoginInput
 import com.example.frontend.data.LoginResult
 import com.example.frontend.repositories.authRepository
@@ -16,12 +18,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class AuthViewModel(private val repository:authRepository): ViewModel(){
+class AuthViewModel(private val repository:authRepository, private val tokenManager: TokenManager): ViewModel(){
     private val _loginResult= MutableStateFlow<Result<LoginResult>?>(null)
     val loginResult: StateFlow<Result<LoginResult>?> = _loginResult.asStateFlow()
 
     var isLoading =MutableStateFlow(false)
-
             fun login(user:LoginInput){
                 viewModelScope.launch{
                     try{
@@ -29,6 +30,7 @@ class AuthViewModel(private val repository:authRepository): ViewModel(){
                         isLoading.value=true
                         if(response.isSuccessful){
                             _loginResult.value=Result.success(response.body()!!)
+                            response.body()?.let {tokenManager.saveTokens(it.accessToken,it.refreshToken)  }
                         }
                         else{
                             _loginResult.value=Result.failure(Exception("Login failed:${response.code()}"))

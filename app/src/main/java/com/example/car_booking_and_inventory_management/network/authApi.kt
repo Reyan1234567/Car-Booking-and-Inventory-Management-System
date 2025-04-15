@@ -1,6 +1,7 @@
 package com.example.frontend.network
 
 import androidx.compose.animation.core.rememberTransition
+import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.frontend.DataStore.TokenManager
 import com.example.frontend.data.LoginInput
 import com.example.frontend.data.LoginResult
@@ -19,6 +20,8 @@ interface authApi {
     @POST("auth/refresh")
     suspend fun refresh(@Body refreshToken: RefreshRequest): Response<LoginResult>
 
+    @POST("auth/signup")
+    suspend fun signup(@Body userInfo:Signup):Response<Signup>
 
     companion object{
         private const val BASE_URL="https://localhost:4000/"
@@ -41,5 +44,6 @@ interface authApi {
                 .build()
 
         }
+
     }
 }
