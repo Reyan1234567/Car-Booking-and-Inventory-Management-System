@@ -43,7 +43,9 @@ import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 import com.example.frontend.R
 import com.example.frontend.ui.theme.Inter
 import com.example.frontend.ui.theme.Vold
@@ -53,7 +55,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Signup1(modifier: Modifier = Modifier,navController: NavController) {
+fun Signup1(modifier: Modifier = Modifier,navController: NavController, viewModel: SignupViewModel) {
     var firstname by remember { mutableStateOf("") }
     var firstnameErr by remember { mutableStateOf("") }
 
@@ -222,7 +224,14 @@ fun Signup1(modifier: Modifier = Modifier,navController: NavController) {
 
         Spacer(modifier=Modifier.padding(12.dp))
         Button(
-            onClick = {navController.navigate("sign_up2")},
+            onClick = {
+                viewModel.updateEmail(email)
+                viewModel.updateLastname(lastname)
+                viewModel.updateFirstname(firstname)
+                viewModel.updateBirthDate(birthDate)
+                viewModel.updatePhoneNumber(phoneNumber)
+                navController.navigate("sign_up2")
+                      },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),

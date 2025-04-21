@@ -239,7 +239,7 @@ fun LoginScreen(
                     ClickableText(
                         text = AnnotatedString(text = " Sign-up"),
                         style = TextStyle(color = Color.Blue, fontSize = 16.sp),
-                        onClick = { navController.navigate("sign_up2") })
+                        onClick = { navController.navigate("sign_up1") })
                 }
             }
 

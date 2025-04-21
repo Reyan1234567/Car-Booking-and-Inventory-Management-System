@@ -1,5 +1,9 @@
 package com.example.car_booking_and_inventory_management.viewModels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.frontend.repositories.authRepository
@@ -16,6 +20,37 @@ class SignupViewModel(private val repository: authRepository): ViewModel() {
 
     private val _signupResponse=MutableStateFlow<Result<Signup>?>(null)
     val signupResponse:StateFlow<Result<Signup>?> =_signupResponse.asStateFlow()
+
+     var firstname by mutableStateOf("")
+     var lastname by mutableStateOf("")
+     var birthDate by mutableStateOf("")
+     var phoneNumber by mutableStateOf("")
+     var email by mutableStateOf("")
+     var username by mutableStateOf("")
+     var password by mutableStateOf("")
+
+    fun updateFirstname(value:String){
+        firstname=value
+    }
+    fun updateLastname(value:String){
+        lastname=value
+    }
+
+    fun updateBirthDate(value:String){
+        birthDate=value
+    }
+    fun updatePhoneNumber(value:String){
+        phoneNumber=value
+    }
+    fun updateEmail(value:String){
+        email=value
+    }
+    fun updatePassword(value:String){
+        password=value
+    }
+    fun updateUsername(value:String){
+        username=value
+    }
 
     fun signup(body:Signup){
         viewModelScope.launch{

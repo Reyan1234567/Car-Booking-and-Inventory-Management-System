@@ -21,10 +21,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,18 +36,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.car_booking_and_inventory_management.data.Signup
+import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 import com.example.frontend.R
 import com.example.frontend.ui.theme.Vold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Signup2(modifier: Modifier = Modifier) {
+fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel: SignupViewModel) {
     var username by remember { mutableStateOf("") }
     var usernameErr by remember { mutableStateOf("") }
 
@@ -57,6 +64,26 @@ fun Signup2(modifier: Modifier = Modifier) {
     var passwordVisible by remember { mutableStateOf(false) }
     var rePasswordVisible by remember { mutableStateOf(false) }
 
+    var SignupState=viewModel.signupResponse.collectAsState()
+
+    val context= LocalContext.current
+    val snackbarHostState= remember { SnackbarHostState() }
+
+    LaunchedEffect(SignupState.value) {
+        SignupState.value?.onSuccess{
+            snackbarHostState.showSnackbar("Signup successful")
+            navController.navigate("login"){
+                popUpTo("login"){
+                    inclusive=false
+                }
+            }
+
+        }?.onFailure {
+            snackbarHostState.showSnackbar("Signup failed:${it.message}")
+            navController.navigate("login")
+        }
+
+    }
 
     Column(
         modifier
@@ -200,7 +227,13 @@ fun Signup2(modifier: Modifier = Modifier) {
 
         Spacer(modifier=Modifier.padding(24.dp))
         Button(
-            onClick = {},
+            onClick = {
+                viewModel.updateUsername(username)
+                viewModel.updatePassword(password)
+                val signupData=Signup(viewModel.firstname, viewModel.lastname,
+                    viewModel.phoneNumber,viewModel.birthDate, viewModel.email, viewModel.username,viewModel.password)
+                viewModel.signup(signupData)
+            },
             modifier = Modifier.fillMaxWidth().padding(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFEA6307),

@@ -9,12 +9,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.example.car_booking_and_inventory_management.screens.SignUpScreen
 import com.example.car_booking_and_inventory_management.screens.Signup1
 import com.example.car_booking_and_inventory_management.screens.Signup2
+import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 import com.example.frontend.DataStore.TokenManager
 import com.example.frontend.network.authApi
 import com.example.frontend.repositories.authRepository
@@ -39,11 +42,18 @@ class MainActivity : ComponentActivity() {
                 composable(route="sign_up"){
                     SignUpScreen(modifier = Modifier,repository=repository,navController)
                 }
-                composable(route="sign_up1"){
-                    Signup1(modifier = Modifier,navController)
-                }
-                composable(route="sign_up2") {
-                    Signup2(modifier=Modifier)
+                navigation(
+                    startDestination="sign_up1",
+                    route="sign_up_flow"
+                ){
+                    composable(route="sign_up1"){ backStackEntry->
+                        val viewModel:SignupViewModel=viewModel(backStackEntry)
+                        Signup1(modifier = Modifier,navController,viewModel)
+                    }
+                    composable(route="sign_up2") {backStackEntry->
+                        val viewModel:SignupViewModel=viewModel(backStackEntry)
+                        Signup2(modifier=Modifier,navController, ,viewModel)
+                    }
                 }
             }
         }
