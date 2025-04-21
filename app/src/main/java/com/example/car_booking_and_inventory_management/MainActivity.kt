@@ -13,6 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.screens.SignUpScreen
+import com.example.car_booking_and_inventory_management.screens.Signup1
+import com.example.car_booking_and_inventory_management.screens.Signup2
 import com.example.frontend.DataStore.TokenManager
 import com.example.frontend.network.authApi
 import com.example.frontend.repositories.authRepository
@@ -35,7 +37,13 @@ class MainActivity : ComponentActivity() {
                     LoginScreen(modifier=Modifier.fillMaxSize(),repository,navController,tokenManager)
                 }
                 composable(route="sign_up"){
-                    SignUpScreen(modifier = Modifier)
+                    SignUpScreen(modifier = Modifier,repository=repository,navController)
+                }
+                composable(route="sign_up1"){
+                    Signup1(modifier = Modifier,navController)
+                }
+                composable(route="sign_up2") {
+                    Signup2(modifier=Modifier)
                 }
             }
         }

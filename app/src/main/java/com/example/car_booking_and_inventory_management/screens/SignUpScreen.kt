@@ -329,17 +329,17 @@ fun SignUpScreen(modifier: Modifier = Modifier, repository:authRepository, navCo
 }
 
 
-fun validateEmail(email:String):String{
-    return (if(email.isBlank()){
-         "Email is required"
-    }
-    else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-         "Incorrect email format"
-    }
-    else{
-         ""
-    })
-}
+//fun validateEmail(email:String):String{
+//    return (if(email.isBlank()){
+//         "Email is required"
+//    }
+//    else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+//         "Incorrect email format"
+//    }
+//    else{
+//         ""
+//    })
+//}
 
 fun cantBeEmpty(str:String):String{
     return(if(str.isBlank()){
@@ -349,61 +349,61 @@ fun cantBeEmpty(str:String):String{
         ""
     })
 }
+//
+//fun validatePassword(password:String):String {
+//    return (if (password.isBlank()) {
+//        "Password is required"
+//    } else if (password.length < 6) {
+//        "Password must be above 6 characters"
+//    } else if (password.length > 20) {
+//        "Password must be below 20 characters"
+//    } else {
+//        ""
+//    })
+//}
+//
+//fun validateRePassword(rePassword:String,Password:String):String{
+//    return (if(rePassword.isBlank()){
+//        "You must re-Enter your Password"
+//    }
+//    else if(rePassword!=Password){
+//        "Enter the same Password"
+//    }
+//    else{
+//        ""
+//    })
+//}
+//
+//fun validateUsername(username:String):String {
+//    return (if (username.isBlank()) {
+//        "Username is required"
+//    } else if (username.length < 6) {
+//        "Username must be above 6 characters"
+//    }
+//    else {
+//        ""
+//    })
+//}
 
-fun validatePassword(password:String):String {
-    return (if (password.isBlank()) {
-        "Password is required"
-    } else if (password.length < 6) {
-        "Password must be above 6 characters"
-    } else if (password.length > 20) {
-        "Password must be below 20 characters"
-    } else {
-        ""
-    })
-}
 
-fun validateRePassword(rePassword:String,Password:String):String{
-    return (if(rePassword.isBlank()){
-        "You must re-Enter your Password"
-    }
-    else if(rePassword!=Password){
-        "Enter the same Password"
-    }
-    else{
-        ""
-    })
-}
-
-fun validateUsername(username:String):String {
-    return (if (username.isBlank()) {
-        "Username is required"
-    } else if (username.length < 6) {
-        "Username must be above 6 characters"
-    }
-    else {
-        ""
-    })
-}
-
-
-fun validateBirthDate(birthDate:String):String{
-    val sdf=SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    var BirthDate=sdf.parse(birthDate)!!
-    var startDate="01/01/1970"
-    var endDate="01/01/2010"
-
-    var StartDate=sdf.parse(startDate)!!
-    var EndDate=sdf.parse(endDate)!!
-
-    return (if(BirthDate.before(StartDate)){
-        "Enter your real age"
-    }else if(EndDate.before(BirthDate)){
-        "You must be 18, but just set it to 2007"
-    }else{
-        ""
-    })
-
-}
+//fun validateBirthDate(birthDate:String):String{
+//    val sdf=SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+//    var BirthDate=sdf.parse(birthDate)!!
+//    var startDate="01/01/1970"
+//    var endDate="01/01/2010"
+//
+//    var StartDate=sdf.parse(startDate)!!
+//    var EndDate=sdf.parse(endDate)!!
+//
+//    return (if(BirthDate.before(StartDate)){
+//        "Enter your real age"
+//    }else if(EndDate.before(BirthDate)){
+//        "You must be 18, but just set it to 2007"
+//    }else{
+//        ""
+//    })
+//
+//}
 
 
 

@@ -3,6 +3,7 @@ package com.example.frontend.screens
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,14 +12,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -43,6 +50,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -74,6 +82,8 @@ fun LoginScreen(
     var username by remember {mutableStateOf("")}
     var password by remember {mutableStateOf("")}
 
+    var passwordVisible by remember { mutableStateOf(false) }
+
     var isLoading = authViewModel.isLoading.collectAsState()
 
     val snackbarHostState=remember{ SnackbarHostState() }
@@ -92,16 +102,14 @@ fun LoginScreen(
     Scaffold(
         snackbarHost={SnackbarHost(hostState=snackbarHostState)}
     ){
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.background),
-                contentDescription = "backgroundImage",
-                modifier = Modifier.fillMaxSize()
-            )
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .imePadding()
+                    .verticalScroll(rememberScrollState())
+                    ,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -131,7 +139,9 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(1.dp,Color.LightGray, RoundedCornerShape(16.dp))
+                        ,
                     colors = TextFieldDefaults.textFieldColors(
                         unfocusedIndicatorColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
@@ -142,17 +152,42 @@ fun LoginScreen(
                 TextField(
                     value = password,
                     onValueChange = { password = it },
+                    visualTransformation = if(passwordVisible){
+                        VisualTransformation.None
+                    }
+                    else{
+                        PasswordVisualTransformation()
+                    },
                     placeholder = {
                         Text(
                             text = "Password",
                             style = TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))
                         )
+                    }                    ,trailingIcon = {IconButton(
+                        onClick = {passwordVisible=!passwordVisible}
+                    ) {
+                        if(passwordVisible){
+                            Icon(
+                                painter = painterResource(R.drawable.eye),
+                                contentDescription = "eye",
+                                modifier=Modifier.size(20.dp)
+                            )
+                        }
+                        else{
+                            Icon(
+                                painter = painterResource(R.drawable.eyeslash),
+                                contentDescription = "eye",
+                                modifier=Modifier.size(20.dp)
+                            )
+                        }
+
+                    }
                     },
-                    visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(1.dp,Color.LightGray, RoundedCornerShape(16.dp)),
                     colors = TextFieldDefaults.textFieldColors(
                         unfocusedIndicatorColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
@@ -204,10 +239,10 @@ fun LoginScreen(
                     ClickableText(
                         text = AnnotatedString(text = " Sign-up"),
                         style = TextStyle(color = Color.Blue, fontSize = 16.sp),
-                        onClick = { navController.navigate("sign_up") })
+                        onClick = { navController.navigate("sign_up2") })
                 }
             }
-        }
+
     }
 }
 
