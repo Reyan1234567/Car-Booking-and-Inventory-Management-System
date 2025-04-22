@@ -55,12 +55,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.car_booking_and_inventory_management.R
 import com.example.frontend.DataStore.TokenManager
-import com.example.frontend.R
 import com.example.frontend.data.LoginInput
 import com.example.frontend.repositories.authRepository
 import com.example.frontend.ui.theme.Vold
-import com.example.frontend.viewModelFactory.AuthViewModelFactory
 import com.example.frontend.viewModels.AuthViewModel
 
 
@@ -69,12 +68,9 @@ import com.example.frontend.viewModels.AuthViewModel
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    repository: authRepository,
     navController: NavController,
-    tokenManager: TokenManager
+    authViewModel: AuthViewModel=viewModel()
 ) {
-    val factory=AuthViewModelFactory(repository,tokenManager)
-    val authViewModel: AuthViewModel = viewModel(factory=factory)
     val loginState=authViewModel.loginResult.collectAsState()
 
     val context= LocalContext.current
@@ -94,6 +90,9 @@ fun LoginScreen(
             val accessToken=loginData.accessToken
             val refreshToken=loginData.refreshToken
             Toast.makeText(context, "Login successful! Welcome ${username}", Toast.LENGTH_LONG).show()
+            navController.navigate("cars") {
+                popUpTo("login") { inclusive = true }
+            }
         }?.onFailure {
             Toast.makeText(context, "Login failed: ${it.message}", Toast.LENGTH_LONG).show()
         }
@@ -210,6 +209,10 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
+                        if (username.isBlank() || password.isBlank()) {
+                            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
                         val user = LoginInput(username = username, password = password)
                         authViewModel.login(user)
                     },

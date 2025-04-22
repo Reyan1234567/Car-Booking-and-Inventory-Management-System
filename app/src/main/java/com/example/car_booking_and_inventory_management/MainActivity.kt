@@ -14,7 +14,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.example.car_booking_and_inventory_management.screens.SignUpScreen
 import com.example.car_booking_and_inventory_management.screens.Signup1
 import com.example.car_booking_and_inventory_management.screens.Signup2
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
@@ -23,24 +22,18 @@ import com.example.frontend.network.authApi
 import com.example.frontend.repositories.authRepository
 import com.example.frontend.screens.LoginScreen
 import com.example.frontend.ui.theme.FrontendTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        val tokenManager:TokenManager= TokenManager(context =applicationContext )
-        val api=authApi.provideRetrofit(tokenManager).create(authApi::class.java)
-        val repository=authRepository(api)
-
         setContent {
             val navController=rememberNavController()
             NavHost(navController=navController, startDestination="login"){
                 composable(route="login"){
-                    LoginScreen(modifier=Modifier.fillMaxSize(),repository,navController,tokenManager)
-                }
-                composable(route="sign_up"){
-                    SignUpScreen(modifier = Modifier,repository=repository,navController)
+                    LoginScreen(modifier=Modifier.fillMaxSize(),navController)
                 }
                 navigation(
                     startDestination="sign_up1",
@@ -52,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route="sign_up2") {backStackEntry->
                         val viewModel:SignupViewModel=viewModel(backStackEntry)
-                        Signup2(modifier=Modifier,navController, ,viewModel)
+                        Signup2(modifier=Modifier,navController,viewModel)
                     }
                 }
             }

@@ -11,6 +11,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface authApi {
@@ -23,27 +24,29 @@ interface authApi {
     @POST("auth/signup")
     suspend fun signup(@Body userInfo:Signup):Response<Signup>
 
-    companion object{
-        private const val BASE_URL="https://localhost:4000/"
-
-        fun provideRetrofit(tokenManager:TokenManager):Retrofit{
-            val authApi=Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(authApi::class.java)
-
-            val client= OkHttpClient.Builder()
-                .addInterceptor(AuthInterceptor(tokenManager,authApi))
-                .build()
-
-            return Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build()
-
-        }
-
-    }
 }
+
+
+//    companion object{
+//        private const val BASE_URL="https://localhost:4000/"
+//
+//        fun provideRetrofit(tokenManager:TokenManager):Retrofit{
+//            val authApi=Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build()
+//                .create(authApi::class.java)
+//
+//            val client= OkHttpClient.Builder()
+//                .addInterceptor(AuthInterceptor(tokenManager,authApi))
+//                .build()
+//
+//            return Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .client(client)
+//                .build()
+//
+//        }
+//
+//    }

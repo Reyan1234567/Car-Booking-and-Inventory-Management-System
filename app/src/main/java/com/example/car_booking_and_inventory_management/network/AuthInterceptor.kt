@@ -27,29 +27,33 @@ class AuthInterceptor(
             response.close()
 
             val refreshToken=runBlocking{tokenManager.getRefreshToken()}
+            if (refreshToken == null) {
+                // No refresh token available, user needs to login again
+                return response
+            }
 
             val newTokenResponse: retrofit2.Response<LoginResult>?=try{
                 runBlocking {
-                    authApi.refresh(RefreshRequest(refreshToken!!))
+                    authApi.refresh(RefreshRequest(refreshToken))
                 }
             }
             catch (e:Exception){
                 null
             }
-            if(newTokenResponse!=null){
+            if (newTokenResponse?.isSuccessful == true && newTokenResponse.body() != null) {
                 runBlocking{
-                    newTokenResponse.body()
-                        ?.let { tokenManager.saveTokens(it.accessToken, it.refreshToken) }
+                    newTokenResponse.body()?.let {tokenManager.saveTokens(it.accessToken, it.refreshToken)}
+                }
+                val at = newTokenResponse.body()?.accessToken
+                if (at != null) {
+                    val retriedRequest=request.newBuilder()
+                        .addHeader("Authorization","Bearer $at")
+                        .build()
+                    return chain.proceed(retriedRequest)
                 }
             }
-            val at= newTokenResponse?.body()
-                ?.let{it.accessToken}
-
-            val retriedRequest=request.newBuilder()
-                .addHeader("Authorization","Bearer $at")
-                .build()
-
-            return chain.proceed(retriedRequest)
+            // If we get here, refresh failed or new token is null
+            return response
         }
         return response
     }

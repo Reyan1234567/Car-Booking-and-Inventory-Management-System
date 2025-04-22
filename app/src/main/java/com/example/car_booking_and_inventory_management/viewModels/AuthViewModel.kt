@@ -11,14 +11,17 @@ import com.example.frontend.DataStore.TokenManager
 import com.example.frontend.data.LoginInput
 import com.example.frontend.data.LoginResult
 import com.example.frontend.repositories.authRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.Result
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import javax.inject.Inject
 
-class AuthViewModel(private val repository:authRepository, private val tokenManager: TokenManager): ViewModel(){
+@HiltViewModel
+class AuthViewModel @Inject constructor(private val repository:authRepository): ViewModel(){
     private val _loginResult= MutableStateFlow<Result<LoginResult>?>(null)
     val loginResult: StateFlow<Result<LoginResult>?> = _loginResult.asStateFlow()
 
@@ -26,19 +29,28 @@ class AuthViewModel(private val repository:authRepository, private val tokenMana
             fun login(user:LoginInput){
                 viewModelScope.launch{
                     try{
+                        isLoading.value = true
                         val response=repository.login(user)
-                        isLoading.value=true
-                        if(response.isSuccessful){
+                        if(response.isSuccessful && response.body() != null){
                             _loginResult.value=Result.success(response.body()!!)
-                            response.body()?.let {tokenManager.saveTokens(it.accessToken,it.refreshToken)  }
+                            response.body()?.let {repository.saveTokens(it.accessToken,it.refreshToken)}
                         }
                         else{
-                            _loginResult.value=Result.failure(Exception("Login failed:${response.code()}"))
+                            val errorMessage = when(response.code()) {
+                                401 -> "Invalid username or password"
+                                403 -> "Account is locked"
+                                404 -> "User not found"
+                                500 -> "Server error, please try again later"
+                                else -> "Login failed: ${response.message()}"
+                            }
+                            _loginResult.value=Result.failure(Exception(errorMessage))
                         }
-                        isLoading.value=false
                     }
                     catch(e:Exception){
-                        _loginResult.value=Result.failure(e)
+                        _loginResult.value=Result.failure(Exception("Network error: ${e.message}"))
+                    }
+                    finally {
+                        isLoading.value = false
                     }
                 }
             }

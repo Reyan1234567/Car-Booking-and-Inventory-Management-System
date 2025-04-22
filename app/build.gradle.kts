@@ -2,14 +2,16 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
-    namespace = "com.example.frontend"
+    namespace = "com.example.car_booking_and_inventory_management"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.frontend"
+        applicationId = "com.example.car_booking_and_inventory_management"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -28,11 +30,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
@@ -65,5 +67,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 //    implementation(libs.androidx.compose.bom.v20250200)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+}
 
+kapt {
+    correctErrorTypes = true
 }
