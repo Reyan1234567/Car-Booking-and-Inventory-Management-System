@@ -1,6 +1,5 @@
-package com.example.frontend.ui.theme
+package com.example.car_booking_and_inventory_management.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

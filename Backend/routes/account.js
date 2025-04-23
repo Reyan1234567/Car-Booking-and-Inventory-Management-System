@@ -1,5 +1,5 @@
 import { Router } from "express";
-import jwt from "jsonwebtokens";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/users.js";
 import { config } from "dotenv";
@@ -8,100 +8,156 @@ import Refresh from "../models/refresh.js";
 const router = Router();
 config()
 
-const accessToken_Secret = process.env.ACCESSTOKEN;
-const refreshToken_Secret = process.env.REFRESHTOKEN;
+const accessToken_Secret = process.env.ACCESS_TOKEN;
+const refreshToken_Secret = process.env.REFRESH_TOKEN;
+
 
 //Sign-up
-router.post("/signup", async (req, res) => {
-  const { body } = req;
-  if (!body.username || !body.email || !body.password) {
-    return res.status(400).send("All fields must be filled");
-  }
-  const userExistence = User.findOne({ username: body.username });
-  if (userExistence) {
-    return res.status(400).send("User exists");
-  }
-  //remember to add password length and some strength detection
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const isValidEmail = emailRegex.test(body.email);
-  if (!isValidEmail) {
-    return res.status(400).send("email is not valid");
-  }
-  const salt = 10;
+router.post("/auth/signup", async (req, res) => {
   try {
+    const { body } = req;
+    if (!body.username || !body.email || !body.password) {
+      return res.status(400).json({ error: "All fields must be filled" });
+    }
+
+    const userExistence = await User.findOne({ username: body.username });
+    if (userExistence) {
+      return res.status(400).json({ error: "Username already exists" });
+    }
+
+    const emailExistence = await User.findOne({ email: body.email });
+    if (emailExistence) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValidEmail = emailRegex.test(body.email);
+    if (!isValidEmail) {
+      return res.status(400).json({ error: "Email is not valid" });
+    }
+
+    const salt = 10;
     const hashedPassword = await bcrypt.hash(body.password, salt);
-    const response = new User({
+    
+    const newUser = new User({
       username: body.username,
       password: hashedPassword,
-      email: body.username,
+      email: body.email,
+      firstName: body.firstname,
+      lastName: body.lastname,
+      birthDate: body.birthDate,
+      phoneNumber: body.phoneNumber,
     });
-    const newUser = response.save();
-    res.status(200).send(newUser);
+
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
   } catch (error) {
-    console.log(error);
-    res.send(error.message);
+    console.error("Signup error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
+router.get('getUsers',async(req,res)=>{
+    const response=User.findAll()
+    res.send(response)
+})
+
 //Sign-in 
-router.post("/signin", async (req, res) => {
-  const { body } = req;
-  if (!body.username || !body.password) {
-    return res.status(400).send("All fields must be filled");
-  }
-  const userExist = User.findOne({ username: body.username });
-  if (userExist) {
-    return res.status(404).send("Unauthorized");
-  }
-  const decrypt = await bcrypt.compare(body.password, userExist.password);
-  if (decrypt) {
-    return res.status(404).send("Unauthorized");
-  }
+router.post("/auth/signin", async (req, res) => {
   try {
+    console.log(accessToken_Secret)
+    console.log(refreshToken_Secret)
+    const { body } = req;
+    if (!body.username || !body.password) {
+      return res.status(400).json({ error: "All fields must be filled" });
+    }
+
+    const user = await User.findOne({ username: body.username });
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(body.password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
     const accessToken = jwt.sign(
-      { userId: body._id, username: body.username },
+      { userId: user._id, username: user.username },
       accessToken_Secret,
       { expiresIn: "15m" }
     );
+
     const refreshToken = jwt.sign(
-      { userId: body._id, username: body.username },
+      { userId: user._id, username: user.username },
       refreshToken_Secret,
       { expiresIn: "3d" }
     );
-    req.user=userExist
-    res.status(200).send({ accessToken: accessToken, refreshToken: refreshToken });
+
+    // Save refresh token
+    await new Refresh({ token: refreshToken }).save();
+
+    res.status(200).json({ 
+      accessToken, 
+      refreshToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
   } catch (error) {
-    console.log(error);
-    res.send(error.message);
+    console.error("Signin error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 //RefreshToken 
-router.post("/refresh", (req, res) => {
-  const { body } = req;
-  const refresh = body.refreshToken;
-  if (!refresh) {
-    return res.status(401).send("Unauthorized");
-  }
-  if (!Refresh.findOne({ refreshToken: refresh })) {
-    return res.status(401).send("Unauthorized");
-  }
-  const verify = jwt.verify(refreshToken_Secret, refresh);
-  if (!verify) {
-    return res.status(401).send("Unauthorized");
-  }
-
+router.post("/auth/refresh", async (req, res) => {
   try {
-    const accessToken = jwt.sign(verify, accessToken, { expiresIn: "15m" });
-    const refreshToken = jwt.sign(verify, refreshToken, { expiresIn: "3d" });
-    res
-      .status(200)
-      .send({ accessToken: accessToken, refreshToken: refreshToken });
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(401).json({ error: "Refresh token is required" });
+    }
+
+    const storedToken = await Refresh.findOne({ token: refreshToken });
+    if (!storedToken) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const decoded = jwt.verify(refreshToken, refreshToken_Secret);
+    if (!decoded) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    const accessToken = jwt.sign(
+      { userId: decoded.userId, username: decoded.username },
+      accessToken_Secret,
+      { expiresIn: "15m" }
+    );
+
+    const newRefreshToken = jwt.sign(
+      { userId: decoded.userId, username: decoded.username },
+      refreshToken_Secret,
+      { expiresIn: "3d" }
+    );
+
+    // Update stored refresh token
+    await Refresh.findOneAndUpdate(
+      { token: refreshToken },
+      { token: newRefreshToken }
+    );
+
+    res.status(200).json({ 
+      accessToken, 
+      refreshToken: newRefreshToken 
+    });
   } catch (error) {
-    console.log(error);
-    res.send(error.message);
+    console.error("Refresh token error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
 //check if field is empty
 router.get("/fieldCheck",(req,res)=>{
   const {user}=req
@@ -116,4 +172,5 @@ router.get("/fieldCheck",(req,res)=>{
       
   }
 })
+
 export default router;

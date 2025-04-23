@@ -1,32 +1,27 @@
-package com.example.frontend.viewModels
+package com.example.car_booking_and_inventory_management.viewModels
 
-import android.media.session.MediaSession.Token
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.frontend.DataStore.TokenManager
-import com.example.frontend.data.LoginInput
-import com.example.frontend.data.LoginResult
-import com.example.frontend.repositories.authRepository
+import com.example.car_booking_and_inventory_management.data.LoginInput
+import com.example.car_booking_and_inventory_management.data.LoginResult
+import com.example.car_booking_and_inventory_management.repositories.authRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.Result
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(private val repository:authRepository): ViewModel(){
+class AuthViewModel @Inject constructor(private val repository: authRepository): ViewModel(){
     private val _loginResult= MutableStateFlow<Result<LoginResult>?>(null)
     val loginResult: StateFlow<Result<LoginResult>?> = _loginResult.asStateFlow()
 
     var isLoading =MutableStateFlow(false)
-            fun login(user:LoginInput){
+            fun login(user: LoginInput){
                 viewModelScope.launch{
                     try{
                         isLoading.value = true
@@ -47,6 +42,7 @@ class AuthViewModel @Inject constructor(private val repository:authRepository): 
                         }
                     }
                     catch(e:Exception){
+                        Log.e(TAG,"some error",e)
                         _loginResult.value=Result.failure(Exception("Network error: ${e.message}"))
                     }
                     finally {

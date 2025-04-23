@@ -1,9 +1,11 @@
 package com.example.car_booking_and_inventory_management.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,14 +46,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
-import com.example.frontend.R
-import com.example.frontend.ui.theme.Vold
+//import com.example.frontend.R
+import com.example.car_booking_and_inventory_management.ui.theme.Vold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel: SignupViewModel) {
+fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewModel: SignupViewModel) {
     var username by remember { mutableStateOf("") }
     var usernameErr by remember { mutableStateOf("") }
 
@@ -65,24 +68,34 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel
     var rePasswordVisible by remember { mutableStateOf(false) }
 
     var SignupState=viewModel.signupResponse.collectAsState()
+    var isLoading=viewModel.isLoading.collectAsState()
 
     val context= LocalContext.current
     val snackbarHostState= remember { SnackbarHostState() }
 
+    Log.v(TAG,"${SignupState.value}")
+
     LaunchedEffect(SignupState.value) {
-        SignupState.value?.onSuccess{
-            snackbarHostState.showSnackbar("Signup successful")
-            navController.navigate("login"){
-                popUpTo("login"){
-                    inclusive=false
+        Log.v(TAG,"verbose message: Signup Starting")
+        Log.v(TAG, "SignupState is: ${SignupState.value}")
+        val state = SignupState.value
+        if (state != null) {
+            if (state.isSuccess) {
+                snackbarHostState.showSnackbar("Signup successful")
+                Log.v(TAG, "Signup successful")
+                navController.navigate("login") {
+                    popUpTo("login") { inclusive = false }
                 }
+            } else {
+                val error = state.exceptionOrNull()
+                snackbarHostState.showSnackbar("Signup failed: ${error?.message}")
+                Log.v(TAG, "Signup failed: ${error?.message}")
+                navController.navigate("login")
             }
-
-        }?.onFailure {
-            snackbarHostState.showSnackbar("Signup failed:${it.message}")
-            navController.navigate("login")
         }
-
+        else{
+            Log.v(TAG,"Shiii state is null")
+        }
     }
 
     Column(
@@ -97,7 +110,8 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel
         Image(
             painter = painterResource(R.drawable.polo),
             contentDescription = "Logo",
-            modifier=Modifier.width(100.dp)
+            modifier=Modifier
+                .width(100.dp)
                 .clip(RoundedCornerShape(20.dp))
         )
         Spacer(modifier=Modifier.padding(20.dp))
@@ -112,10 +126,11 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel
                     usernameErr= validateUsername(it)
                 },
                 placeholder = { Text("JohnDoe", style= TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))) },
-                modifier=Modifier.fillMaxWidth()
+                modifier=Modifier
+                    .fillMaxWidth()
                     .padding(8.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp,Color.LightGray, RoundedCornerShape(16.dp)),
+                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
                 colors= TextFieldDefaults.textFieldColors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -141,10 +156,11 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel
                     PasswordVisualTransformation()
                 },
                 placeholder = { Text("*************" , style= TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))) },
-                modifier=Modifier.fillMaxWidth()
+                modifier=Modifier
+                    .fillMaxWidth()
                     .padding(8.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp,Color.LightGray, RoundedCornerShape(16.dp)),
+                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
                 colors= TextFieldDefaults.textFieldColors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -185,10 +201,11 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel
                     rePasswordErr= validateRePassword(it,password)
                 },
                 placeholder = { Text("*************" , style= TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))) },
-                modifier=Modifier.fillMaxWidth()
+                modifier=Modifier
+                    .fillMaxWidth()
                     .padding(8.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp,Color.LightGray, RoundedCornerShape(16.dp)),
+                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
                 colors= TextFieldDefaults.textFieldColors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -230,11 +247,16 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel
             onClick = {
                 viewModel.updateUsername(username)
                 viewModel.updatePassword(password)
+                Log.v(TAG, "button clicked")
+                Log.v(TAG, "${viewModel.firstname}, ${viewModel.lastname},${viewModel.phoneNumber},${viewModel.birthDate}, ${viewModel.email}, ${viewModel.username}, ${viewModel.password}")
                 val signupData=Signup(viewModel.firstname, viewModel.lastname,
                     viewModel.phoneNumber,viewModel.birthDate, viewModel.email, viewModel.username,viewModel.password)
                 viewModel.signup(signupData)
+                Log.v(TAG, "${SignupState.value}")
             },
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFEA6307),
                 contentColor= Color.White
@@ -246,7 +268,16 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController,viewModel
                 false
             }
         ) {
-            Text("Sign-up")
+            if (isLoading.value) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Text("Sign-up")
+            }
         }
 
 

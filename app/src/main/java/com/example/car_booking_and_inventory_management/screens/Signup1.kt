@@ -1,9 +1,7 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,16 +37,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
-import com.example.frontend.R
-import com.example.frontend.ui.theme.Inter
-import com.example.frontend.ui.theme.Vold
+//import com.example.frontend.R
+import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -91,7 +87,7 @@ fun Signup1(modifier: Modifier = Modifier,navController: NavController, viewMode
                 .clip(RoundedCornerShape(20.dp))
         )
         Spacer(modifier=Modifier.padding(12.dp))
-        Text("Signup", fontFamily=Vold, fontSize=20.sp)
+        Text("Signup", fontFamily= Vold, fontSize=20.sp)
         Spacer(modifier=Modifier.padding(12.dp))
         Column(){
             Text("Firstname",modifier=Modifier.padding(start=12.dp))

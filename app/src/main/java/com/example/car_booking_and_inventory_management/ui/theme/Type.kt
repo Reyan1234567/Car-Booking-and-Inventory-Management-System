@@ -1,4 +1,4 @@
-package com.example.frontend.ui.theme
+package com.example.car_booking_and_inventory_management.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

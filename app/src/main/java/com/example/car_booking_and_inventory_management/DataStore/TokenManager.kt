@@ -1,17 +1,15 @@
-package com.example.frontend.DataStore
+package com.example.car_booking_and_inventory_management.DataStore
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
-import javax.inject.Inject
 
 //Adds a dataStore to every Context, bound to a preferences file named "auth_prefs".
 private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
 
-class TokenManager @Inject constructor(private val context: Context) {
+class TokenManager(private val context: Context) {
 
     companion object {
         val ACCESS_TOKEN = stringPreferencesKey("ACCESS_TOKEN")

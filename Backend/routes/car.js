@@ -1,4 +1,4 @@
-import Cars from "../models/cars"
+import Cars from "../models/cars.js"
 import {Router} from "express"
 
 const router=Router()

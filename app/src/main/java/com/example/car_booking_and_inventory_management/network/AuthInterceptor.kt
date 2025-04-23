@@ -1,8 +1,8 @@
-package com.example.frontend.network
+package com.example.car_booking_and_inventory_management.network
 
-import com.example.frontend.DataStore.TokenManager
-import com.example.frontend.data.LoginResult
-import com.example.frontend.data.RefreshRequest
+import com.example.car_booking_and_inventory_management.DataStore.TokenManager
+import com.example.car_booking_and_inventory_management.data.LoginResult
+import com.example.car_booking_and_inventory_management.data.RefreshRequest
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 
@@ -10,7 +10,7 @@ import okhttp3.Interceptor
 
 class AuthInterceptor(
     private val tokenManager: TokenManager,
-    private val authApi:authApi
+    private val authApi: authApi
 ):Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         var request=chain.request()

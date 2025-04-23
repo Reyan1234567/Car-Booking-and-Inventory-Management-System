@@ -1,4 +1,4 @@
-import Booking from "../models/bookings";
+import Booking from "../models/bookings.js";
 import { Router } from "express";
 
 const router = Router();

@@ -20,10 +20,10 @@ const userSchema = new mongoose.Schema({
   },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  contactNumber: { type: String, required: true, trim:true, unique:true },
-  licenseNumber: { type: String, required: true },
-  licenseExpiry: { type: Date, required: true },
-  age: { type: Number },
+  phoneNumber: { type: String, required: true, trim:true, unique:true },
+  licenseNumber: { type: String},
+  licenseExpiry: { type: Date },
+  birthDate: { type: String, required :true},
   history: [
     {
       type: mongoose.Schema.Types.ObjectId,

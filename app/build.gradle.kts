@@ -69,6 +69,7 @@ dependencies {
 //    implementation(libs.androidx.compose.bom.v20250200)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation (libs.androidx.hilt.navigation.compose) // or latest version
 }
 
 kapt {

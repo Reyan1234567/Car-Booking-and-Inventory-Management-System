@@ -3,14 +3,9 @@ import { config } from "dotenv";
 config();
 
 const connect = async () => {
-    try {
-      await mongoose.connect(process.env.DB, () => {
-        console.log("database connected successfully");
-      });
-    
-  } catch (error) {
-    console.log(error)
-  }
+  await mongoose.connect(process.env.DB)
+    .then(()=>console.log("Mongodb Connected"))
+    .catch(err=>console.log(`Connectrion Error:${err}`))
 };
 
 

@@ -1,12 +1,14 @@
 package com.example.car_booking_and_inventory_management.viewModels
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.car_booking_and_inventory_management.data.Signup
-import com.example.frontend.repositories.authRepository
+import com.example.car_booking_and_inventory_management.repositories.authRepository
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,8 @@ class SignupViewModel @Inject constructor(private val repository: authRepository
 
     private val _signupResponse=MutableStateFlow<Result<Signup>?>(null)
     val signupResponse:StateFlow<Result<Signup>?> =_signupResponse.asStateFlow()
+
+    var isLoading = MutableStateFlow(false)
 
      var firstname by mutableStateOf("")
      var lastname by mutableStateOf("")
@@ -41,15 +45,19 @@ class SignupViewModel @Inject constructor(private val repository: authRepository
     fun updateBirthDate(value:String){
         birthDate=value
     }
+
     fun updatePhoneNumber(value:String){
         phoneNumber=value
     }
+
     fun updateEmail(value:String){
         email=value
     }
+
     fun updatePassword(value:String){
         password=value
     }
+
     fun updateUsername(value:String){
         username=value
     }
@@ -57,16 +65,24 @@ class SignupViewModel @Inject constructor(private val repository: authRepository
     fun signup(body:Signup){
         viewModelScope.launch{
             try{
-                var response=repository.signup(body)
+                isLoading.value=true
+                Log.v(TAG, "Inside the function")
+                val response=repository.signup(body)
                 if(response.isSuccessful){
+                    Log.v(TAG, "Inside the successful function")
                     _signupResponse.value=Result.success(response.body()!!)
                 }
                 else{
+                    Log.v(TAG, "Inside the failure function")
                     _signupResponse.value=Result.failure(Exception("Signup Failed: ${response.errorBody()?.toString()}"))
                 }
             }
             catch (e:Exception){
-
+                Log.e(TAG, "Exception during signup:catch",e)
+                _signupResponse.value=Result.failure(e)
+            }
+            finally {
+                isLoading.value=false
             }
         }
     }
