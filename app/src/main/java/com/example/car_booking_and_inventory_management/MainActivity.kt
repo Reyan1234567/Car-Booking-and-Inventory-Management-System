@@ -16,11 +16,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.car_booking_and_inventory_management.screens.CarSearchFilter
 import com.example.car_booking_and_inventory_management.screens.Signup1
 import com.example.car_booking_and_inventory_management.screens.Signup2
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 import com.example.car_booking_and_inventory_management.screens.LoginScreen
+import com.example.car_booking_and_inventory_management.screens.SearchScreen
+import com.example.car_booking_and_inventory_management.screens.SearchScreen1
 import com.example.car_booking_and_inventory_management.ui.theme.FrontendTheme
+import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,9 +34,41 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController=rememberNavController()
-            NavHost(navController=navController, startDestination="login"){
+            NavHost(navController=navController, startDestination="home"){
                 composable(route="login"){
                     LoginScreen(modifier=Modifier.fillMaxSize(),navController)
+                }
+                navigation(
+                    startDestination = "carSearchFilter",
+                    route="home"
+                ){
+                    composable(route="carSearchFilter") {backStackEntry->
+                        val parentEntry=remember(backStackEntry){
+                            navController.getBackStackEntry("home")
+                        }
+                        val viewModel:CarFilterViewModel= hiltViewModel(backStackEntry)
+                        CarSearchFilter(modifier = Modifier,navController, viewModel)
+                    }
+                    composable(route="searchPickups") {backStackEntry->
+                        val parentEntry=remember(backStackEntry){
+                            navController.getBackStackEntry("home")
+                        }
+                        val viewModel:CarFilterViewModel= hiltViewModel(backStackEntry)
+                        SearchScreen(modifier = Modifier,navController, viewModel)
+                    }
+                    composable(route="searchDropOffs") {backStackEntry->
+                        val parentEntry=remember(backStackEntry){
+                            navController.getBackStackEntry("home")
+                        }
+                        val viewModel:CarFilterViewModel= hiltViewModel(backStackEntry)
+                        SearchScreen1(modifier = Modifier,navController, viewModel)
+                    }
+                }
+                composable(route="history"){
+
+                }
+                composable(route="profile"){
+
                 }
                 navigation(
                     startDestination="sign_up1",
@@ -55,21 +91,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FrontendTheme {
-        Greeting("Android")
     }
 }

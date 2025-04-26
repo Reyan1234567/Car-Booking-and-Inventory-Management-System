@@ -55,6 +55,32 @@ router.put("cars/:id",async(req,res)=>{
 
 
 
+router.post("api/filteredCars", async(req,res)=>{
+    const {body}=req.body
+
+    try{
+        const convertToDate=(stringDate)=>{
+        const [date,month,year]=stringDate.split("/")
+        const newDate=newDate(date,month-1,year)
+        return newDate
+    }
+
+    const newStartDate=convertToDate(body.startDate)
+
+    const filteredCars = await Cars.find({
+        endDate: { $lt: newStartDate }
+    });
+
+    res.json(filteredCars).status(200)
+}
+    catch(err){
+        console.log(err)
+        res.send(err.message).status(404)
+    }
+})
+
+
+
 
 
 

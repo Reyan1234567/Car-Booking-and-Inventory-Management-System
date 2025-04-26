@@ -1,0 +1,108 @@
+package com.example.car_booking_and_inventory_management.viewModels
+
+import android.content.ContentValues.TAG
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import com.example.car_booking_and_inventory_management.data.Location
+import com.example.car_booking_and_inventory_management.repositories.CarFilterRepository
+import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import androidx.lifecycle.viewModelScope
+import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarFilters
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+
+
+@HiltViewModel
+class CarFilterViewModel @Inject constructor(private val repository: CarFilterRepository):
+    ViewModel() {
+
+    private val _carsGetResponse= MutableStateFlow<Result<List<Location>>?>(null)
+    val carsGetResponse: StateFlow<Result<List<Location>>?> =_carsGetResponse.asStateFlow()
+
+    private val _carsFilterResponse= MutableStateFlow<Result<List<Car>>?>(null)
+    val carsFilterResponse: StateFlow<Result<List<Car>>?> =_carsFilterResponse.asStateFlow()
+
+    var isLoading by mutableStateOf(false)
+
+    var pickUp by  mutableStateOf("Select destination")
+    var dropOff by  mutableStateOf("Select destination")
+    var startDate by  mutableStateOf("01/11/2025")
+    var startTime by  mutableStateOf("09:00 am")
+    var endDate by  mutableStateOf("01/11/2025")
+    var endTime by  mutableStateOf("09:00 am")
+
+
+    fun updatePickUp(pickup:String){
+        pickUp=pickup
+    }
+
+    fun updateDropOff(dropoff:String){
+        dropOff=dropoff
+    }
+
+    fun updateStartDate(startdate:String){
+        startDate=startdate
+    }
+
+    fun updateStartTime(starttime:String){
+        startTime=starttime
+    }
+
+    fun updateEndDate(enddate:String){
+        endDate=enddate
+    }
+
+    fun updateEndTime(endtime:String){
+        endTime=endtime
+    }
+
+    fun getLocations(query:String){
+        viewModelScope.launch{
+            try{
+                val result=repository.getLocations(query)
+               if(result.isSuccessful){
+                    _carsGetResponse.value=Result.success(result.body()!!)
+               }
+                else{
+                    _carsGetResponse.value=Result.failure(Exception("${result.errorBody()?.toString()}") )
+               }
+            }
+            catch(e:Exception){
+                Log.v(TAG, "inside the catch statement")
+                _carsGetResponse.value=Result.failure(e)
+
+            }
+        }
+    }
+
+    fun getFilteredCars(filters:CarFilters){
+        viewModelScope.launch {
+            try{
+                isLoading=true
+                val result=repository.getFilteredCars(filters)
+                if(result.isSuccessful){
+                    _carsFilterResponse.value=Result.success(result.body()!!)
+                }
+                else{
+                    _carsFilterResponse.value=Result.failure((Exception("${result.errorBody()?.toString()}")))
+                }
+            }
+            catch(e:Exception){
+                _carsFilterResponse.value=Result.failure(e)
+            }
+            finally {
+                isLoading=false
+            }
+        }
+    }
+
+}

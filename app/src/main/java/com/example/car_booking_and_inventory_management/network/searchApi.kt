@@ -1,0 +1,24 @@
+package com.example.car_booking_and_inventory_management.network
+
+import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarFilters
+import com.example.car_booking_and_inventory_management.data.Location
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Query
+
+interface searchApi {
+
+    @GET("api/cars")
+    suspend fun getAllCars(): Response<List<Car>>
+
+    @GET("api/locations")
+    suspend fun getLocations(@Query("search") search:String):Response<List<Location>>
+
+    @POST("api/filteredCars")
+    suspend fun getFilteredCars(@Body filters:CarFilters):Response<List<Car>>
+
+
+}

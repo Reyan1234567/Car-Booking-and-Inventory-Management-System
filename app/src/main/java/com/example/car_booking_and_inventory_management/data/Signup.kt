@@ -7,7 +7,7 @@ data class Signup(
     val firstname:String,
     val lastname:String,
     val phoneNumber: String,
-    val birthDate: String,
+    val birthDate: Date,
     val email: String,
     val username:String,
     val password:String,

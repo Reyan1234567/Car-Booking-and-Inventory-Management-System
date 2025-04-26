@@ -30,7 +30,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         return api.login(body)
     }
 
-    suspend fun signup(body:Signup):Response<Signup>{
+    suspend fun signup(body: Signup):Response<Signup>{
         return api.signup(body)
     }
 

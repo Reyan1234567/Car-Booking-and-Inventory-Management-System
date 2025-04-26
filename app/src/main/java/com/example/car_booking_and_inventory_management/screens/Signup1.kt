@@ -67,7 +67,7 @@ fun Signup1(modifier: Modifier = Modifier,navController: NavController, viewMode
     var showDatePicker by remember { mutableStateOf(false) }
     var selectedDateMillis by remember { mutableStateOf<Long?>(null) }
 
-    val birthDate= selectedDateMillis?.let{ formatDate(it) }?:"01/01/1900"
+    val birthDate= selectedDateMillis?.let{ formatDate(it) }?:""
     var birthDateErr by remember { mutableStateOf("") }
 
     Column(

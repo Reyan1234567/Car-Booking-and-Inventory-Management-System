@@ -4,6 +4,8 @@ import android.content.Context
 import com.example.car_booking_and_inventory_management.DataStore.TokenManager
 import com.example.car_booking_and_inventory_management.network.AuthInterceptor
 import com.example.car_booking_and_inventory_management.network.authApi
+import com.example.car_booking_and_inventory_management.network.searchApi
+import com.example.car_booking_and_inventory_management.repositories.CarFilterRepository
 import com.example.car_booking_and_inventory_management.repositories.authRepository
 import dagger.Module
 import dagger.Provides
@@ -50,6 +52,11 @@ object AppModule {
         return retrofit.create(authApi::class.java)
     }
 
+    @Provides
+    fun providesSearchApi(retrofit: Retrofit): searchApi {
+        return retrofit.create(searchApi::class.java)
+    }
+
 
 //    @Provides
 //    @Singleton
@@ -61,6 +68,12 @@ object AppModule {
     @Singleton
     fun provideAuthRepository(api: authApi, tokenManager: TokenManager): authRepository {
         return authRepository(api,tokenManager)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationFilterRepository(api: searchApi): CarFilterRepository {
+        return CarFilterRepository(api)
     }
 //
 //}

@@ -51,6 +51,9 @@ import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 //import com.example.frontend.R
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -245,12 +248,15 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewMode
         Spacer(modifier=Modifier.padding(24.dp))
         Button(
             onClick = {
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val now: Date = Date()
                 viewModel.updateUsername(username)
                 viewModel.updatePassword(password)
                 Log.v(TAG, "button clicked")
                 Log.v(TAG, "${viewModel.firstname}, ${viewModel.lastname},${viewModel.phoneNumber},${viewModel.birthDate}, ${viewModel.email}, ${viewModel.username}, ${viewModel.password}")
                 val signupData=Signup(viewModel.firstname, viewModel.lastname,
-                    viewModel.phoneNumber,viewModel.birthDate, viewModel.email, viewModel.username,viewModel.password)
+                    viewModel.phoneNumber,
+                    viewModel.birthDate.let{sdf.parse(it)} ?:now, viewModel.email, viewModel.username,viewModel.password)
                 viewModel.signup(signupData)
                 Log.v(TAG, "${SignupState.value}")
             },

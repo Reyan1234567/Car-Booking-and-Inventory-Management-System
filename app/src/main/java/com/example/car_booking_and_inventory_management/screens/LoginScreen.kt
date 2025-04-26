@@ -134,7 +134,8 @@ fun LoginScreen(
                             text = "Password",
                             style = TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))
                         )
-                    }                    ,trailingIcon = {IconButton(
+                    },
+                    trailingIcon = {IconButton(
                         onClick = {passwordVisible=!passwordVisible}
                     ) {
                         if(passwordVisible){
@@ -198,7 +199,7 @@ fun LoginScreen(
                 ) {
                     if (isLoading.value) {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxHeight(),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator()
