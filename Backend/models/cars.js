@@ -14,8 +14,11 @@ const carSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   dailyRate: { type: Number, required: true },
   hourlyRate: { type: Number, required: true },
-  availabilityStatus: { type: String, required: true, enum: ['Available', 'Unavailable'] }
-});
+  notAvailableOn:[
+    {startDate:{type:Date},
+    endDate:{type:Date}}]
+  })
+
 
 const Car = mongoose.model('Car', carSchema);
 

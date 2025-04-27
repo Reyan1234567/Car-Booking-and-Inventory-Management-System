@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -59,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.car_booking_and_inventory_management.R
+//import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.ui.theme.Inter
@@ -72,7 +75,8 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,viewModel:CarFilterViewModel) {
-    var differentDropOff by remember { mutableStateOf(false) }
+//    var differentDropOff by remember { mutableStateOf(false) }
+    var differentDropOff=viewModel.showDropOff
     var showCalander by remember { mutableStateOf(false) }
 
     var selectedStartDateInMillis by remember { mutableStateOf<Long?>(null) }
@@ -87,9 +91,11 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
 
     LaunchedEffect(FilterResult.value) {
         val result=FilterResult.value
-        result?.onSuccess {
-            navController.navigate("")
-        }?.onFailure {
+        result?.onSuccess {value->
+            navController.navigate("searchResults")
+            Log.v(TAG,"${value}")
+        }?.onFailure {value->
+            Log.v(TAG,"${value}")
             snackbarHostState.showSnackbar("Some Error happened")
         }
     }
@@ -133,7 +139,7 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                             color = if (!differentDropOff) Color.Black else Color.Gray
                         ),
                         modifier = Modifier.clickable {
-                            differentDropOff = false
+                            viewModel.changeShowDropOff(false)
                         }
                     )
 
@@ -147,7 +153,7 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                             color = if (differentDropOff) Color.Black else Color.Gray
                         ),
                         modifier = Modifier.clickable {
-                            differentDropOff = true
+                            viewModel.changeShowDropOff(true)
                         }
                     )
                 }
@@ -286,15 +292,27 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
             item {
                 Button(
                     onClick = {
-//                        navController.navigate("")
                         if(!differentDropOff){
                         viewModel.updateDropOff(viewModel.pickUp)
-                            val filter=CarFilters(viewModel.pickUp,viewModel.dropOff,viewModel.startDate,viewModel.endDate)
+                            val filter= CarFilters(
+                                viewModel.pickUp,
+                                viewModel.dropOff,
+                                viewModel.startDate,
+                                viewModel.endDate,
+                            )
                             viewModel.getFilteredCars(filter)
+                            Log.v(TAG,"${viewModel.pickUp},${viewModel.dropOff},${viewModel.startDate},${viewModel.endDate}")
                         }else{
-                            val filter=CarFilters(viewModel.pickUp,viewModel.dropOff,viewModel.startDate,viewModel.endDate)
+                            val filter=CarFilters(
+                                viewModel.pickUp,
+                                viewModel.dropOff,
+                                viewModel.startDate,
+                                viewModel.endDate,
+                            )
                             viewModel.getFilteredCars(filter)
+                            Log.v(TAG,"${viewModel.pickUp},${viewModel.dropOff},${viewModel.startDate},${viewModel.endDate}")
                         }
+
                               },
                     modifier = Modifier
                         .padding(16.dp)

@@ -1,5 +1,5 @@
-import Cars from "../models/cars.js"
 import {Router} from "express"
+import Cars from "../models/cars.js"
 
 const router=Router()
 
@@ -55,29 +55,46 @@ router.put("cars/:id",async(req,res)=>{
 
 
 
-router.post("api/filteredCars", async(req,res)=>{
-    const {body}=req.body
+router.post("/api/filteredCars", async (req, res) => {
+    const { body } = req;
+    console.log(body);
+    console.log(body.startDate);
 
-    try{
-        const convertToDate=(stringDate)=>{
-        const [date,month,year]=stringDate.split("/")
-        const newDate=newDate(date,month-1,year)
-        return newDate
+    try {
+        if (!body.startDate || !body.endDate) {
+            return res.status(400).send("Both startDate and endDate are required.");
+        }
+
+        const convertToDate = (stringDate) => {
+            const [date, month, year] = stringDate.split("/");
+            const newDate = new Date(year, month - 1, date);
+            return newDate;
+        };
+
+        console.log(body.startDate);
+        const newStartDate = convertToDate(body.startDate);
+        const newEndDate = convertToDate(body.endDate);
+
+        console.log(newStartDate);
+
+        const filteredCars = await Cars.find({
+            notAvailableOn:{
+                $not:{
+                    $elemMatch:{
+                        startDate:{$lte:newEndDate},
+                        endDate:{$gte:newStartDate}
+                    }
+                }
+            }
+        });
+        
+        console.log(filteredCars);
+        res.status(200).json(filteredCars); 
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err.message); 
     }
-
-    const newStartDate=convertToDate(body.startDate)
-
-    const filteredCars = await Cars.find({
-        endDate: { $lt: newStartDate }
-    });
-
-    res.json(filteredCars).status(200)
-}
-    catch(err){
-        console.log(err)
-        res.send(err.message).status(404)
-    }
-})
+});
 
 
 

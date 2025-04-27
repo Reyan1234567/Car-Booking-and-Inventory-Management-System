@@ -1,16 +1,17 @@
 import { Router } from "express";
-import Locations from "../models/locations/js";
+import Locations from "../models/locations.js";
 const router = Router();
 
-router.get("api/locations", async (req, res) => {
-  const { query } = req.query;
+router.get("/api/locations", async (req, res) => {
+  const { search } = req.query;
 
   try {
+    console.log("THIS IS THE QUERY:"+ search)
     const results = await Locations.find({
       $or: [
-        { name: { $refex: query.search, $options: "i" } },
-        { city: { $regex: query.search, $options: "i" } },
-        { searchTerms: { $regex: query.search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
+        { city: { $regex: search, $options: "i" } },
+        { searchTerms: { $regex: search, $options: "i" } },
       ],
     }).limit(10);
 

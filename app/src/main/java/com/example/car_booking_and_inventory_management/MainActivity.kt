@@ -1,9 +1,11 @@
 package com.example.car_booking_and_inventory_management
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,12 +25,14 @@ import com.example.car_booking_and_inventory_management.viewModels.SignupViewMod
 import com.example.car_booking_and_inventory_management.screens.LoginScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen1
+import com.example.car_booking_and_inventory_management.screens.SearchViewScreen
 import com.example.car_booking_and_inventory_management.ui.theme.FrontendTheme
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -46,22 +50,29 @@ class MainActivity : ComponentActivity() {
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("home")
                         }
-                        val viewModel:CarFilterViewModel= hiltViewModel(backStackEntry)
+                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
                         CarSearchFilter(modifier = Modifier,navController, viewModel)
                     }
                     composable(route="searchPickups") {backStackEntry->
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("home")
                         }
-                        val viewModel:CarFilterViewModel= hiltViewModel(backStackEntry)
+                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
                         SearchScreen(modifier = Modifier,navController, viewModel)
                     }
                     composable(route="searchDropOffs") {backStackEntry->
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("home")
                         }
-                        val viewModel:CarFilterViewModel= hiltViewModel(backStackEntry)
+                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
                         SearchScreen1(modifier = Modifier,navController, viewModel)
+                    }
+                    composable(route="searchResults") {backStackEntry->
+                        val parentEntry=remember(backStackEntry){
+                            navController.getBackStackEntry("home")
+                        }
+                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
+                        SearchViewScreen(modifier = Modifier,navController, viewModel)
                     }
                 }
                 composable(route="history"){

@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
+import android.content.ContentValues.TAG
 import android.provider.CallLog
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,12 +10,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -56,10 +61,17 @@ fun SearchScreen(
     var search by remember { mutableStateOf("") }
     var searchResult by remember { mutableStateOf(emptyList<Location>()) }
 
+    var notFound by remember { mutableStateOf("") }
 
     LaunchedEffect(searchResultsLocations.value) {
         searchResultsLocations.value?.onSuccess{filteredCars->
             searchResult=filteredCars
+            if(filteredCars.isEmpty()){
+                notFound="NOT FOUND"
+            }
+            else{
+                notFound=""
+            }
         }?.onFailure{
 
         }
@@ -69,14 +81,16 @@ fun SearchScreen(
         modifier=Modifier.padding(16.dp)
     ){
         Row(
-            modifier=Modifier.fillMaxWidth().padding(top=8.dp, start=0.dp),
+            modifier=Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, start = 0.dp),
             horizontalArrangement = Arrangement.Start
         ){
             IconButton(
                 onClick = {navController.popBackStack()}
             ) {
                 Icon(
-                    imageVector= Icons.Default.ArrowBack,
+                    imageVector= Icons.Default.KeyboardArrowLeft,
                     contentDescription="back button"
                 )
             }
@@ -96,7 +110,7 @@ fun SearchScreen(
             }
             ,modifier=Modifier
                 .fillMaxWidth()
-                .padding(top=16.dp)
+                .padding(top = 16.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
             , colors = TextFieldDefaults.textFieldColors(
@@ -105,44 +119,61 @@ fun SearchScreen(
                 containerColor = Color.White
             )
         )
-    }
-
-    if(searchResult.isNotEmpty()){
-        LazyColumn {
-            items(searchResult) { location ->
-                LocationCard(modifier = Modifier, location = location, {
-                    viewModel.updatePickUp(location.name)
-                    navController.popBackStack()
-                })
+        if(searchResult.isNotEmpty()){
+            LazyColumn(modifier=Modifier.padding(8.dp)){
+                items(searchResult) { location ->
+                    LocationCard(modifier = Modifier, location = location, {
+                        viewModel.updatePickUp("${location.name}, ${location.city}")
+                        Log.v(TAG,viewModel.pickUp)
+                        navController.popBackStack()
+                    })
+                }
             }
         }
-    }
-    else if(search==""){
-
-    }
-    else{
-        Text(text="NOT FOUND")
-    }
+        else{
+            Text(text=notFound, modifier=Modifier.padding(8.dp), style = TextStyle(fontSize = 16.sp , fontFamily = Vold))
+        }
+}
 }
 
 
 @Composable
 fun LocationCard(modifier: Modifier = Modifier, location:Location, onClick:()->Unit) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceAround
-    ){
-        Text(text=location.name,
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)
+        .clickable(
+            onClick = onClick
+        )){
+        Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription="icon",
             modifier=Modifier
-                .clickable(
-                    onClick=onClick
-        ))
-
-        Text(text=location.city,
-            modifier=Modifier
-                .clickable(
-                    onClick=onClick
-                )
+                .width(40.dp)
+                .padding(top = 12.dp)
         )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+        ) {
+            Text(
+                text = location.name, style = TextStyle(fontSize = 16.sp, fontFamily = Vold),
+                modifier = Modifier
+                    .clickable(
+                        onClick = onClick
+                    )
+            )
 
+            Text(
+                text = location.city,
+                style = TextStyle(fontSize = 12.sp, fontFamily = Vold, color = Color.Gray),
+                modifier = Modifier
+                    .clickable(
+                        onClick = onClick
+                    )
+            )
+
+        }
     }
 }

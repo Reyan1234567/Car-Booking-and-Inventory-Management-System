@@ -28,6 +28,9 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     private val _carsGetResponse= MutableStateFlow<Result<List<Location>>?>(null)
     val carsGetResponse: StateFlow<Result<List<Location>>?> =_carsGetResponse.asStateFlow()
 
+    private val _carsGetResponse1= MutableStateFlow<Result<List<Location>>?>(null)
+    val carsGetResponse1: StateFlow<Result<List<Location>>?> =_carsGetResponse1.asStateFlow()
+
     private val _carsFilterResponse= MutableStateFlow<Result<List<Car>>?>(null)
     val carsFilterResponse: StateFlow<Result<List<Car>>?> =_carsFilterResponse.asStateFlow()
 
@@ -40,6 +43,12 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     var endDate by  mutableStateOf("01/11/2025")
     var endTime by  mutableStateOf("09:00 am")
 
+    var showDropOff by mutableStateOf(false)
+    private set
+
+    fun changeShowDropOff(value:Boolean){
+        showDropOff=value
+    }
 
     fun updatePickUp(pickup:String){
         pickUp=pickup
@@ -79,6 +88,25 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
             catch(e:Exception){
                 Log.v(TAG, "inside the catch statement")
                 _carsGetResponse.value=Result.failure(e)
+
+            }
+        }
+    }
+
+    fun getLocations1(query:String){
+        viewModelScope.launch{
+            try{
+                val result=repository.getLocations(query)
+                if(result.isSuccessful){
+                    _carsGetResponse1.value=Result.success(result.body()!!)
+                }
+                else{
+                    _carsGetResponse1.value=Result.failure(Exception("${result.errorBody()?.toString()}") )
+                }
+            }
+            catch(e:Exception){
+                Log.v(TAG, "inside the catch statement")
+                _carsGetResponse1.value=Result.failure(e)
 
             }
         }

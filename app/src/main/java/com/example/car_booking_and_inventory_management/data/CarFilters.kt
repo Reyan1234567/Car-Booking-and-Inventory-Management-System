@@ -4,5 +4,5 @@ data class CarFilters(
     var pickUp:String,
     var dropOff:String,
     var startDate:String,
-    var endDate:String,
+    var endDate:String
 )
