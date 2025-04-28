@@ -1,5 +1,6 @@
 import {Router} from "express"
 import Cars from "../models/cars.js"
+import Bookings from "../models/bookings.js"
 
 const router=Router()
 
@@ -77,16 +78,14 @@ router.post("/api/filteredCars", async (req, res) => {
 
         console.log(newStartDate);
 
-        const filteredCars = await Cars.find({
-            notAvailableOn:{
-                $not:{
-                    $elemMatch:{
-                        startDate:{$lte:newEndDate},
-                        endDate:{$gte:newStartDate}
-                    }
-                }
-            }
-        });
+        const CarIdsBookedAtThatTime = await Bookings.find({
+            $or:[{startDate:{$gt:newEndDate}},
+            {endDate:{$lt:newStartDate}}]
+        }).distinct(carId);
+
+        const filteredCars=await Cars.find({
+            _id:{$nin:CarIdsBookedAtThatTime}
+        })
         
         console.log(filteredCars);
         res.status(200).json(filteredCars); 
@@ -106,4 +105,25 @@ router.post("/api/filteredCars", async (req, res) => {
 
 
 
+
 export default router
+
+
+
+
+
+
+
+
+
+
+
+
+// notAvailableOn:{
+//     $not:{
+//         $elemMatch:{
+//             startDate:{$lte:newEndDate},
+//             endDate:{$gte:newStartDate}
+//         }
+//     }
+// }

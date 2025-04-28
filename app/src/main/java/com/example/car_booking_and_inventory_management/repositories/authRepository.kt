@@ -14,6 +14,10 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         tokenManager.saveTokens(accesstToken,refreshToken)
     }
 
+    suspend fun saveUsername(username:String){
+        tokenManager.saveUsername(username)
+    }
+
     suspend fun getAccessToken(){
         tokenManager.getAccessToken()
     }

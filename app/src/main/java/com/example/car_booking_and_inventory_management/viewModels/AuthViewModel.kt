@@ -1,7 +1,6 @@
 package com.example.car_booking_and_inventory_management.viewModels
 
-import android.content.ContentValues.TAG
-import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.LoginInput
@@ -28,7 +27,11 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                         val response=repository.login(user)
                         if(response.isSuccessful && response.body() != null){
                             _loginResult.value=Result.success(response.body()!!)
-                            response.body()?.let {repository.saveTokens(it.accessToken,it.refreshToken)}
+                            response.body()?.let {
+                                repository.saveTokens(it.accessToken,it.refreshToken)
+                                repository.saveUsername(it.user.username)
+                            }
+
                         }
                         else{
                             val errorMessage = when(response.code()) {
@@ -42,7 +45,6 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                         }
                     }
                     catch(e:Exception){
-                        Log.e(TAG,"some error",e)
                         _loginResult.value=Result.failure(Exception("Network error: ${e.message}"))
                     }
                     finally {

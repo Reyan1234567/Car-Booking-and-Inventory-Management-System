@@ -6,18 +6,17 @@ const bookingSchema = new mongoose.Schema({
   bookingStatus: {
     type: String,
     required: true,
-    enum: ["Confirmed", "Pending", "Cancelled", "Waiting Approval"],
+    enum: ["Confirmed", "Pending", "Cancelled"],
+    default:"Pending"
   },
-  driver: {
-    userId: {
+  userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
   },
-  car: {
-    carId: { type: mongoose.Schema.Types.ObjectId, ref: "Car", required: true },
-  },
+  carId: { type: mongoose.Schema.Types.ObjectId, ref: "Car", required: true },
+  startDate: {type:Date, required:true},
+  endDate: {type:Date, required:true},
   pickupDate: { type: Date, required: true },
   pickupTime: { type: String, required: true },
   dropoffDate: { type: Date, required: true },

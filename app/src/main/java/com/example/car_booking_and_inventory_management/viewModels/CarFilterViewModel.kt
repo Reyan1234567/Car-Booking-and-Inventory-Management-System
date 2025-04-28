@@ -34,6 +34,10 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     private val _carsFilterResponse= MutableStateFlow<Result<List<Car>>?>(null)
     val carsFilterResponse: StateFlow<Result<List<Car>>?> =_carsFilterResponse.asStateFlow()
 
+
+    private val _legitimacyResponse= MutableStateFlow<Result<Boolean>?>(null)
+    val legitimacyResponse:StateFlow<Result<Boolean>?> =_legitimacyResponse.asStateFlow()
+
     var isLoading by mutableStateOf(false)
 
     var pickUp by  mutableStateOf("Select destination")
@@ -74,6 +78,8 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
         endTime=endtime
     }
 
+    var username= ""
+
     fun getLocations(query:String){
         viewModelScope.launch{
             try{
@@ -105,7 +111,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
                 }
             }
             catch(e:Exception){
-                Log.v(TAG, "inside the catch statement")
+                Log.v(TAG, "inside the catch statement${e}")
                 _carsGetResponse1.value=Result.failure(e)
 
             }
@@ -129,6 +135,32 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
             }
             finally {
                 isLoading=false
+            }
+        }
+    }
+
+    fun checkLegitimacy(username:String){
+        viewModelScope.launch {
+            try {
+                val result=repository.checkLegitimacy(username)
+                if(result.isSuccessful && result.body()!=null)   {
+                    _legitimacyResponse.value=Result.success(result.body()!!)
+                }
+                else{
+                    _legitimacyResponse.value=Result.failure(Exception("${result.errorBody()?.toString()}"))
+                }
+            }
+            catch(e:Exception){
+                _legitimacyResponse.value=Result.failure(e)
+            }
+        }
+    }
+
+    fun getUsername(){
+        viewModelScope.launch {
+            val result=repository.getUsername()
+            if (result != null) {
+                username=result
             }
         }
     }

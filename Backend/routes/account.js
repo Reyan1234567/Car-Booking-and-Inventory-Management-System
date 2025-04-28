@@ -6,11 +6,10 @@ import { config } from "dotenv";
 import Refresh from "../models/refresh.js";
 
 const router = Router();
-config()
+config();
 
 const accessToken_Secret = process.env.ACCESS_TOKEN;
 const refreshToken_Secret = process.env.REFRESH_TOKEN;
-
 
 //Sign-up
 router.post("/auth/signup", async (req, res) => {
@@ -38,7 +37,7 @@ router.post("/auth/signup", async (req, res) => {
 
     const salt = 10;
     const hashedPassword = await bcrypt.hash(body.password, salt);
-    
+
     const newUser = new User({
       username: body.username,
       password: hashedPassword,
@@ -57,16 +56,16 @@ router.post("/auth/signup", async (req, res) => {
   }
 });
 
-router.get('getUsers',async(req,res)=>{
-    const response=User.findAll()
-    res.send(response)
-})
+router.get("getUsers", async (req, res) => {
+  const response = User.findAll();
+  res.send(response);
+});
 
-//Sign-in 
+//Sign-in
 router.post("/auth/signin", async (req, res) => {
   try {
-    console.log(accessToken_Secret)
-    console.log(refreshToken_Secret)
+    console.log(accessToken_Secret);
+    console.log(refreshToken_Secret);
     const { body } = req;
     if (!body.username || !body.password) {
       return res.status(400).json({ error: "All fields must be filled" });
@@ -97,14 +96,14 @@ router.post("/auth/signin", async (req, res) => {
     // Save refresh token
     await new Refresh({ token: refreshToken }).save();
 
-    res.status(200).json({ 
-      accessToken, 
+    res.status(200).json({
+      accessToken,
       refreshToken,
       user: {
         id: user._id,
         username: user.username,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
   } catch (error) {
     console.error("Signin error:", error);
@@ -112,7 +111,7 @@ router.post("/auth/signin", async (req, res) => {
   }
 });
 
-//RefreshToken 
+//RefreshToken
 router.post("/auth/refresh", async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -148,9 +147,9 @@ router.post("/auth/refresh", async (req, res) => {
       { token: newRefreshToken }
     );
 
-    res.status(200).json({ 
-      accessToken, 
-      refreshToken: newRefreshToken 
+    res.status(200).json({
+      accessToken,
+      refreshToken: newRefreshToken,
     });
   } catch (error) {
     console.error("Refresh token error:", error);
@@ -159,18 +158,39 @@ router.post("/auth/refresh", async (req, res) => {
 });
 
 //check if field is empty
-router.get("/fieldCheck",(req,res)=>{
-  const {user}=req
+router.get("/fieldCheck", (req, res) => {
+  const { user } = req;
   try {
-      if(!user.enrolledCourses){
-        return res.status(200).send(false)
-      }
-      else{
-        return res.status(200).send(true)
-      }
-  } catch (error) {
-      
+    if (!user.enrolledCourses) {
+      return res.status(200).send(false);
+    } else {
+      return res.status(200).send(true);
+    }
+  } catch (error) {}
+});
+
+
+
+//check if the user's Legitmacy
+router.get("api/checkLegitimacy", async (req, res) => {
+  const { username } = req.query;
+
+  try {
+    const user = User.find({
+      username: username,
+    });
+    if (!user) {
+      return res.status(404).send("User can't be found");
+    }
+    if (!user.licensePhoto || !user.selfiePhoto) {
+      return res.status(200).send(false);
+    } else {
+      return res.status(200).send(true);
+    }
+  } catch (e) {
+    res.status(400).send(e.message);
+    console.log(e);
   }
-})
+});
 
 export default router;

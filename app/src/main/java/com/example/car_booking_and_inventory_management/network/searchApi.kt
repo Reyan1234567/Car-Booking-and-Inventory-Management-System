@@ -20,5 +20,8 @@ interface searchApi {
     @POST("api/filteredCars")
     suspend fun getFilteredCars(@Body filters:CarFilters):Response<List<Car>>
 
+    @GET("api/checkLegitimacy")
+    suspend fun checkLegitimacy(@Query("username") username:String):Response<Boolean>
+
 
 }

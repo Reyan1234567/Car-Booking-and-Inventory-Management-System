@@ -26,6 +26,7 @@ import com.example.car_booking_and_inventory_management.screens.LoginScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen1
 import com.example.car_booking_and_inventory_management.screens.SearchViewScreen
+import com.example.car_booking_and_inventory_management.screens.SingleCarScreen
 import com.example.car_booking_and_inventory_management.ui.theme.FrontendTheme
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -73,6 +74,14 @@ class MainActivity : ComponentActivity() {
                         }
                         val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
                         SearchViewScreen(modifier = Modifier,navController, viewModel)
+                    }
+                    composable(route="singleCar/{name}") {backStackEntry->
+                        val name=backStackEntry.arguments?.getString("name")
+                        val parentEntry=remember(backStackEntry){
+                            navController.getBackStackEntry("home")
+                        }
+                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
+                        SingleCarScreen(modifier = Modifier,navController, viewModel,name!!)
                     }
                 }
                 composable(route="history"){

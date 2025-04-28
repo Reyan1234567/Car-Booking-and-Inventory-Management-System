@@ -14,12 +14,18 @@ const carSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   dailyRate: { type: Number, required: true },
   hourlyRate: { type: Number, required: true },
-  notAvailableOn:[
-    {startDate:{type:Date},
-    endDate:{type:Date}}]
   })
 
 
 const Car = mongoose.model('Car', carSchema);
 
 export default Car
+
+
+
+
+
+
+  // notAvailableOn:[
+  //   {startDate:{type:Date},
+  //   endDate:{type:Date}}]

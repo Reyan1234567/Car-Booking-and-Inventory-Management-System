@@ -1,8 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Icon
-import android.widget.Space
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,9 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.car_booking_and_inventory_management.data.Car
-import com.example.car_booking_and_inventory_management.data.CarSearchResults
+import com.example.car_booking_and_inventory_management.data.FilterItem
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 
@@ -59,32 +60,57 @@ import com.example.car_booking_and_inventory_management.viewModels.CarFilterView
 @Composable
 fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: CarFilterViewModel) {
     var search by remember { mutableStateOf("") }
-    var filters= listOf("cars","racks","jimmy butler","rosa parks","obama")
 
-//    var searchResults by remember { mutableStateOf(emptyList<CarSearchResults>()) }
+    val filters = remember {mutableStateListOf(
+        FilterItem(name = "Toyota Corolla"),
+        FilterItem(name = "Honda Civic"),
+        FilterItem(name = "Ford Mustang"),
+        FilterItem(name = "Chevrolet Camaro"),
+        FilterItem(name = "BMW 3 Series"),
+        FilterItem(name = "Mercedes-Benz C-Class"),
+        FilterItem(name = "Audi A4"),
+        FilterItem(name = "Tesla Model 3"),
+        FilterItem(name = "Volkswagen Golf"),
+        FilterItem(name = "Subaru Impreza"),
+        FilterItem(name = "Nissan Altima"),
+        FilterItem(name = "Mazda3"),
+        FilterItem(name = "Hyundai Elantra"),
+        FilterItem(name = "Kia Forte"),
+        FilterItem(name = "Dodge Charger")
+    )}
+
+
 
     var CarSearchs=viewModel.carsFilterResponse.collectAsState()
     var carsearchs=CarSearchs.value
 
     var searchResultArray by remember { mutableStateOf(emptyList<Car>()) }
-    var filteredResultArray by remember { mutableStateOf(emptyList<Car>()) }
 
     var filterFlag by remember { mutableStateOf("") }
-    var filteredFlagArray by remember { mutableStateOf(emptyList<Car>()) }
 
 
-//    LaunchedEffect(carsearchs) {
-//        carsearchs?.onSuccess {
-//
-//        }?.onFailure {
-//
-//        }
-//    }
-    var filterAndSearchResult= remember(filteredResultArray, filteredFlagArray){
-        searchResultArray.filter { filteredResultArray.contains(it) && filteredFlagArray.contains(it) }
-    }
+        val finalResults = searchResultArray.filter { car ->
+            val matchesSearch = search.isBlank() ||
+                    car.name.contains(search, ignoreCase = true) ||
+                    car.make.contains(search, ignoreCase = true) ||
+                    car.model.contains(search, ignoreCase = true) ||
+                    car.category.contains(search, ignoreCase = true) ||
+                    car.type.contains(search, ignoreCase = true) ||
+                    car.transmissionType.contains(search, ignoreCase = true)
 
-    Column(modifier=Modifier.padding(16.dp, top=20.dp)){
+            val matchesFilter = filterFlag.isBlank() ||
+                    car.name.contains(filterFlag, ignoreCase = true) ||
+                    car.make.contains(filterFlag, ignoreCase = true) ||
+                    car.model.contains(filterFlag, ignoreCase = true) ||
+                    car.category.contains(filterFlag, ignoreCase = true) ||
+                    car.type.contains(filterFlag, ignoreCase = true) ||
+                    car.transmissionType.contains(filterFlag, ignoreCase = true)
+
+            matchesSearch && matchesFilter
+        }
+
+
+    Column(modifier=Modifier.padding(end=14.dp, top=24.dp, start=12.dp)){
         Row(
             modifier=Modifier.fillMaxWidth()
         ){
@@ -97,17 +123,15 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
                         color = Color.LightGray,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(14.dp)
+                    .height(45.dp)
+                    .padding(8.dp)
+
+
             )
-            Spacer(modifier = Modifier.padding(2.dp))
             TextField(
                 value = search,
                 onValueChange={
-                    search=it
-                    filteredResultArray=searchResultArray.filter{
-                        it.name.contains(search)||it.make.contains(search)||it.model.contains(search)||it.category.contains(search)||it.type.contains(search)||it.transmissionType.contains(search)
-                    }
-                    },
+                    search=it },
                 placeholder = {Text("Search", style = TextStyle(fontFamily = Vold), color = Color.Gray)},
                 colors = TextFieldDefaults.textFieldColors(
                     unfocusedIndicatorColor = Color.Transparent,
@@ -115,16 +139,10 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
                     containerColor = Color.LightGray
                 ),
                 modifier=Modifier
-                    .padding(4.dp)
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .height(45.dp)
                     .clip(RoundedCornerShape(8.dp)),
-                trailingIcon = {
-                    IconButton(onClick = {}){
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
-                        )
-                    }
-                }
             )
 
         }
@@ -133,13 +151,24 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
             modifier=Modifier.padding(8.dp)
         ){
             items(filters){filter->
-                FilterItems(modifier=Modifier,{
-                    filterFlag=filter
-                    filteredFlagArray=searchResultArray.filter{on->
-                        on.name.contains(filterFlag)||on.make.contains(filterFlag)||on.model.contains(filterFlag)||on.category.contains(filterFlag)||on.type.contains(filterFlag)||on.transmissionType.contains(filterFlag)
-                    }
-                },filter)
-
+                val isSelected = filter.value.value
+                if(!isSelected){
+                    FilterItems(modifier =Modifier,{
+                        filters.forEach { it ->
+                            it.value.value = false
+                        }
+                        filter.value.value=true
+                        filterFlag=filter.name
+                        Log.v(TAG,"${filter.value.value}")
+                    },filter.name,0xFFC5C5C5,0xFF000000 )
+                }
+                else{
+                    FilterItems(modifier=Modifier,{
+                        filter.value.value=false
+                        filterFlag=""
+                        Log.v(TAG,"${filter.value.value}")
+                    },filter.name,0xFF2F2F2F , 0xFFFFFFFF)
+                }
             }
         }
         Spacer(modifier=Modifier.padding(4.dp))
@@ -147,10 +176,9 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
         carsearchs?.onSuccess {cars->
             LazyColumn(modifier=Modifier.padding(2.dp)){
                 searchResultArray=cars
-                filteredFlagArray=searchResultArray
-                filteredResultArray=searchResultArray
-                items(filterAndSearchResult){car->
+                items(finalResults){car->
                     CarDisplay(modifier=Modifier,car,{
+                        navController.navigate("singleCar/${car.name}")
                     })
                 }
             }
@@ -165,19 +193,22 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
 fun FilterItems(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    text: String
+    text: String,
+    color: Long,
+    contentColor: Long
 ) {
     Surface(
         modifier = modifier
             .padding(4.dp)
             .clickable(onClick = onClick),
-        color = Color.LightGray,
+        color = Color(color),
         shape = RoundedCornerShape(8.dp)
     ) {
         Text(
             text = text,
             style = TextStyle(fontFamily = Vold, fontSize = 12.sp),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            color=Color(contentColor)
         )
     }
 }
@@ -242,3 +273,4 @@ fun CarDisplay(modifier: Modifier = Modifier, car:Car, onClick: () -> Unit) {
         }
     }
 }
+
