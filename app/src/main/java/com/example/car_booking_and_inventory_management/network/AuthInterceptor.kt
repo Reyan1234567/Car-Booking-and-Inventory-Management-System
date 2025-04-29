@@ -2,10 +2,12 @@ package com.example.car_booking_and_inventory_management.network
 
 import com.example.car_booking_and_inventory_management.DataStore.TokenManager
 import com.example.car_booking_and_inventory_management.data.LoginResult
+import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshRequest
+import com.example.car_booking_and_inventory_management.data.RefreshResult
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
-
+import org.json.JSONObject
 
 
 class AuthInterceptor(
@@ -16,6 +18,10 @@ class AuthInterceptor(
         var request=chain.request()
 
         val token=runBlocking{tokenManager.getAccessToken()}
+        if(token==null){
+            return chain.proceed(request)
+        }
+
         val modifiedRequest=request.newBuilder()
             .addHeader("Authorization","Bearer $token")
             .build()
@@ -23,24 +29,36 @@ class AuthInterceptor(
 
         val response=chain.proceed(modifiedRequest)
 
-        if(response.code==401){
+        val errorBody=try{
+            val errorJson=response.peekBody(Long.MAX_VALUE).string()
+            JSONObject(errorJson).getString("error")
+        }
+        catch (e:Exception){
+            null
+        }
+
+        if(response.code==401 && errorBody=="Unauthorized - Token expired"){
             response.close()
 
             val refreshToken=runBlocking{tokenManager.getRefreshToken()}
             if (refreshToken == null) {
-                // No refresh token available, user needs to login again
                 return response
             }
 
-            val newTokenResponse: retrofit2.Response<LoginResult>?=try{
+            val newTokenResponse: retrofit2.Response<RefreshResult>?=try{
                 runBlocking {
-                    authApi.refresh(RefreshRequest(refreshToken))
+                    authApi.refresh(Refresh(refreshToken))
                 }
             }
             catch (e:Exception){
                 null
             }
-            if (newTokenResponse?.isSuccessful == true && newTokenResponse.body() != null) {
+
+            if(newTokenResponse?.body()==null){
+                return response
+            }
+
+            if (newTokenResponse.isSuccessful == true) {
                 runBlocking{
                     newTokenResponse.body()?.let {tokenManager.saveTokens(it.accessToken, it.refreshToken)}
                 }

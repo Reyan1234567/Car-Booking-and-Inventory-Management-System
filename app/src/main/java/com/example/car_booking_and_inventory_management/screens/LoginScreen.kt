@@ -39,10 +39,10 @@ import com.example.car_booking_and_inventory_management.ui.theme.Vold
 fun LoginScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    viewModel: AuthViewModel
 ) {
-    val authViewModel =hiltViewModel<AuthViewModel>()
 
-    val loginState=authViewModel.loginResult.collectAsState()
+    val loginState=viewModel.loginResult.collectAsState()
 
     val context= LocalContext.current
 
@@ -51,7 +51,7 @@ fun LoginScreen(
 
     var passwordVisible by remember { mutableStateOf(false) }
 
-    var isLoading = authViewModel.isLoading.collectAsState()
+    var isLoading = viewModel.isLoading1.collectAsState()
 
     val snackbarHostState=remember{ SnackbarHostState() }
     val scope= rememberCoroutineScope()
@@ -59,15 +59,12 @@ fun LoginScreen(
     LaunchedEffect(loginState.value) {
 
         loginState.value?.onSuccess {loginData->
-            val accessToken=loginData.accessToken
-            val refreshToken=loginData.refreshToken
-            Toast.makeText(context, "Login successful! Welcome ${username}", Toast.LENGTH_LONG).show()
-            navController.navigate("cars") {
+            snackbarHostState.showSnackbar("Login successful! Welcome ${loginData.user.firstName}")
+            navController.navigate("home") {
                 popUpTo("login") { inclusive = true }
             }
         }?.onFailure {
-            Toast.makeText(context, "Login failed: ${it.message}", Toast.LENGTH_LONG).show()
-        }
+            snackbarHostState.showSnackbar("Login failed: ${it.message}")        }
     }
 
     Scaffold(
@@ -187,7 +184,7 @@ fun LoginScreen(
                             return@Button
                         }
                         val user = LoginInput(username = username, password = password)
-                        authViewModel.login(user)
+                        viewModel.login(user)
                     },
                     modifier = Modifier
                         .fillMaxWidth()

@@ -15,15 +15,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
+import com.example.car_booking_and_inventory_management.data.Booking
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 @HiltViewModel
 class CarFilterViewModel @Inject constructor(private val repository: CarFilterRepository):
     ViewModel() {
+
+    private val _createBooking= MutableStateFlow<Result<Booking>?>(null)
+    val createBooking: StateFlow<Result<Booking>?> =_createBooking.asStateFlow()
 
     private val _carsGetResponse= MutableStateFlow<Result<List<Location>>?>(null)
     val carsGetResponse: StateFlow<Result<List<Location>>?> =_carsGetResponse.asStateFlow()
@@ -35,8 +40,8 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     val carsFilterResponse: StateFlow<Result<List<Car>>?> =_carsFilterResponse.asStateFlow()
 
 
-    private val _legitimacyResponse= MutableStateFlow<Result<Boolean>?>(null)
-    val legitimacyResponse:StateFlow<Result<Boolean>?> =_legitimacyResponse.asStateFlow()
+    private val _legitimacyResponse= MutableStateFlow<Boolean?>(null)
+    val legitimacyResponse:StateFlow<Boolean?> =_legitimacyResponse.asStateFlow()
 
     var isLoading by mutableStateOf(false)
 
@@ -78,8 +83,6 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
         endTime=endtime
     }
 
-    var username= ""
-
     fun getLocations(query:String){
         viewModelScope.launch{
             try{
@@ -88,7 +91,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
                     _carsGetResponse.value=Result.success(result.body()!!)
                }
                 else{
-                    _carsGetResponse.value=Result.failure(Exception("${result.errorBody()?.toString()}") )
+                    _carsGetResponse.value=Result.failure(Exception("${result.errorBody()?.string()}") )
                }
             }
             catch(e:Exception){
@@ -107,7 +110,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
                     _carsGetResponse1.value=Result.success(result.body()!!)
                 }
                 else{
-                    _carsGetResponse1.value=Result.failure(Exception("${result.errorBody()?.toString()}") )
+                    _carsGetResponse1.value=Result.failure(Exception("${result.errorBody()?.string()}") )
                 }
             }
             catch(e:Exception){
@@ -127,7 +130,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
                     _carsFilterResponse.value=Result.success(result.body()!!)
                 }
                 else{
-                    _carsFilterResponse.value=Result.failure((Exception("${result.errorBody()?.toString()}")))
+                    _carsFilterResponse.value=Result.failure((Exception("${result.errorBody()?.string()}")))
                 }
             }
             catch(e:Exception){
@@ -139,30 +142,36 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
         }
     }
 
-    fun checkLegitimacy(username:String){
-        viewModelScope.launch {
-            try {
-                val result=repository.checkLegitimacy(username)
-                if(result.isSuccessful && result.body()!=null)   {
-                    _legitimacyResponse.value=Result.success(result.body()!!)
-                }
-                else{
-                    _legitimacyResponse.value=Result.failure(Exception("${result.errorBody()?.toString()}"))
-                }
+    fun checkLegitimacy(){
+        val result= runBlocking{ repository.checkLegitimacy() }
+        if(result){
+            _legitimacyResponse.value=true
+        }
+        else{
+            _legitimacyResponse.value=false
+        }
+    }
+
+//    suspend fun getUsername():String?{
+//            return repository.getUsername()
+//
+//    }
+
+
+    fun createBooking(booking: Booking){
+        viewModelScope.launch{
+            try{
+                val result=repository.createBooking(booking)
+              if(result.isSuccessful){
+                  _createBooking.value=Result.success(result.body()!!)
+              }
+              else{
+              _createBooking.value=Result.failure(Exception("some error shit, I am burnt out!!!!"))
+              }
             }
             catch(e:Exception){
-                _legitimacyResponse.value=Result.failure(e)
+                _createBooking.value=Result.failure(e)
             }
         }
     }
-
-    fun getUsername(){
-        viewModelScope.launch {
-            val result=repository.getUsername()
-            if (result != null) {
-                username=result
-            }
-        }
-    }
-
 }

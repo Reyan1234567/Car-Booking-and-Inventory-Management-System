@@ -32,7 +32,6 @@ const bookingSchema = new mongoose.Schema({
   estimatedTotalPrice: { type: Number, required: true },
   paymentMethod: {
     type: String,
-    required: true,
     enum: ["Credit Card", "Cash", "Bank Transfer"],
   },
   paymentStatus: {
@@ -44,6 +43,7 @@ const bookingSchema = new mongoose.Schema({
     childSeat: { type: Number, default: 0 },
     gpsNavigation: { type: Boolean, default: false },
   },
+  remark:{type:String}
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);

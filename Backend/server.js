@@ -10,7 +10,9 @@ app.use(cors({
     origin: 'http://10.0.2.2:4000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
-}));app.use(routes)
+}));
+
+app.use(routes)
 config()
 
 connect()

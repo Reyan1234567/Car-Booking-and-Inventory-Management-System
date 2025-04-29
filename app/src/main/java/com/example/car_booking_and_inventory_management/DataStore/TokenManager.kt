@@ -15,28 +15,53 @@ class TokenManager(private val context: Context) {
         val ACCESS_TOKEN = stringPreferencesKey("ACCESS_TOKEN")
         val REFRESH_TOKEN = stringPreferencesKey("REFRESH_TOKEN")
         val USER_NAME= stringPreferencesKey("USER_NAME")
+        val EMAIL= stringPreferencesKey("EMAIL")
+        val PROFILE_PHOTO= stringPreferencesKey("PROFILE_PHOTO")
+        val LICENSE_PHOTO= stringPreferencesKey("LICENSE_PHOTO")
+        val PHONE_NUMBER= stringPreferencesKey("PHONE_NUMBER")
+        val FIRST_NAME= stringPreferencesKey("FIRST_NAME")
+        val LAST_NAME= stringPreferencesKey("LAST_NAME")
     }
 
-    suspend fun saveTokens(accessToken: String, refreshToken: String) {
+    suspend fun saveUserInfo(accessToken: String, refreshToken: String, username:String, email:String, phoneNumber:String, profilePhoto:String, licensePhoto:String, firstName:String, lastName:String) {
         context.dataStore.edit {
             it[ACCESS_TOKEN] = accessToken
             it[REFRESH_TOKEN] = refreshToken
+            it[USER_NAME]=username
+            it[EMAIL]=email
+            it[PHONE_NUMBER]=phoneNumber
+            it[PROFILE_PHOTO]=profilePhoto
+            it[LICENSE_PHOTO]=licensePhoto
+            it[FIRST_NAME]=firstName
+            it[LAST_NAME]=lastName
         }
     }
 
-    suspend fun saveUsername(username:String){
+    suspend fun saveTokens(accessToken: String, refreshToken: String){
         context.dataStore.edit{
-            it[USER_NAME]=username
+            it[ACCESS_TOKEN]=accessToken
+            it[REFRESH_TOKEN]=refreshToken
         }
     }
+
+    suspend fun getUsername(): String?=
+        context.dataStore.data.first()[USER_NAME]
+
+    suspend fun getEmail(): String?=
+        context.dataStore.data.first()[EMAIL]
+
+    suspend fun getPhoneNumber(): String?=
+        context.dataStore.data.first()[PHONE_NUMBER]
+
+    suspend fun getProfilePhoto(): String?=
+        context.dataStore.data.first()[PROFILE_PHOTO]
+
+    suspend fun getLicensePhoto(): String?=
+        context.dataStore.data.first()[LICENSE_PHOTO]
 
     suspend fun getAccessToken(): String?=
         context.dataStore.data.first()[ACCESS_TOKEN]
 
-
-    suspend fun getUsername():String?{
-        return context.dataStore.data.first()[USER_NAME]
-    }
 
     suspend fun getRefreshToken(): String? =
         context.dataStore.data.first()[REFRESH_TOKEN]

@@ -45,13 +45,14 @@ import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 //import com.example.frontend.R
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
+import com.example.car_booking_and_inventory_management.viewModels.AuthViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Signup1(modifier: Modifier = Modifier,navController: NavController, viewModel: SignupViewModel) {
+fun Signup1(modifier: Modifier = Modifier,navController: NavController, viewModel: AuthViewModel) {
     var firstname by remember { mutableStateOf("") }
     var firstnameErr by remember { mutableStateOf("") }
 

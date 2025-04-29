@@ -1,7 +1,10 @@
 import Booking from "../models/bookings.js";
 import { Router } from "express";
+import checkAccessToken from "../middleware/checkAccessToken.js";
 
 const router = Router();
+
+router.use(checkAccessToken)
 
 router.post("booking", async (req, res) => {
   const { body } = req;

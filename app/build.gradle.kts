@@ -67,6 +67,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.material)
 //    implementation(libs.androidx.compose.bom.v20250200)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

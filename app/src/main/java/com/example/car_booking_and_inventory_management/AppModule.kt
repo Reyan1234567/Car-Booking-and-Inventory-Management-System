@@ -72,8 +72,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideLocationFilterRepository(api: searchApi): CarFilterRepository {
-        return CarFilterRepository(api)
+    fun provideLocationFilterRepository(api: searchApi, tokenManager: TokenManager): CarFilterRepository {
+        return CarFilterRepository(api, tokenManager)
     }
 //
 //}

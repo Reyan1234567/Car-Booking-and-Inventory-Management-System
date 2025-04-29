@@ -7,7 +7,12 @@ data class LoginResult(
 )
 
 data class Username(
-    val _id:String,
-    val username:String,
-    val email:String
+    val id: String,
+    val username: String,
+    val email: String,
+    val phoneNumber:String,
+    val profilePhoto:String,
+    val licensePhoto:String,
+    val firstName:String,
+    val lastName:String
 )

@@ -1,6 +1,10 @@
 import { Router } from "express";
 import Locations from "../models/locations.js";
+import checkAccessToken from "../middleware/checkAccessToken.js";
+
 const router = Router();
+
+router.use(checkAccessToken)
 
 router.get("/api/locations", async (req, res) => {
   const { search } = req.query;

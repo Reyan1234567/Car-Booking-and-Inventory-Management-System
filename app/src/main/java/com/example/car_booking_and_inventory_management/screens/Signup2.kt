@@ -23,6 +23,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -51,13 +53,14 @@ import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 //import com.example.frontend.R
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
+import com.example.car_booking_and_inventory_management.viewModels.AuthViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewModel: SignupViewModel) {
+fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewModel: AuthViewModel) {
     var username by remember { mutableStateOf("") }
     var usernameErr by remember { mutableStateOf("") }
 
@@ -71,7 +74,7 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewMode
     var rePasswordVisible by remember { mutableStateOf(false) }
 
     var SignupState=viewModel.signupResponse.collectAsState()
-    var isLoading=viewModel.isLoading.collectAsState()
+    var isLoading=viewModel.isLoading2.collectAsState()
 
     val context= LocalContext.current
     val snackbarHostState= remember { SnackbarHostState() }
@@ -101,193 +104,214 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewMode
         }
     }
 
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-        , horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ){
-        Image(
-            painter = painterResource(R.drawable.polo),
-            contentDescription = "Logo",
-            modifier=Modifier
-                .width(100.dp)
-                .clip(RoundedCornerShape(20.dp))
-        )
-        Spacer(modifier=Modifier.padding(20.dp))
-        Text("Signup", fontFamily= Vold, fontSize=20.sp)
-        Spacer(modifier=Modifier.padding(20.dp))
-        Column(){
-            Text("Username",modifier=Modifier.padding(start=12.dp))
-            TextField(
-                value =username,
-                onValueChange = {
-                    username=it
-                    usernameErr= validateUsername(it)
-                },
-                placeholder = { Text("JohnDoe", style= TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))) },
-                modifier=Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
-                colors= TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    containerColor = Color.White
-                ),
-            )
-            Text(usernameErr,modifier=Modifier.padding(start=12.dp), color = Color.Red)
-        }
-
-        Spacer(modifier=Modifier.padding(8.dp))
-        Column(){
-            Text("Password",modifier=Modifier.padding(start=12.dp))
-            TextField(
-                value =password,
-                onValueChange = {
-                    password=it
-                    passwordErr=validatePassword(it)
-                },
-                visualTransformation = if(passwordVisible){
-                    VisualTransformation.None
-                }
-                else{
-                    PasswordVisualTransformation()
-                },
-                placeholder = { Text("*************" , style= TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))) },
-                modifier=Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
-                colors= TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    containerColor = Color.White
-                )
-                ,trailingIcon = {IconButton(
-                    onClick = {passwordVisible=!passwordVisible}
-                ) {
-                    if(passwordVisible){
-                        Icon(
-                            painter = painterResource(R.drawable.eye),
-                            contentDescription = "eye",
-                            modifier=Modifier.size(20.dp)
-                        )
-                    }
-                    else{
-                        Icon(
-                            painter = painterResource(R.drawable.eyeslash),
-                            contentDescription = "eye",
-                            modifier=Modifier.size(20.dp)
-                        )
-                    }
-
-                }
-                }
-            )
-
-            Text(passwordErr,modifier=Modifier.padding(start=12.dp), color = Color.Red)
-        }
-
-        Spacer(modifier=Modifier.padding(8.dp))
-        Column(){
-            Text("Re-Enter your Password",modifier=Modifier.padding(start=12.dp))
-            TextField(
-                value =rePassword,
-                onValueChange = {
-                    rePassword=it
-                    rePasswordErr= validateRePassword(it,password)
-                },
-                placeholder = { Text("*************" , style= TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))) },
-                modifier=Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
-                colors= TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    containerColor = Color.White
-                ),
-                visualTransformation = if(rePasswordVisible){
-                    VisualTransformation.None
-                }
-                else{
-                    PasswordVisualTransformation()
-                },
-                trailingIcon = {IconButton(
-                    onClick = {rePasswordVisible=!rePasswordVisible}
-                ) {
-                    if(rePasswordVisible){
-                        Icon(
-                            painter = painterResource(R.drawable.eye),
-                            contentDescription = "eye",
-                            modifier=Modifier.size(20.dp)
-                        )
-                    }
-                    else{
-                        Icon(
-                            painter = painterResource(R.drawable.eyeslash),
-                            contentDescription = "eye",
-                            modifier=Modifier.size(20.dp)
-                        )
-                    }
-
-                }
-                }
-            )
-            Text(rePasswordErr,modifier=Modifier.padding(start=12.dp), color = Color.Red)
-
-        }
-
-        Spacer(modifier=Modifier.padding(24.dp))
-        Button(
-            onClick = {
-                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                val now: Date = Date()
-                viewModel.updateUsername(username)
-                viewModel.updatePassword(password)
-                Log.v(TAG, "button clicked")
-                Log.v(TAG, "${viewModel.firstname}, ${viewModel.lastname},${viewModel.phoneNumber},${viewModel.birthDate}, ${viewModel.email}, ${viewModel.username}, ${viewModel.password}")
-                val signupData=Signup(viewModel.firstname, viewModel.lastname,
-                    viewModel.phoneNumber,
-                    viewModel.birthDate.let{sdf.parse(it)} ?:now, viewModel.email, viewModel.username,viewModel.password)
-                viewModel.signup(signupData)
-                Log.v(TAG, "${SignupState.value}")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFEA6307),
-                contentColor= Color.White
-            ),
-            enabled = if(username!="" && password!="" && rePassword!="" && usernameErr=="" && passwordErr=="" && rePasswordErr==""){
-                true
-            }
-            else{
-                false
-            }
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ){padding->
+        Column(
+            modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            if (isLoading.value) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                Text("Sign-up")
+            Image(
+                painter = painterResource(R.drawable.polo),
+                contentDescription = "Logo",
+                modifier = Modifier
+                    .width(100.dp)
+                    .clip(RoundedCornerShape(20.dp))
+            )
+            Spacer(modifier = Modifier.padding(20.dp))
+            Text("Signup", fontFamily = Vold, fontSize = 20.sp)
+            Spacer(modifier = Modifier.padding(20.dp))
+            Column() {
+                Text("Username", modifier = Modifier.padding(start = 12.dp))
+                TextField(
+                    value = username,
+                    onValueChange = {
+                        username = it
+                        usernameErr = validateUsername(it)
+                    },
+                    placeholder = {
+                        Text(
+                            "JohnDoe",
+                            style = TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        containerColor = Color.White
+                    ),
+                )
+                Text(usernameErr, modifier = Modifier.padding(start = 12.dp), color = Color.Red)
             }
+
+            Spacer(modifier = Modifier.padding(8.dp))
+            Column() {
+                Text("Password", modifier = Modifier.padding(start = 12.dp))
+                TextField(
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        passwordErr = validatePassword(it)
+                    },
+                    visualTransformation = if (passwordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
+                    placeholder = {
+                        Text(
+                            "*************",
+                            style = TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        containerColor = Color.White
+                    ), trailingIcon = {
+                        IconButton(
+                            onClick = { passwordVisible = !passwordVisible }
+                        ) {
+                            if (passwordVisible) {
+                                Icon(
+                                    painter = painterResource(R.drawable.eye),
+                                    contentDescription = "eye",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(R.drawable.eyeslash),
+                                    contentDescription = "eye",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+
+                        }
+                    }
+                )
+
+                Text(passwordErr, modifier = Modifier.padding(start = 12.dp), color = Color.Red)
+            }
+
+            Spacer(modifier = Modifier.padding(8.dp))
+            Column() {
+                Text("Re-Enter your Password", modifier = Modifier.padding(start = 12.dp))
+                TextField(
+                    value = rePassword,
+                    onValueChange = {
+                        rePassword = it
+                        rePasswordErr = validateRePassword(it, password)
+                    },
+                    placeholder = {
+                        Text(
+                            "*************",
+                            style = TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D))
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        containerColor = Color.White
+                    ),
+                    visualTransformation = if (rePasswordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { rePasswordVisible = !rePasswordVisible }
+                        ) {
+                            if (rePasswordVisible) {
+                                Icon(
+                                    painter = painterResource(R.drawable.eye),
+                                    contentDescription = "eye",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(R.drawable.eyeslash),
+                                    contentDescription = "eye",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+
+                        }
+                    }
+                )
+                Text(rePasswordErr, modifier = Modifier.padding(start = 12.dp), color = Color.Red)
+
+            }
+
+            Spacer(modifier = Modifier.padding(24.dp))
+            Button(
+                onClick = {
+                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val now: Date = Date()
+                    viewModel.updateUsername(username)
+                    viewModel.updatePassword(password)
+                    Log.v(TAG, "button clicked")
+                    Log.v(
+                        TAG,
+                        "${viewModel.firstname}, ${viewModel.lastname},${viewModel.phoneNumber},${viewModel.birthDate}, ${viewModel.email}, ${viewModel.username}, ${viewModel.password}"
+                    )
+                    val signupData = Signup(viewModel.firstname,
+                        viewModel.lastname,
+                        viewModel.phoneNumber,
+                        viewModel.birthDate.let { sdf.parse(it) } ?: now,
+                        viewModel.email,
+                        viewModel.username,
+                        viewModel.password)
+                    viewModel.signup(signupData)
+                    Log.v(TAG, "${SignupState.value}")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFEA6307),
+                    contentColor = Color.White
+                ),
+                enabled = if (username != "" && password != "" && rePassword != "" && usernameErr == "" && passwordErr == "" && rePasswordErr == "") {
+                    true
+                } else {
+                    false
+                }
+            ) {
+                if (isLoading.value) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    Text("Sign-up")
+                }
+            }
+
+
         }
-
-
-
     }
 }
 

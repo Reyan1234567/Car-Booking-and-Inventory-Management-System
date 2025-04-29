@@ -1,9 +1,12 @@
 import {Router} from "express"
 import Cars from "../models/cars.js"
 import Bookings from "../models/bookings.js"
+import checkAccessToken from "../middleware/checkAccessToken.js";
 
 const router=Router()
 
+
+router.use(checkAccessToken)
 //Get All cars
 router.get("/cars",async (req,res)=>{
     const response=await Cars.findA()
@@ -50,7 +53,7 @@ router.put("cars/:id",async(req,res)=>{
     }
     catch(err){
         console.log(err)
-        res.status(401).send(err.message)
+        res.status(401).json({"error": err.message})
     }
 })
 
@@ -79,6 +82,7 @@ router.post("/api/filteredCars", async (req, res) => {
         console.log(newStartDate);
 
         const CarIdsBookedAtThatTime = await Bookings.find({
+            status:{$ne:"cancelled"},
             $or:[{startDate:{$gt:newEndDate}},
             {endDate:{$lt:newStartDate}}]
         }).distinct(carId);

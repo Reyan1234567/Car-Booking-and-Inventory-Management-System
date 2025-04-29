@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import User from "../models/users.js";
 import { config } from "dotenv";
 import Refresh from "../models/refresh.js";
+import checkAccessToken from "../middleware/checkAccessToken.js";
 
 const router = Router();
 config();
@@ -15,7 +16,8 @@ const refreshToken_Secret = process.env.REFRESH_TOKEN;
 router.post("/auth/signup", async (req, res) => {
   try {
     const { body } = req;
-    if (!body.username || !body.email || !body.password) {
+    if (!body.username || !body.email || !body.password ||!body.phoneNumber ||!body.firstname ||!body.lastname ||!body.birthDate) {
+      console.log(body)
       return res.status(400).json({ error: "All fields must be filled" });
     }
 
@@ -56,7 +58,7 @@ router.post("/auth/signup", async (req, res) => {
   }
 });
 
-router.get("getUsers", async (req, res) => {
+router.get("/getUsers",checkAccessToken,async (req, res) => {
   const response = User.findAll();
   res.send(response);
 });
@@ -64,8 +66,6 @@ router.get("getUsers", async (req, res) => {
 //Sign-in
 router.post("/auth/signin", async (req, res) => {
   try {
-    console.log(accessToken_Secret);
-    console.log(refreshToken_Secret);
     const { body } = req;
     if (!body.username || !body.password) {
       return res.status(400).json({ error: "All fields must be filled" });
@@ -73,7 +73,7 @@ router.post("/auth/signin", async (req, res) => {
 
     const user = await User.findOne({ username: body.username });
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).send("Invalid credentials");
     }
 
     const isPasswordValid = await bcrypt.compare(body.password, user.password);
@@ -94,7 +94,7 @@ router.post("/auth/signin", async (req, res) => {
     );
 
     // Save refresh token
-    await new Refresh({ token: refreshToken }).save();
+    await new Refresh({ refreshToken: refreshToken, username:user._id }).save();
 
     res.status(200).json({
       accessToken,
@@ -103,6 +103,11 @@ router.post("/auth/signin", async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
+        phoneNumber:user.phoneNumber,
+        profilePhoto:user.profilePhoto,
+        licensePhoto:user.licensePhoto,
+        firstName:user.firstName,
+        lastName:user.lastName
       },
     });
   } catch (error) {
@@ -116,7 +121,7 @@ router.post("/auth/refresh", async (req, res) => {
   try {
     const { refreshToken } = req.body;
     if (!refreshToken) {
-      return res.status(401).json({ error: "Refresh token is required" });
+      return res.status(404).json({ error: "Refresh token Not found" });
     }
 
     const storedToken = await Refresh.findOne({ token: refreshToken });
@@ -124,10 +129,16 @@ router.post("/auth/refresh", async (req, res) => {
       return res.status(401).json({ error: "Invalid refresh token" });
     }
 
-    const decoded = jwt.verify(refreshToken, refreshToken_Secret);
-    if (!decoded) {
-      return res.status(401).json({ error: "Invalid refresh token" });
-    }
+    jwt.verify(refreshToken, refreshToken_Secret,(err,decoded)=>{
+      if(err){
+        return res.status(401).json({ error: "Invalid refresh token" });
+
+      }
+      if (!decoded) {
+        return res.status(401).json({ error: "Invalid refresh token" });
+      }
+    })
+    
 
     const accessToken = jwt.sign(
       { userId: decoded.userId, username: decoded.username },
@@ -157,40 +168,28 @@ router.post("/auth/refresh", async (req, res) => {
   }
 });
 
-//check if field is empty
-router.get("/fieldCheck", (req, res) => {
-  const { user } = req;
-  try {
-    if (!user.enrolledCourses) {
-      return res.status(200).send(false);
-    } else {
-      return res.status(200).send(true);
-    }
-  } catch (error) {}
-});
-
 
 
 //check if the user's Legitmacy
-router.get("api/checkLegitimacy", async (req, res) => {
-  const { username } = req.query;
+// router.get("api/checkLegitimacy", async (req, res) => {
+//   const { username } = req.query;
 
-  try {
-    const user = User.find({
-      username: username,
-    });
-    if (!user) {
-      return res.status(404).send("User can't be found");
-    }
-    if (!user.licensePhoto || !user.selfiePhoto) {
-      return res.status(200).send(false);
-    } else {
-      return res.status(200).send(true);
-    }
-  } catch (e) {
-    res.status(400).send(e.message);
-    console.log(e);
-  }
-});
+//   try {
+//     const user = User.find({
+//       username: username,
+//     });
+//     if (!user) {
+//       return res.status(404).send("User can't be found");
+//     }
+//     if (!user.licensePhoto || !user.profilePhoto) {
+//       return res.status(200).send(false);
+//     } else {
+//       return res.status(200).send(true);
+//     }
+//   } catch (e) {
+//     res.status(400).send(e.message);
+//     console.log(e);
+//   }
+// });
 
 export default router;

@@ -49,6 +49,7 @@ import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.ui.theme.Inter
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,viewModel: CarFilterViewModel,name:String) {
@@ -70,15 +71,15 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
     }
 
     LaunchedEffect(legit) {
-        legit?.onSuccess { bool->
-            if(bool){
-              navController.navigate("")
-
-            }
-            else{
-
-            }
-        }
+//        if(legit!=null){
+//            if(legit){
+//                val
+//                viewModel.createBooking()         }
+//            else{
+//                //navController and toast/snackBar
+//            }
+//
+//        }
     }
 
     Box(modifier = Modifier.fillMaxSize()){
@@ -183,8 +184,12 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                 ),
                 shape= RoundedCornerShape(8.dp)
             ){
-                Column(modifier=Modifier.padding(8.dp).fillMaxWidth()){
-                    Row(modifier=Modifier.padding(8.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+                Column(modifier=Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()){
+                    Row(modifier=Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                         Column {
                             Text("Price per day", style = TextStyle(fontFamily = Vold))
                             Text("1500 ETB",style = TextStyle(fontFamily = Inter))
@@ -194,7 +199,9 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                             Text("1500 ETB",style = TextStyle(fontFamily = Inter))
                         }
                     }
-                    Row(modifier=Modifier.padding(8.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+                    Row(modifier=Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                         Column {
                             Text("Price per day", style = TextStyle(fontFamily = Vold))
                             Text("1500 ETB",style = TextStyle(fontFamily = Inter))
@@ -205,16 +212,19 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                         }
                     }
                 }
-                Column(modifier=Modifier.padding(8.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                Column(modifier=Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
                     Text("Price per day", style = TextStyle(fontFamily = Vold))
                     Text("1500 ETB",style = TextStyle(fontFamily = Inter))
                 }
             }
             Button(onClick = {
-                viewModel.getUsername()
-                viewModel.checkLegitimacy(viewModel.username)
+                    viewModel.checkLegitimacy()
             },
-                modifier.padding(16.dp).fillMaxWidth(),
+                modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFEA6307)
                 ),

@@ -28,6 +28,7 @@ import com.example.car_booking_and_inventory_management.screens.SearchScreen1
 import com.example.car_booking_and_inventory_management.screens.SearchViewScreen
 import com.example.car_booking_and_inventory_management.screens.SingleCarScreen
 import com.example.car_booking_and_inventory_management.ui.theme.FrontendTheme
+import com.example.car_booking_and_inventory_management.viewModels.AuthViewModel
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,10 +40,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController=rememberNavController()
-            NavHost(navController=navController, startDestination="home"){
-                composable(route="login"){
-                    LoginScreen(modifier=Modifier.fillMaxSize(),navController)
-                }
+            NavHost(navController=navController, startDestination="sign_up_flow"){
+
                 navigation(
                     startDestination = "carSearchFilter",
                     route="home"
@@ -91,22 +90,29 @@ class MainActivity : ComponentActivity() {
 
                 }
                 navigation(
-                    startDestination="sign_up1",
+                    startDestination="login",
                     route="sign_up_flow"
                 ){
                     composable(route="sign_up1"){ backStackEntry->
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("sign_up_flow")
                         }
-                        val viewModel:SignupViewModel= hiltViewModel(parentEntry)
+                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
                         Signup1(modifier = Modifier,navController,viewModel)
                     }
                     composable(route="sign_up2") {backStackEntry->
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("sign_up_flow")
                         }
-                        val viewModel:SignupViewModel= hiltViewModel(parentEntry)
+                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
                         Signup2(modifier=Modifier,navController,viewModel)
+                    }
+                    composable(route="login"){backStackEntry->
+                        val parentEntry= remember (backStackEntry){
+                            navController.getBackStackEntry("sign_up_flow")
+                        }
+                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
+                        LoginScreen(modifier=Modifier.fillMaxSize(),navController,viewModel)
                     }
                 }
             }

@@ -3,7 +3,9 @@ package com.example.car_booking_and_inventory_management.network
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
+import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshRequest
+import com.example.car_booking_and_inventory_management.data.RefreshResult
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -13,11 +15,10 @@ interface authApi {
     suspend fun login(@Body user: LoginInput): Response<LoginResult>
 
     @POST("auth/refresh")
-    suspend fun refresh(@Body refreshToken: RefreshRequest): Response<LoginResult>
+    suspend fun refresh(@Body refreshToken: Refresh): Response<RefreshResult>
 
     @POST("auth/signup")
     suspend fun signup(@Body userInfo: Signup): Response<Signup>
-
 }
 
 

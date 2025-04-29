@@ -21,8 +21,10 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   phoneNumber: { type: String, required: true, trim:true, unique:true },
-  licenseNumber: { type: String},
-  licenseExpiry: { type: Date },
+  // licenseNumber: { type: String},
+  // licenseExpiry: { type: Date },
+  licensePhoto:{type:String, default:"Not set yet"},
+  profilePhoto:{type:String, default:"Not set yet"},
   birthDate: { type: String, required :true},
   history: [
     {

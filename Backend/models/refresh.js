@@ -9,15 +9,14 @@ const refreshSchema=new mongoose.Schema({
     },
     userId:{
         type:mongoose.Schema.Types.ObjectId,
-        required:true
     },
     createdAt:{
         type:Date,
-        required:true
+        default:()=>{new Date()}
     },
     expiresAt:{
         type:Date,
-        required:true
+        default:()=>new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
     }
 
 },{timeStamps:true})
