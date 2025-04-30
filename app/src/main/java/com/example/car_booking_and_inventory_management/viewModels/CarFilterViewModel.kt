@@ -45,11 +45,11 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
 
     var isLoading by mutableStateOf(false)
 
-    var pickUp by  mutableStateOf("Select destination")
-    var dropOff by  mutableStateOf("Select destination")
-    var startDate by  mutableStateOf("01/11/2025")
+    var pickUp by  mutableStateOf("Click to select destination")
+    var dropOff by  mutableStateOf("Click to select destination")
+    var startDate by  mutableStateOf("Click to select Date")
     var startTime by  mutableStateOf("09:00 am")
-    var endDate by  mutableStateOf("01/11/2025")
+    var endDate by  mutableStateOf("Click to select Date")
     var endTime by  mutableStateOf("09:00 am")
 
     var showDropOff by mutableStateOf(false)
@@ -169,6 +169,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
               _createBooking.value=Result.failure(Exception("some error shit, I am burnt out!!!!"))
               }
             }
+            
             catch(e:Exception){
                 _createBooking.value=Result.failure(e)
             }

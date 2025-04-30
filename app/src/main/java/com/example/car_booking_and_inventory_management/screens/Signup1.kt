@@ -1,5 +1,7 @@
 package com.example.car_booking_and_inventory_management.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -142,9 +144,10 @@ fun Signup1(modifier: Modifier = Modifier,navController: NavController, viewMode
             TextField(
                 value =birthDate,
                 onValueChange = {
-                   birthDateErr=validateBirthDate(it)
+                   birthDateErr=validateBirthDate(birthDate)
+                    Log.v(TAG, "BIRTHDATEERROR:${birthDateErr}, and ${birthDate}")
                 },
-                placeholder = {Text("${showDatePicker}" , style=TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D)))},
+                placeholder = {Text("Enter your Birth-Date" , style=TextStyle(fontFamily = Vold, color = Color(0xFF9D9D9D)))},
                 readOnly = true,
                 modifier=Modifier
                     .fillMaxWidth()

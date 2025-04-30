@@ -41,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -78,6 +80,10 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewMode
 
     val context= LocalContext.current
     val snackbarHostState= remember { SnackbarHostState() }
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
 
     Log.v(TAG,"${SignupState.value}")
 
@@ -266,6 +272,9 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewMode
             Spacer(modifier = Modifier.padding(24.dp))
             Button(
                 onClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+
                     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     val now: Date = Date()
                     viewModel.updateUsername(username)
@@ -300,7 +309,7 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewMode
             ) {
                 if (isLoading.value) {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.size(20.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()

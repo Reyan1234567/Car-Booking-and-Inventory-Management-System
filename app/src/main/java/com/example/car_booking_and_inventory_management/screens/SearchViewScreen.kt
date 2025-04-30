@@ -176,14 +176,19 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
         carsearchs?.onSuccess {cars->
             LazyColumn(modifier=Modifier.padding(2.dp)){
                 searchResultArray=cars
-                items(finalResults){car->
-                    CarDisplay(modifier=Modifier,car,{
-                        navController.navigate("singleCar/${car.name}")
-                    })
+                if(finalResults!= emptyList<Car>()){
+                    items(finalResults){car->
+                        CarDisplay(modifier=Modifier,car,{
+                            navController.navigate("singleCar/${car.name}")
+                        })
+                    }
+                }
+                else{
+                    item{ Text(text = "Nothing found") }
                 }
             }
         }?.onFailure {
-           Text("No Cars Found ")
+           Text("No Cars Found")
         }
     }
 }

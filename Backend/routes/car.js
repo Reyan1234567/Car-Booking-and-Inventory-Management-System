@@ -70,6 +70,8 @@ router.post("/api/filteredCars", async (req, res) => {
         }
 
         const convertToDate = (stringDate) => {
+            // const sdf=SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            // return sdf.parse(stringDate)
             const [date, month, year] = stringDate.split("/");
             const newDate = new Date(year, month - 1, date);
             return newDate;
@@ -85,7 +87,7 @@ router.post("/api/filteredCars", async (req, res) => {
             status:{$ne:"cancelled"},
             $or:[{startDate:{$gt:newEndDate}},
             {endDate:{$lt:newStartDate}}]
-        }).distinct(carId);
+        }).distinct('carId');
 
         const filteredCars=await Cars.find({
             _id:{$nin:CarIdsBookedAtThatTime}

@@ -11,10 +11,11 @@ const checkAccessToken=(req,res,next)=>{
     console.log(`IN THE MIDDLEWARE:${authorization}`)
 
     const accessToken=authorization.split(" ")[1]
+    console.log(`${accessToken} before check`)
     if(!accessToken){
         res.status(401).json({"error":"Unauthorized"})
     }
-
+    console.log("before verification")
     jwt.verify(accessToken, process.env.ACCESS_TOKEN,(decoded,err)=>{
         if(err){
             console.log(err)
@@ -22,12 +23,12 @@ const checkAccessToken=(req,res,next)=>{
             if(err.name === 'TokenExpiredError'){
                 errorMessage="Unauthorized - Token expired"
             }
-            res.status(401).json({"error": errorMessage})
+            return res.status(401).json({"error": errorMessage})
         }
         
         if(!decoded){
             console.log("Unauthorized: No decoded payload")
-            res.json({error:"Unauthorized-No decoded payload"}).status(401)
+            return res.json({error:"Unauthorized - No decoded payload"}).status(401)
         }
         next()
     } )

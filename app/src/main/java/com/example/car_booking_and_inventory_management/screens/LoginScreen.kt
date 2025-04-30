@@ -17,6 +17,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -41,6 +43,8 @@ fun LoginScreen(
     navController: NavController,
     viewModel: AuthViewModel
 ) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val loginState=viewModel.loginResult.collectAsState()
 
@@ -48,6 +52,9 @@ fun LoginScreen(
 
     var username by remember {mutableStateOf("")}
     var password by remember {mutableStateOf("")}
+
+    var usernameErr by remember {mutableStateOf("")}
+    var passwordErr by remember {mutableStateOf("")}
 
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -97,7 +104,10 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 TextField(
                     value = username,
-                    onValueChange = { username = it },
+                    onValueChange = {
+                        username = it
+                        usernameErr=validateFields(username)
+                         },
                     placeholder = {
                         Text(
                             "Username",
@@ -108,7 +118,7 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(1.dp,Color.LightGray, RoundedCornerShape(16.dp))
+                        .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
                         ,
                     colors = TextFieldDefaults.textFieldColors(
                         unfocusedIndicatorColor = Color.Transparent,
@@ -116,10 +126,19 @@ fun LoginScreen(
                         containerColor = Color.White
                     )
                 )
+                Row(modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start){
+                    Text(
+                        text = usernameErr,
+                        style = TextStyle(fontSize = 12.sp, color = Color.Red),
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        passwordErr=validateFields(password)},
                     visualTransformation = if(passwordVisible){
                         VisualTransformation.None
                     }
@@ -156,15 +175,24 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(1.dp,Color.LightGray, RoundedCornerShape(16.dp)),
+                        .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp)),
                     colors = TextFieldDefaults.textFieldColors(
                         unfocusedIndicatorColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         containerColor = Color.White
                     )
                 )
+                Row(
+                    modifier=Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ){
+                    Text(
+                        text = passwordErr,
+                        style = TextStyle(fontSize = 12.sp, color = Color.Red),
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -179,6 +207,8 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
                         if (username.isBlank() || password.isBlank()) {
                             Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                             return@Button
@@ -192,11 +222,17 @@ fun LoginScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFEA6307),
                         contentColor = Color.White
-                    )
+                    ),
+                    enabled = if(usernameErr=="" && passwordErr=="" && username!="" && password!=""){
+                        true
+                    }
+                    else{
+                        false
+                    }
                 ) {
                     if (isLoading.value) {
                         Box(
-                            modifier = Modifier.fillMaxHeight(),
+                            modifier = Modifier.size(20.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator()
@@ -219,7 +255,14 @@ fun LoginScreen(
     }
 }
 
-
+fun validateFields(field:String):String{
+    if(field.isBlank()){
+        return "This field is required"
+    }
+    else{
+        return ""
+    }
+}
 
 
 

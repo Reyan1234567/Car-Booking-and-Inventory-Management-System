@@ -132,8 +132,8 @@ router.post("/auth/refresh", async (req, res) => {
     jwt.verify(refreshToken, refreshToken_Secret,(err,decoded)=>{
       if(err){
         return res.status(401).json({ error: "Invalid refresh token" });
-
       }
+      
       if (!decoded) {
         return res.status(401).json({ error: "Invalid refresh token" });
       }
