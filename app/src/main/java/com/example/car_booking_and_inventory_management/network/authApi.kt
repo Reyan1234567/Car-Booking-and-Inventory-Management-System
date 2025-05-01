@@ -6,9 +6,12 @@ import com.example.car_booking_and_inventory_management.data.LoginResult
 import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshRequest
 import com.example.car_booking_and_inventory_management.data.RefreshResult
+import com.example.car_booking_and_inventory_management.data.Username
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface authApi {
     @POST("auth/signin")
@@ -19,6 +22,10 @@ interface authApi {
 
     @POST("auth/signup")
     suspend fun signup(@Body userInfo: Signup): Response<Signup>
+
+    @GET("checkAccessToken")
+    suspend fun checkAccessToken():Response<LoginResult>
+
 }
 
 

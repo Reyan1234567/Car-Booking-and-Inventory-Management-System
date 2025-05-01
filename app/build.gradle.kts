@@ -68,6 +68,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material)
+    implementation(libs.coil.compose)
 //    implementation(libs.androidx.compose.bom.v20250200)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

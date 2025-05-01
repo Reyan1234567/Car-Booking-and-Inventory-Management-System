@@ -1,5 +1,6 @@
 package com.example.car_booking_and_inventory_management.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,19 +55,21 @@ import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 import kotlinx.coroutines.runBlocking
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,viewModel: CarFilterViewModel,name:String) {
+fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,viewModel: CarFilterViewModel,plate:String) {
 
-    val legitmacyCheck=viewModel.legitimacyResponse.collectAsState()
+    val legitmacyCheck=viewModel.legitmacyResponse.collectAsState()
     val legit=legitmacyCheck.value
 
-
+    val snackbarHostState= remember { SnackbarHostState() }
     val viewModelResult=viewModel.carsFilterResponse.collectAsState()
     var theInfoIwantInAnArray by remember { mutableStateOf(emptyList<Car>()) }
     var theInfoIwant by remember { mutableStateOf(Car()) }
+
     viewModelResult.value?.onSuccess{info->
         theInfoIwantInAnArray=info.filter{
-        it.name==name
+        it.plate==plate
         }
         theInfoIwant=theInfoIwantInAnArray[0]
     }?.onFailure {
@@ -71,181 +77,212 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
     }
 
     LaunchedEffect(legit) {
-//        if(legit!=null){
-//            if(legit){
-//                val
-//                viewModel.createBooking()         }
-//            else{
-//                //navController and toast/snackBar
-//            }
-//
-//        }
+        legit?.onSuccess{
+//            snackbarHostState.showSnackbar(it.message.toString())
+        }?.onFailure {
+            navController.navigate("profile")
+            snackbarHostState.showSnackbar(it.message.toString())
+        }
     }
 
-    Box(modifier = Modifier.fillMaxSize()){
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround){
-            Image(
-                painter = rememberAsyncImagePainter(theInfoIwant.imageUrl),
-                contentDescription = "the image before",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding()
-                    .height(300.dp)
-            )
-            Spacer(modifier.padding(8.dp))
-            Text(text=theInfoIwant.name, style = TextStyle(fontFamily = Vold, fontSize = 20.sp), modifier=Modifier.padding(start=16.dp))
-            Card(modifier=Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-                colors=CardDefaults.cardColors(
-                    containerColor = Color.LightGray,
-                    contentColor = Color.Black
-                ),
-                shape= RoundedCornerShape(8.dp)
-            ){
-                Column(modifier=Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()){
-                    Text(text="Specifications", style = TextStyle(fontFamily = Vold, fontSize = 16.sp), modifier=Modifier.padding(4.dp))
-                    Row(modifier=Modifier
-                        .padding(4.dp)
-                        .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly){
-                        Column{
-                            Row{
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = "person",
-                                    modifier=Modifier.height(16.dp)
-                                )
-                                Spacer(modifier=Modifier.padding(2.dp))
-                                Text(theInfoIwant.model)
-                            }
-
-                            Row{
-                                Icon(
-                                    imageVector = Icons.Default.MailOutline,
-                                    contentDescription = "person",
-                                    modifier=Modifier.height(16.dp)
-
-                                )
-                                Spacer(modifier=Modifier.padding(2.dp))
-                                Text(theInfoIwant.passengerCapacity.toString())
-                            }
-                        }
-                        Spacer(modifier=Modifier.padding(8.dp))
-                        Column {
-                            Row{
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = "person",
-                                    modifier=Modifier.height(16.dp)
-                                )
-                                Spacer(modifier=Modifier.padding(2.dp))
-                                Text(theInfoIwant.luggageCapacity)
-                            }
-
-                            Row{
-                                Icon(
-                                    imageVector = Icons.Default.Build,
-                                    contentDescription = "person",
-                                    modifier=Modifier.height(16.dp)
-                                )
-                                Spacer(modifier=Modifier.padding(2.dp))
-                                Text(theInfoIwant.category)
-                            }
-                        }
-                        Spacer(modifier=Modifier.padding(8.dp))
-                        Column(){
-                            Text("vehicle Type", style = TextStyle(fontFamily = Vold))
-                            Text(theInfoIwant.type)
-                        }
-                        Spacer(modifier=Modifier.padding(8.dp))
-                        Column(){
-                            Text("Fuel Type", style = TextStyle(fontFamily = Vold))
-                            Text(theInfoIwant.fuelType)
-                        }
-                    }
-                }
-            }
-
-            Column(modifier=Modifier.padding(16.dp)){
-                Text("Price per day", style = TextStyle(fontFamily = Vold))
-                Text("1500 ETB",style = TextStyle(fontFamily = Inter))
-            }
-
-            Card(
-                modifier=Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors=CardDefaults.cardColors(
-                    containerColor = Color(0xFFEC7320),
-                    contentColor = Color.White
-                ),
-                shape= RoundedCornerShape(8.dp)
-            ){
-                Column(modifier=Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()){
-                    Row(modifier=Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
-                        Column {
-                            Text("Price per day", style = TextStyle(fontFamily = Vold))
-                            Text("1500 ETB",style = TextStyle(fontFamily = Inter))
-                        }
-                        Column {
-                            Text("Price per day", style = TextStyle(fontFamily = Vold))
-                            Text("1500 ETB",style = TextStyle(fontFamily = Inter))
-                        }
-                    }
-                    Row(modifier=Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
-                        Column {
-                            Text("Price per day", style = TextStyle(fontFamily = Vold))
-                            Text("1500 ETB",style = TextStyle(fontFamily = Inter))
-                        }
-                        Column {
-                            Text("Price per day", style = TextStyle(fontFamily = Vold))
-                            Text("1500 ETB",style = TextStyle(fontFamily = Inter))
-                        }
-                    }
-                }
-                Column(modifier=Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
-                    Text("Price per day", style = TextStyle(fontFamily = Vold))
-                    Text("1500 ETB",style = TextStyle(fontFamily = Inter))
-                }
-            }
-            Button(onClick = {
-                    viewModel.checkLegitimacy()
-            },
-                modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFEA6307)
-                ),
-                shape = RoundedCornerShape(12.dp)
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ){
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.SpaceAround
             ) {
-                Text("Book now")
+                Image(
+                    painter = rememberAsyncImagePainter(theInfoIwant.imageUrl),
+                    contentDescription = "the image before",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding()
+                        .height(300.dp)
+                )
+                Spacer(modifier.padding(8.dp))
+                Text(
+                    text = theInfoIwant.name,
+                    style = TextStyle(fontFamily = Vold, fontSize = 20.sp),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.LightGray,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Specifications",
+                            style = TextStyle(fontFamily = Vold, fontSize = 16.sp),
+                            modifier = Modifier.padding(4.dp)
+                        )
+                        Row(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Column {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = "person",
+                                        modifier = Modifier.height(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.padding(2.dp))
+                                    Text(theInfoIwant.year.toString())
+                                }
+
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.MailOutline,
+                                        contentDescription = "person",
+                                        modifier = Modifier.height(16.dp)
+
+                                    )
+                                    Spacer(modifier = Modifier.padding(2.dp))
+                                    Text(theInfoIwant.passengerCapacity.toString())
+                                }
+                            }
+                            Spacer(modifier = Modifier.padding(8.dp))
+                            Column {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = "person",
+                                        modifier = Modifier.height(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.padding(2.dp))
+                                    Text(theInfoIwant.luggageCapacity)
+                                }
+
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.Build,
+                                        contentDescription = "person",
+                                        modifier = Modifier.height(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.padding(2.dp))
+                                    Text(theInfoIwant.category)
+                                }
+                            }
+                            Spacer(modifier = Modifier.padding(8.dp))
+                            Column() {
+                                Text("vehicle Type", style = TextStyle(fontFamily = Vold))
+                                Text(theInfoIwant.type)
+                            }
+                            Spacer(modifier = Modifier.padding(8.dp))
+                            Column() {
+                                Text("Fuel Type", style = TextStyle(fontFamily = Vold))
+                                Text(theInfoIwant.fuelType)
+                            }
+                        }
+                    }
+                }
+
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Price per day", style = TextStyle(fontFamily = Vold))
+                    Text("1500 ETB", style = TextStyle(fontFamily = Inter))
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFEC7320),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text("Price per day", style = TextStyle(fontFamily = Vold))
+                                Text("1500 ETB", style = TextStyle(fontFamily = Inter))
+                            }
+                            Column {
+                                Text("Price per day", style = TextStyle(fontFamily = Vold))
+                                Text("1500 ETB", style = TextStyle(fontFamily = Inter))
+                            }
+                        }
+                        Row(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text("Price per day", style = TextStyle(fontFamily = Vold))
+                                Text("1500 ETB", style = TextStyle(fontFamily = Inter))
+                            }
+                            Column {
+                                Text("Price per day", style = TextStyle(fontFamily = Vold))
+                                Text("1500 ETB", style = TextStyle(fontFamily = Inter))
+                            }
+                        }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Price per day", style = TextStyle(fontFamily = Vold))
+                        Text("1500 ETB", style = TextStyle(fontFamily = Inter))
+                    }
+                }
+                Button(
+                    onClick = {
+                        val userName = runBlocking { viewModel.getUsername() }
+                        if (userName != null) {
+                            viewModel.checkLegitimacy(userName)
+                        }
+                    },
+                    modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFEA6307)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Book now")
+                }
+
             }
 
-        }
-
-        IconButton(onClick = {}, modifier=Modifier.padding(4.dp)) {
-            Icon(
-                imageVector= Icons.Default.KeyboardArrowLeft,
-                contentDescription ="back icon",
-                modifier=Modifier
-                    .padding(4.dp)
-                    .background(
-                        color = Color.Gray,
-                        shape = RoundedCornerShape(4.dp)
-                    ),
-            )
+            IconButton(onClick = {
+                navController.popBackStack()
+            }, modifier = Modifier.padding(16.dp)) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    contentDescription = "back icon",
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .background(
+                            color = Color.Gray,
+                            shape = RoundedCornerShape(4.dp)
+                        ),
+                )
+            }
         }
     }
 }

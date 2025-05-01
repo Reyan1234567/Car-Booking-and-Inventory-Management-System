@@ -39,15 +39,18 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.FilterItem
@@ -88,7 +91,6 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
 
     var filterFlag by remember { mutableStateOf("") }
 
-
         val finalResults = searchResultArray.filter { car ->
             val matchesSearch = search.isBlank() ||
                     car.name.contains(search, ignoreCase = true) ||
@@ -123,6 +125,9 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
                         color = Color.LightGray,
                         shape = RoundedCornerShape(8.dp)
                     )
+                    .clickable{
+                        navController.popBackStack()
+                    }
                     .height(45.dp)
                     .padding(8.dp)
 
@@ -174,17 +179,18 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
         Spacer(modifier=Modifier.padding(4.dp))
 
         carsearchs?.onSuccess {cars->
-            LazyColumn(modifier=Modifier.padding(2.dp)){
+            LazyColumn(modifier=Modifier.padding(2.dp), horizontalAlignment = Alignment.CenterHorizontally){
                 searchResultArray=cars
                 if(finalResults!= emptyList<Car>()){
                     items(finalResults){car->
                         CarDisplay(modifier=Modifier,car,{
-                            navController.navigate("singleCar/${car.name}")
+                            Log.v(TAG, car.plate)
+                            navController.navigate("singleCar/${car.plate}")
                         })
                     }
                 }
                 else{
-                    item{ Text(text = "Nothing found") }
+                    item{ Text(text = "Nothing found", style = TextStyle(fontSize = 20.sp, fontFamily = Vold), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(16.dp)) }
                 }
             }
         }?.onFailure {
@@ -222,7 +228,9 @@ fun FilterItems(
 @Composable
 fun CarDisplay(modifier: Modifier = Modifier, car:Car, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier.padding(8.dp).clickable{
+            onClick()
+        },
         colors= CardDefaults.cardColors(containerColor = Color(0xFFEC7320)),
         shape= RoundedCornerShape(12.dp)
     ){
@@ -269,11 +277,14 @@ fun CarDisplay(modifier: Modifier = Modifier, car:Car, onClick: () -> Unit) {
                 )
 
             }
-           Image(
-               painter = rememberAsyncImagePainter(car.imageUrl),
-               contentDescription = "",
-               modifier=Modifier.width(120.dp),
-               contentScale = ContentScale.Crop
+           AsyncImage(
+               model = car.imageUrl,
+               contentDescription = "Example Image",
+               modifier = Modifier
+                   .height(200.dp)
+                   .width(150.dp)
+                   .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop,
            )
         }
     }

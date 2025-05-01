@@ -18,6 +18,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.Booking
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
+import com.example.car_booking_and_inventory_management.data.Username
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -40,17 +41,17 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     val carsFilterResponse: StateFlow<Result<List<Car>>?> =_carsFilterResponse.asStateFlow()
 
 
-    private val _legitimacyResponse= MutableStateFlow<Boolean?>(null)
-    val legitimacyResponse:StateFlow<Boolean?> =_legitimacyResponse.asStateFlow()
+    private val _legitmacyResponse= MutableStateFlow<Result<Username>?>(null)
+    val legitmacyResponse:StateFlow<Result<Username>?> =_legitmacyResponse.asStateFlow()
 
     var isLoading by mutableStateOf(false)
 
     var pickUp by  mutableStateOf("Click to select destination")
     var dropOff by  mutableStateOf("Click to select destination")
     var startDate by  mutableStateOf("Click to select Date")
-    var startTime by  mutableStateOf("09:00 am")
+    var startTime by  mutableStateOf("Click to select time")
     var endDate by  mutableStateOf("Click to select Date")
-    var endTime by  mutableStateOf("09:00 am")
+    var endTime by  mutableStateOf("Click to select time")
 
     var showDropOff by mutableStateOf(false)
     private set
@@ -82,6 +83,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     fun updateEndTime(endtime:String){
         endTime=endtime
     }
+
 
     fun getLocations(query:String){
         viewModelScope.launch{
@@ -142,20 +144,26 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
         }
     }
 
-    fun checkLegitimacy(){
-        val result= runBlocking{ repository.checkLegitimacy() }
-        if(result){
-            _legitimacyResponse.value=true
-        }
-        else{
-            _legitimacyResponse.value=false
+    fun checkLegitimacy(username: String){
+        viewModelScope.launch {
+            try {
+                val result=repository.checkLegitimacy(username)
+                if(result.isSuccessful && result.body()!=null){
+                    _legitmacyResponse.value=Result.success(result.body()!!)
+                }
+                else{
+                    _legitmacyResponse.value=Result.failure(Exception(result.errorBody()?.string()))
+                }
+            }
+            catch (e:Exception){
+                _legitmacyResponse.value=Result.failure(e)
+            }
         }
     }
 
-//    suspend fun getUsername():String?{
-//            return repository.getUsername()
-//
-//    }
+    suspend fun getUsername():String?{
+            return repository.getUsername()
+    }
 
 
     fun createBooking(booking: Booking){

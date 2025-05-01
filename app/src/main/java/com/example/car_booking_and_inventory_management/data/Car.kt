@@ -3,6 +3,7 @@ package com.example.car_booking_and_inventory_management.data
 import java.util.Date
 
 data class Car(
+    val plate:String="00000",
     val name: String = "Unknown Car",
     val make: String = "Unknown Make",
     val price: Int = 0,

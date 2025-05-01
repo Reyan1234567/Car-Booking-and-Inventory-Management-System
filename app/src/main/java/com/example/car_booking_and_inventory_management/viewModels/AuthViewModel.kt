@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
 import com.example.car_booking_and_inventory_management.data.Signup
+import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.repositories.authRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.Result
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +28,10 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
 
     private val _signupResponse=MutableStateFlow<Result<Signup>?>(null)
     val signupResponse:StateFlow<Result<Signup>?> =_signupResponse.asStateFlow()
+
+    private val _accessTokenResponse= MutableStateFlow<Result<LoginResult>?>(null)
+    val accessTokenResponse:StateFlow<Result<LoginResult>?> =_accessTokenResponse.asStateFlow()
+
 
     var isLoading1 = MutableStateFlow(false)
 ////////////////////////////////////////////////////////////////////
@@ -128,4 +134,23 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
             }
         }
     }
+
+    fun checkAccessToken(){
+        viewModelScope.launch {
+            try {
+                val result=repository.checkAT()
+                if(result.isSuccessful && result.body()!=null){
+                    _accessTokenResponse.value=Result.success(result.body()!!)
+                }
+                else{
+                    _accessTokenResponse.value=Result.failure(Exception(result.errorBody()?.string()))
+                }
+            }
+            catch (e:Exception){
+                _accessTokenResponse.value=Result.failure(e)
+            }
+        }
+    }
+
+
 }

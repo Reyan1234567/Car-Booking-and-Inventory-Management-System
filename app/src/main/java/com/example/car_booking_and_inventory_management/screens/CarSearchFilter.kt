@@ -83,6 +83,7 @@ import java.util.Date
 import java.util.Locale
 
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -90,8 +91,12 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
 //    var differentDropOff by remember { mutableStateOf(false) }
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
-    var selectedStartTime by remember {mutableStateOf(LocalTime.now())}
-    var selectedEndTime by remember {mutableStateOf(LocalTime.now())}
+    var selectedStartTime by remember {mutableStateOf("")}
+    var selectedEndTime by remember {mutableStateOf("")}
+
+    val calendar = Calendar.getInstance()
+    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+    val minute = calendar.get(Calendar.MINUTE)
 
     var differentDropOff=viewModel.showDropOff
     var showCalander by remember { mutableStateOf(false) }
@@ -100,24 +105,26 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
     var selectedEndDateInMillis by remember { mutableStateOf<Long?>(null) }
 
     var FilterResult=viewModel.carsFilterResponse.collectAsState()
-
+    var filterResult=FilterResult.value
     var isLoading=viewModel.isLoading
 
     val context= LocalContext.current
     val snackbarHostState= remember { SnackbarHostState() }
 
-    LaunchedEffect(FilterResult.value) {
-        val result=FilterResult.value
+    LaunchedEffect(filterResult) {
+        val result=filterResult
         result?.onSuccess {value->
             navController.navigate("searchResults")
+            filterResult=null
             Log.v(TAG,"${value}")
         }?.onFailure {value->
             Log.v(TAG,"${value}")
-            snackbarHostState.showSnackbar(value.message.toString())
+            snackbarHostState.showSnackbar("${value.message}")
         }
     }
     Scaffold(
-        bottomBar = {
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+                bottomBar = {
             BottomNavigationBar(modifier, navController)
         }
     ) { padding ->
@@ -276,9 +283,11 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                         Text(
                             text = viewModel.startTime,
                             style = TextStyle(fontSize = 16.sp, color = Color.Black, fontFamily = Vold),
-                            modifier = Modifier.padding(16.dp).clickable{
-                                showStartTimePicker=true
-                            },
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .clickable {
+                                    showStartTimePicker = true
+                                },
                             textAlign = TextAlign.Start
                         )
                         Text(
@@ -301,9 +310,11 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                         Text(
                             text = viewModel.endTime,
                             style = TextStyle(fontSize = 16.sp, color = Color.Black, fontFamily = Vold),
-                            modifier = Modifier.padding(16.dp).clickable{
-                                showEndTimePicker=true
-                            },
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .clickable {
+                                    showEndTimePicker = true
+                                },
                             textAlign = TextAlign.Start
                         )
                     }
@@ -320,6 +331,8 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                                 viewModel.dropOff,
                                 viewModel.startDate,
                                 viewModel.endDate,
+                                viewModel.startTime,
+                                viewModel.endTime
                             )
                             viewModel.getFilteredCars(filter)
                             Log.v(TAG,"${viewModel.pickUp},${viewModel.dropOff},${viewModel.startDate},${viewModel.endDate}")
@@ -329,6 +342,8 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                                 viewModel.dropOff,
                                 viewModel.startDate,
                                 viewModel.endDate,
+                                viewModel.startTime,
+                                viewModel.endTime
                             )
                             viewModel.getFilteredCars(filter)
                             Log.v(TAG,"${viewModel.pickUp},${viewModel.dropOff},${viewModel.startDate},${viewModel.endDate}")
@@ -342,7 +357,7 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(12.dp),
-                    enabled = if(viewModel.pickUp=="Click to select your destination"||viewModel.pickUp=="Click to select your destination"||viewModel.startDate=="Click to select Date"||viewModel.endDate=="Click to select Date"){
+                    enabled = if(viewModel.pickUp=="Click to select your destination"||viewModel.pickUp=="Click to select your destination"||viewModel.startDate=="Click to select Date"||viewModel.endDate=="Click to select Date"||viewModel.endTime=="Click to select time"||viewModel.startTime=="Click to select time"){
                         false
                     }
                     else{
@@ -378,77 +393,41 @@ fun CarSearchFilter(modifier: Modifier = Modifier, navController: NavController,
                     selectedEndDateInMillis = selectedEndDateMillis
                 viewModel.updateStartDate(selectedStartDateInMillis?.let { formatDate(it) }?:viewModel.startDate)
                 viewModel.updateEndDate(selectedEndDateInMillis?.let { formatDate(it) }?:viewModel.endDate)
-
             },
                     onDismiss = { showCalander = false }
 
         )
     }
-
-
-
-    if (showEndTimePicker) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = selectedEndTime.hour,
-            initialMinute = selectedEndTime.minute,
-            is24Hour = false
-        )
-
+    if(showStartTimePicker){
         TimePickerDialog(
-            onCancel = { showEndTimePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        selectedEndTime = LocalTime.of(timePickerState.hour, timePickerState.minute)
-                        viewModel.updateEndTime(selectedEndTime.format(DateTimeFormatter.ofPattern("HH:mm")))
-                        showEndTimePicker = false
-                    }
-                ) {
-                    Text("OK")
-                }
+            context,R.style.CustomTimePickerDialogTheme,{
+                _,selectedHour:Int, selectedMinute:Int->
+                selectedStartTime=String.format("%2d:%02d", selectedHour, selectedMinute)
+                viewModel.startTime=selectedStartTime
+                showStartTimePicker=false
             },
-            dismissButton = {
-                TextButton(onClick = { showEndTimePicker = false }) {
-                    Text("Cancel")
-                }
-            }
-        ) {
-            TimePicker(state = timePickerState)
-        }
+            hour,
+            minute,
+            false
+        ).show()
     }
+
+    if(showEndTimePicker){
+        TimePickerDialog(
+            context, R.style.CustomTimePickerDialogTheme,{
+                    _,selectedHour:Int, selectedMinute:Int->
+                selectedEndTime=String.format("%2d:%02d", selectedHour, selectedMinute)
+                viewModel.endTime=selectedEndTime
+                showEndTimePicker=false
+            },
+            hour,
+            minute,
+            false
+        ).show()
+    }
+
 }
 
-fun TimePicker(){
-    if (showStartTimePicker) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = selectedStartTime.hour,
-            initialMinute = selectedStartTime.minute,
-            is24Hour = false
-        )
-
-        TimePickerDialog(
-            onCancel = { showStartTimePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        selectedStartTime = LocalTime.of(timePickerState.hour, timePickerState.minute)
-                        viewModel.updateStartTime(selectedStartTime.format(DateTimeFormatter.ofPattern("HH:mm")))
-                        showStartTimePicker = false
-                    }
-                ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showStartTimePicker = false }) {
-                    Text("Cancel")
-                }
-            }
-        ) {
-            TimePicker(state = timePickerState)
-        }
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -465,6 +444,7 @@ fun DateRangePickerModal(
     val start=startInMillis?.let{Date(it)}
     val end= endInMillis?.let{ Date(it) }
     val Today= Date(System.currentTimeMillis())
+
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {

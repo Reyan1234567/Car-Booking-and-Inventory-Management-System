@@ -5,6 +5,7 @@ import com.example.car_booking_and_inventory_management.data.Booking
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
 import com.example.car_booking_and_inventory_management.data.Location
+import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.network.searchApi
 import retrofit2.Response
 
@@ -21,9 +22,13 @@ class CarFilterRepository(private val api:searchApi, private val tokenManager: T
         return api.getLocations(query)
     }
 
-//    suspend fun getUsername():String?{
-//        return tokenManager.getUsername()
-//    }
+    suspend fun getUsername():String?{
+        return tokenManager.getUsername()
+    }
+
+    suspend fun checkLegitimacy(username: String): Response<Username> {
+        return api.checkLegitimacy(username)
+    }
 
     suspend fun createBooking(booking:Booking): Response<Booking>{
         return api.createBooking(booking)

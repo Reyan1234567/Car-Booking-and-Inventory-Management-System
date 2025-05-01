@@ -2,4 +2,11 @@
 <resources>
 
     <style name="Theme.CarBookingandInventoryManagement" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="CustomTimePickerDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="colorPrimary">#FF5722</item>
+        <item name="colorPrimaryVariant">#E64A19</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+    </style>
+
 </resources>

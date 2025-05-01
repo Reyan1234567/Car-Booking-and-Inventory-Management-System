@@ -6,6 +6,7 @@ import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
 import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshResult
+import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.network.authApi
 import retrofit2.Response
 import javax.inject.Inject
@@ -39,13 +40,16 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
 //    suspend fun saveUserInfo(username: String) {
 //        tokenManager.saveUserInfo(username)
 //    }
-
         suspend fun getAccessToken() {
             tokenManager.getAccessToken()
         }
 
         suspend fun getRefreshToken() {
             tokenManager.getRefreshToken()
+        }
+
+        suspend fun getUsername() {
+            tokenManager.getUsername()
         }
 
         suspend fun clearTokens() {
@@ -64,5 +68,8 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
             return api.refresh(body)
         }
 
+        suspend fun checkAT():Response<LoginResult>{
+            return api.checkAccessToken()
+        }
 }
 

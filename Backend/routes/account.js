@@ -16,25 +16,25 @@ const refreshToken_Secret = process.env.REFRESH_TOKEN;
 router.post("/auth/signup", async (req, res) => {
   try {
     const { body } = req;
-    if (!body.username || !body.email || !body.password ||!body.phoneNumber ||!body.firstname ||!body.lastname ||!body.birthDate) {
-      console.log(body)
-      return res.status(400).json({ error: "All fields must be filled" });
+    if (!body.username || !body.email || !body.password || !body.phoneNumber || !body.firstname || !body.lastname || !body.birthDate) {
+      console.log(body);
+      return res.status(400).send("All fields must be filled");
     }
 
     const userExistence = await User.findOne({ username: body.username });
     if (userExistence) {
-      return res.status(400).json({ error: "Username already exists" });
+      return res.status(400).send("Username already exists");
     }
 
     const emailExistence = await User.findOne({ email: body.email });
     if (emailExistence) {
-      return res.status(400).json({ error: "Email already exists" });
+      return res.status(400).send("Email already exists");
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValidEmail = emailRegex.test(body.email);
     if (!isValidEmail) {
-      return res.status(400).json({ error: "Email is not valid" });
+      return res.status(400).send("Email is not valid");
     }
 
     const salt = 10;
@@ -54,13 +54,18 @@ router.post("/auth/signup", async (req, res) => {
     res.status(201).json(savedUser);
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).send("Internal server error");
   }
 });
 
-router.get("/getUsers",checkAccessToken,async (req, res) => {
-  const response = User.findAll();
-  res.send(response);
+router.get("/getUsers", checkAccessToken, async (req, res) => {
+  try {
+    const response = await User.find();
+    res.send(response);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).send("Internal server error");
+  }
 });
 
 //Sign-in
@@ -68,7 +73,7 @@ router.post("/auth/signin", async (req, res) => {
   try {
     const { body } = req;
     if (!body.username || !body.password) {
-      return res.status(400).json({ error: "All fields must be filled" });
+      return res.status(400).send("All fields must be filled");
     }
 
     const user = await User.findOne({ username: body.username });
@@ -78,7 +83,7 @@ router.post("/auth/signin", async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(body.password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).send("Invalid credentials");
     }
 
     const accessToken = jwt.sign(
@@ -94,7 +99,7 @@ router.post("/auth/signin", async (req, res) => {
     );
 
     // Save refresh token
-    await new Refresh({ refreshToken: refreshToken, username:user._id }).save();
+    await new Refresh({ refreshToken: refreshToken, username: user._id }).save();
 
     res.status(200).json({
       accessToken,
@@ -103,93 +108,110 @@ router.post("/auth/signin", async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        phoneNumber:user.phoneNumber,
-        profilePhoto:user.profilePhoto,
-        licensePhoto:user.licensePhoto,
-        firstName:user.firstName,
-        lastName:user.lastName
+        phoneNumber: user.phoneNumber,
+        profilePhoto: user.profilePhoto,
+        licensePhoto: user.licensePhoto,
+        firstName: user.firstName,
+        lastName: user.lastName,
       },
     });
   } catch (error) {
     console.error("Signin error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).send("Internal server error");
   }
 });
 
 //RefreshToken
 router.post("/auth/refresh", async (req, res) => {
   try {
+    console.log("shiiii in the refresh route")
     const { refreshToken } = req.body;
+    console.log(refreshToken)
     if (!refreshToken) {
-      return res.status(404).json({ error: "Refresh token Not found" });
+      console.log("shiiii no refreshToken")
+      return res.status(404).send("Refresh token not found");
     }
 
-    const storedToken = await Refresh.findOne({ token: refreshToken });
+    const storedToken = await Refresh.findOne({ refreshToken: refreshToken });
+    console.log("storedToken:", storedToken)
     if (!storedToken) {
-      return res.status(401).json({ error: "Invalid refresh token" });
+      console.log("shiiii no stored token")
+      return res.status(401).send("Invalid refresh token");
     }
 
-    jwt.verify(refreshToken, refreshToken_Secret,(err,decoded)=>{
-      if(err){
-        return res.status(401).json({ error: "Invalid refresh token" });
+    jwt.verify(refreshToken, refreshToken_Secret, async (err, decoded) => {
+      console.log("shiiii in the verify function")
+      if (err) {
+        console.log("shiiii in the verify errr")
+        console.error(err);
+        return res.status(401).send("Invalid refresh token");
       }
-      
+
       if (!decoded) {
-        return res.status(401).json({ error: "Invalid refresh token" });
+        console.log("shiii no decoded")
+        return res.status(401).send("Invalid refresh token");
       }
-    })
-    
 
-    const accessToken = jwt.sign(
-      { userId: decoded.userId, username: decoded.username },
-      accessToken_Secret,
-      { expiresIn: "15m" }
-    );
+      const accessToken = jwt.sign(
+        { userId: decoded.userId, username: decoded.username },
+        accessToken_Secret,
+        { expiresIn: "15m" }
+      );
 
-    const newRefreshToken = jwt.sign(
-      { userId: decoded.userId, username: decoded.username },
-      refreshToken_Secret,
-      { expiresIn: "3d" }
-    );
+      const newRefreshToken = jwt.sign(
+        { userId: decoded.userId, username: decoded.username },
+        refreshToken_Secret,
+        { expiresIn: "3d" }
+      );
 
-    // Update stored refresh token
-    await Refresh.findOneAndUpdate(
+      // Update stored refresh token
+      await Refresh.findOneAndUpdate(
       { token: refreshToken },
       { token: newRefreshToken }
-    );
+);
 
-    res.status(200).json({
-      accessToken,
-      refreshToken: newRefreshToken,
+      res.status(200).json({
+        accessToken,
+        refreshToken: newRefreshToken,
+      });
     });
   } catch (error) {
     console.error("Refresh token error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).send("Internal server error");
   }
 });
 
+//check if accessToken is present
+router.get("/checkAccessToken",checkAccessToken,(req,res)=>{
+  try{
+    res.status(200).send(req.user)
+  }
+  catch(e){
+    res.status(400).send("Some error happened: e.message")
+    console.log(e)
+  }
+})
 
+// check if the user's Legitmacy
+router.get("api/checkLegitimacy",checkAccessToken,async (req, res) => {
+  const { username } = req.query;
 
-//check if the user's Legitmacy
-// router.get("api/checkLegitimacy", async (req, res) => {
-//   const { username } = req.query;
-
-//   try {
-//     const user = User.find({
-//       username: username,
-//     });
-//     if (!user) {
-//       return res.status(404).send("User can't be found");
-//     }
-//     if (!user.licensePhoto || !user.profilePhoto) {
-//       return res.status(200).send(false);
-//     } else {
-//       return res.status(200).send(true);
-//     }
-//   } catch (e) {
-//     res.status(400).send(e.message);
-//     console.log(e);
-//   }
-// });
+  try {
+    const user = User.find({
+      username: username,
+    });
+    if (!user) {
+      return res.status(404).send("User can't be found");
+    }
+    if (!user.licensePhoto || !user.profilePhoto) {
+      return res.status(400).send("license and profile photo aren't uploaded");
+    } else {
+      return res.status(200).send(user);
+    }
+  } catch (e) {
+    res.status(400).send(e.message);
+    console.log(e);
+  }
+});
 
 export default router;

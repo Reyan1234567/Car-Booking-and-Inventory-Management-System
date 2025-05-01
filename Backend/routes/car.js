@@ -79,15 +79,17 @@ router.post("/api/filteredCars", async (req, res) => {
 
         console.log(body.startDate);
         const newStartDate = convertToDate(body.startDate);
+        console.log(newStartDate)
         const newEndDate = convertToDate(body.endDate);
-
-        console.log(newStartDate);
+        console.log(newEndDate)
 
         const CarIdsBookedAtThatTime = await Bookings.find({
-            status:{$ne:"cancelled"},
+            bookingStatus:{$eq:"Cancelled"},
             $or:[{startDate:{$gt:newEndDate}},
-            {endDate:{$lt:newStartDate}}]
+            {endDate:{$lt:newStartDate}}],
         }).distinct('carId');
+
+        console.log(CarIdsBookedAtThatTime)
 
         const filteredCars=await Cars.find({
             _id:{$nin:CarIdsBookedAtThatTime}

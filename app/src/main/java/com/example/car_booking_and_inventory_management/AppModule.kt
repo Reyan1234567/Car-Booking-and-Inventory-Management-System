@@ -92,7 +92,7 @@ fun provideAuthInterceptor(
     tokenManager: TokenManager
 ): AuthInterceptor {
     val retrofit = Retrofit.Builder()
-        .baseUrl("https://localhost:4000/") // ⚠️ this needs to be real when deployed
+        .baseUrl("http://192.168.157.147:4000/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 

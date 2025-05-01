@@ -4,6 +4,7 @@ import com.example.car_booking_and_inventory_management.data.Booking
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
 import com.example.car_booking_and_inventory_management.data.Location
+import com.example.car_booking_and_inventory_management.data.Username
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -21,9 +22,10 @@ interface searchApi {
     @POST("api/filteredCars")
     suspend fun getFilteredCars(@Body filters:CarFilters):Response<List<Car>>
 
-//    @GET("api/checkLegitimacy")
-//    suspend fun checkLegitimacy(@Query("username") username:String):Response<Boolean>
     @POST("api/booking")
     suspend fun createBooking(@Body booking: Booking):Response<Booking>
+
+    @GET("api/checkLegitimacy")
+    suspend fun checkLegitimacy(@Query("username") username:String):Response<Username>
 
 }
