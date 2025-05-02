@@ -1,15 +1,19 @@
 package com.example.car_booking_and_inventory_management.viewModels
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
 import com.example.car_booking_and_inventory_management.data.Signup
+import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.repositories.authRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +23,9 @@ import kotlin.Result
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,8 +39,11 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
     private val _accessTokenResponse= MutableStateFlow<Result<LoginResult>?>(null)
     val accessTokenResponse:StateFlow<Result<LoginResult>?> =_accessTokenResponse.asStateFlow()
 
+    private val _profileUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
+    val profileUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
 
     var isLoading1 = MutableStateFlow(false)
+    var isLoading3=MutableStateFlow(false)
 ////////////////////////////////////////////////////////////////////
     var firstname by mutableStateOf("")
     var lastname by mutableStateOf("")
@@ -152,5 +162,47 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
         }
     }
 
+    fun createMultipartBody(context: Context, uri: Uri, partName:String="image"):MultipartBody.Part?{
+        return try{
+            val inputStream=context.contentResolver.openInputStream(uri)  //The raw binary data
+            val fileBytes=inputStream?.readBytes()
+            val requestFile=fileBytes?.let{
+                RequestBody.create("image/*".toMediaTypeOrNull(), it)
+            }?: return null
+
+            MultipartBody.Part.createFormData(
+                partName,
+                "image_${System.currentTimeMillis()}.jpg",
+                requestFile
+            )
+        }
+        catch(e:Exception){
+            null
+        }
+    }
+
+    fun uploadImage(context:Context, uri: Uri, partName:String="image" ){
+        viewModelScope.launch {
+            isLoading3.value=true
+            val multipart=createMultipartBody(context,uri)
+            if(multipart!=null){
+                try {
+                   val response=repository.uploadProfile(multipart)
+                    if(response.isSuccessful && response.body()!=null){
+                        _profileUploadResult.value= Result.success(response.body()!!)
+                    }
+                    else{
+                        _profileUploadResult.value= Result.failure(Exception(response.errorBody()?.string()))
+                    }
+                }
+                catch (e:Exception){
+                    _profileUploadResult.value= Result.failure(e)
+                }
+                finally {
+                    isLoading3.value=false
+                }
+            }
+        }
+    }
 
 }

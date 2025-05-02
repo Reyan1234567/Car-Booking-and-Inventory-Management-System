@@ -1,9 +1,12 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,10 +30,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,20 +53,24 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.example.car_booking_and_inventory_management.ui.theme.Inter
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
+import com.example.car_booking_and_inventory_management.viewModels.AuthViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, viewModel:AuthViewModel) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var contactNumber by remember { mutableStateOf("") }
     val context= LocalContext.current
     var imageUri by remember{mutableStateOf<Uri?>(null)}
-
+    val snackbarHostState= remember { SnackbarHostState() }
     fun updateUsername(user:String){
         username=user
     }
@@ -75,9 +86,24 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     ){uri: Uri?->
         imageUri=uri
     }
+    val uploadResult=viewModel.profileUploadResult.collectAsState()
+    val isLoading=viewModel.isLoading3.collectAsState()
+
+    LaunchedEffect(uploadResult.value) {
+    val result=uploadResult.value
+        result?.onSuccess {
+            Log.v(TAG, "upload successful")
+        snackbarHostState.showSnackbar("successfully uploaded")
+        }?.onFailure {
+            Log.v(TAG, "upload wasn't successful")
+            snackbarHostState.showSnackbar("${it.message}")
+        }
+    }
+
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+        ,bottomBar = { BottomNavigationBar(navController = navController) }
     ) {
         Column(
             modifier = Modifier
@@ -132,6 +158,23 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 //                    imageVector = Icons.Default.Add,
 //                    contentDescription = ""
 //                ))
+            Button(onClick = {launcher.launch("image/*")}) {
+                Text("Select image")
+            }
+            Button(onClick = {
+                if(imageUri!=null){
+                    viewModel.uploadImage(uri = imageUri!!, context = context)
+                }
+            }) {
+                Text("Upload image")
+            }
+            imageUri?.let { uri ->
+                Image(
+                    painter = rememberImagePainter(uri),
+                    contentDescription = "Selected Image",
+                    modifier = Modifier.size(200.dp)
+                )
+
             Button(
                 onClick = { /* TODO: Save action */ },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
@@ -161,7 +204,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileField(label: String, value: String) {
     Column(
@@ -186,7 +228,7 @@ fun ProfileField(label: String, value: String) {
 
         )
     }
-}
+}}
 
 //@Preview(showBackground = true)
 //@Composable

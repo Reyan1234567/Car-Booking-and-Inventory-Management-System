@@ -214,4 +214,30 @@ router.get("/api/checkLegitimacy",checkAccessToken,async (req, res) => {
   }
 });
 
+
+router.post('/upload', upload.single('image'), async (req, res) => {
+  try {
+      if (!req.file) {
+          return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Save to MongoDB
+      const newImage = new Image({
+          filename: req.file.filename,
+          path: req.file.path,
+          size: req.file.size
+      });
+      await newImage.save();
+
+      // Return public URL
+      const imageUrl = `http://${req.get('host')}/uploads/${req.file.filename}`;
+      res.status(200).json({ url: imageUrl, message: "Upload successful" });
+  } catch (err) {
+      res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+router.use('/uploads', express.static('uploads'));
+
 export default router;

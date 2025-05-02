@@ -6,8 +6,10 @@ import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
 import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshResult
+import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.network.authApi
+import okhttp3.MultipartBody
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -70,6 +72,10 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
 
         suspend fun checkAT():Response<LoginResult>{
             return api.checkAccessToken()
+        }
+
+        suspend fun uploadProfile(image:MultipartBody.Part):Response<UploadResponse>{
+            return api.uploadProfile(image)
         }
 }
 

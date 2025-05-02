@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
                             navController.getBackStackEntry("sign_up_flow")
                         }
                         val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        ProfileScreen(navController=navController)
+                        ProfileScreen(navController=navController, viewModel)
                 }
                     composable(route="firstPage"){ backStackEntry->
                         val parentEntry=remember(backStackEntry){

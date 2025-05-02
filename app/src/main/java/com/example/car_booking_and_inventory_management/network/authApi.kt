@@ -6,11 +6,15 @@ import com.example.car_booking_and_inventory_management.data.LoginResult
 import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshRequest
 import com.example.car_booking_and_inventory_management.data.RefreshResult
+import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Query
 
 interface authApi {
@@ -26,6 +30,11 @@ interface authApi {
     @GET("checkAccessToken")
     suspend fun checkAccessToken():Response<LoginResult>
 
+    @Multipart
+    @POST("upload")
+    suspend fun uploadProfile(
+        @Part image:MultipartBody.Part
+    ):Response<UploadResponse>
 }
 
 
