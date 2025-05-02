@@ -28,9 +28,6 @@ import kotlinx.coroutines.runBlocking
 class CarFilterViewModel @Inject constructor(private val repository: CarFilterRepository):
     ViewModel() {
 
-    private val _createBooking= MutableStateFlow<Result<Booking>?>(null)
-    val createBooking: StateFlow<Result<Booking>?> =_createBooking.asStateFlow()
-
     private val _carsGetResponse= MutableStateFlow<Result<List<Location>>?>(null)
     val carsGetResponse: StateFlow<Result<List<Location>>?> =_carsGetResponse.asStateFlow()
 
@@ -43,6 +40,9 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
 
     private val _legitmacyResponse= MutableStateFlow<Result<Username>?>(null)
     val legitmacyResponse:StateFlow<Result<Username>?> =_legitmacyResponse.asStateFlow()
+
+    private val _bookingCreationResponse= MutableStateFlow<Result<Booking>?>(null)
+    val bookingCreationResponse:StateFlow<Result<Booking>?> =_bookingCreationResponse.asStateFlow()
 
     var isLoading by mutableStateOf(false)
 
@@ -171,15 +171,15 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
             try{
                 val result=repository.createBooking(booking)
               if(result.isSuccessful){
-                  _createBooking.value=Result.success(result.body()!!)
+                  _bookingCreationResponse.value=Result.success(result.body()!!)
               }
               else{
-              _createBooking.value=Result.failure(Exception("some error shit, I am burnt out!!!!"))
+                  _bookingCreationResponse.value=Result.failure(Exception("some error shit, I am burnt out!!!!"))
               }
             }
             
             catch(e:Exception){
-                _createBooking.value=Result.failure(e)
+                _bookingCreationResponse.value=Result.failure(e)
             }
         }
     }

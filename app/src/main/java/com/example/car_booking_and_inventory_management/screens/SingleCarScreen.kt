@@ -49,6 +49,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.car_booking_and_inventory_management.R
+import com.example.car_booking_and_inventory_management.data.Booking
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.ui.theme.Inter
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
@@ -67,6 +68,8 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
     var theInfoIwantInAnArray by remember { mutableStateOf(emptyList<Car>()) }
     var theInfoIwant by remember { mutableStateOf(Car()) }
 
+    var bookingResult=viewModel.bookingCreationResponse.collectAsState()
+
     viewModelResult.value?.onSuccess{info->
         theInfoIwantInAnArray=info.filter{
         it.plate==plate
@@ -78,12 +81,23 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
 
     LaunchedEffect(legit) {
         legit?.onSuccess{
-//            snackbarHostState.showSnackbar(it.message.toString())
+            var booking= Booking()
+            viewModel.createBooking(booking)
         }?.onFailure {
             navController.navigate("profile")
             snackbarHostState.showSnackbar(it.message.toString())
         }
     }
+
+    LaunchedEffect(bookingResult.value) {
+        bookingResult.value?.onSuccess {
+            snackbarHostState.showSnackbar("Your Booking is Pending check booking history for any update")
+        }?.onFailure {
+            snackbarHostState.showSnackbar("Some error happened while trying to create a bookin,${it.message}")
+        }
+    }
+
+
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -251,9 +265,9 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                 }
                 Button(
                     onClick = {
-                        val userName = runBlocking { viewModel.getUsername() }
-                        if (userName != null) {
-                            viewModel.checkLegitimacy(userName)
+                        var username= runBlocking{ (viewModel.getUsername()) }
+                        if(username!=null){
+                            viewModel.checkLegitimacy(username = username)
                         }
                     },
                     modifier

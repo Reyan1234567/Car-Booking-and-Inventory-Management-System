@@ -28,4 +28,5 @@ interface searchApi {
     @GET("api/checkLegitimacy")
     suspend fun checkLegitimacy(@Query("username") username:String):Response<Username>
 
+
 }

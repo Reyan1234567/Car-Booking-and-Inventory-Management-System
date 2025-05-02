@@ -53,7 +53,7 @@ import com.example.car_booking_and_inventory_management.ui.theme.Vold
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var contactNumber by remember { mutableStateOf("") }
@@ -77,7 +77,7 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
     }
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = rememberNavController()) }
+        bottomBar = { BottomNavigationBar(navController = navController) }
     ) {
         Column(
             modifier = Modifier
@@ -121,17 +121,17 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             ProfileField(label = "Contact Number", value = "+251978344283")
 
             Spacer(modifier = Modifier.height(16.dp))
-            TextField(
-                value ="imageUri",
-                onValueChange = {},
-                placeholder = Text("upload your Licence Photo") ,
-                modifier=Modifier.fillMaxWidth().clickable{
-                    launcher.launch("image/*")
-                },
-                trailingIcon = Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = ""
-                ))
+//            TextField(
+//                value ="imageUri",
+//                onValueChange = {},
+//                placeholder = Text("upload your Licence Photo") ,
+//                modifier=Modifier.fillMaxWidth().clickable{
+//                    launcher.launch("image/*")
+//                },
+//                trailingIcon = Icon(
+//                    imageVector = Icons.Default.Add,
+//                    contentDescription = ""
+//                ))
             Button(
                 onClick = { /* TODO: Save action */ },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
@@ -188,8 +188,8 @@ fun ProfileField(label: String, value: String) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun screen() {
-    ProfileScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun screen() {
+//    ProfileScreen()
+//}

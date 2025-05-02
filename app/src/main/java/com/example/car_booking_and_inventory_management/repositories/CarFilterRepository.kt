@@ -34,18 +34,19 @@ class CarFilterRepository(private val api:searchApi, private val tokenManager: T
         return api.createBooking(booking)
     }
 
-    suspend fun checkLegitimacy():Boolean{
-        val license=tokenManager.getLicensePhoto()
-        val profile=tokenManager.getProfilePhoto()
+//    suspend fun checkLegitimacy():Boolean{
+//        val license=tokenManager.getLicensePhoto()
+//        val profile=tokenManager.getProfilePhoto()
+//
+//        if(license==null||profile==null){
+//            return false
+//        }
+//        else if(license=="Not found"||profile=="Not found"){
+//            return false
+//        }
+//        else{
+//            return true
+//        }
+//    }
 
-        if(license==null||profile==null){
-            return false
-        }
-        else if(license=="Not found"||profile=="Not found"){
-            return false
-        }
-        else{
-            return true
-        }
-    }
 }

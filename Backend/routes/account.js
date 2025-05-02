@@ -193,7 +193,7 @@ router.get("/checkAccessToken",checkAccessToken,(req,res)=>{
 })
 
 // check if the user's Legitmacy
-router.get("api/checkLegitimacy",checkAccessToken,async (req, res) => {
+router.get("/api/checkLegitimacy",checkAccessToken,async (req, res) => {
   const { username } = req.query;
 
   try {

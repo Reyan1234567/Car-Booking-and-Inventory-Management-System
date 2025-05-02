@@ -24,6 +24,7 @@ import com.example.car_booking_and_inventory_management.screens.Signup1
 import com.example.car_booking_and_inventory_management.screens.Signup2
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 import com.example.car_booking_and_inventory_management.screens.LoginScreen
+import com.example.car_booking_and_inventory_management.screens.ProfileScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen1
 import com.example.car_booking_and_inventory_management.screens.SearchViewScreen
@@ -86,13 +87,18 @@ class MainActivity : ComponentActivity() {
                 composable(route="history"){
 
                 }
-                composable(route="profile"){
 
-                }
                 navigation(
                     startDestination="firstPage",
                     route="sign_up_flow"
                 ){
+                    composable(route="profile"){backStackEntry->
+                        val parentEntry=remember(backStackEntry){
+                            navController.getBackStackEntry("sign_up_flow")
+                        }
+                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
+                        ProfileScreen(navController=navController)
+                }
                     composable(route="firstPage"){ backStackEntry->
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("sign_up_flow")
