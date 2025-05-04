@@ -124,7 +124,7 @@ fun ProfileScreen1(
                 Spacer(modifier = Modifier.height(100.dp))
 
                 // Profile Image (Placeholder)
-                if (profileImage != null) {
+                if (profileImage != "null") {
                     Image(
                         painter = rememberImagePainter(BASE_URL + profileImage), // Replace with your drawable
                         contentDescription = "Profile Image",
@@ -189,7 +189,7 @@ fun ProfileScreen1(
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    if (licenseImage != null) {
+                    if (licenseImage != "null") {
                         Image(
                             painter = rememberImagePainter(BASE_URL + licenseImage),
                             modifier = Modifier.size(350.dp),
@@ -203,8 +203,11 @@ fun ProfileScreen1(
                         ) {
                             Text(
                                 text = "No license Photo uploaded",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
+                                style = TextStyle(
+                                    fontFamily = Vold,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                ),
                             )
                         }
                     }

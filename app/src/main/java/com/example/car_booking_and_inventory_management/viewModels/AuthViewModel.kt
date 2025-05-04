@@ -217,12 +217,14 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
         }
     }
 
-    suspend fun getProfilePhoto() {
+    suspend fun getProfilePhoto():String?{
+        Log.v(TAG, "from the viewModel's get function ${repository.getProfilePhoto()}")
        return repository.getProfilePhoto()
     }
 
-    suspend fun getLicensePhoto() {
-        return repository.getProfilePhoto()
+    suspend fun getLicensePhoto():String?{
+        Log.v(TAG, "from the viewModel's get function ${repository.getLicensePhoto()}")
+        return repository.getLicensePhoto()
     }
 
     suspend fun getUsername():String?{

@@ -6,7 +6,8 @@ import { config } from "dotenv";
 import Refresh from "../models/refresh.js";
 import checkAccessToken from "../middleware/checkAccessToken.js";
 import {upload} from "../middleware/multer.js"
-import Image from "../models/ProfileImages.js"
+import profileImage from "../models/ProfileImages.js";
+import licenseImage from "../models/LicenseImages.js";
 
 const router = Router();
 config();
@@ -231,14 +232,14 @@ router.get("/api/checkLegitimacy",checkAccessToken,async (req, res) => {
 });
 
 
-router.post('/upload', upload.single('image'), async (req, res) => {
+router.post('/profileUpload', upload.single('image'), async (req, res) => {
   try {
       if (!req.file) {
           return res.status(400).json({ error: "No file uploaded" });
       }
 
       // Save to MongoDB
-      const newImage = new Image({
+      const newImage = new profileImage({
           filename: req.file.filename,
           path: req.file.path,
           size: req.file.size
@@ -254,6 +255,28 @@ router.post('/upload', upload.single('image'), async (req, res) => {
   }
 });
 
+router.post('/licenseUpload', upload.single('image'), async (req, res) => {
+  try {
+      if (!req.file) {
+          return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Save to MongoDB
+      const newImage = new licenseImage({
+          filename: req.file.filename,
+          path: req.file.path,
+          size: req.file.size
+      });
+      await newImage.save();
+
+      // Return public URL
+      const imageUrl = `http://${req.get('host')}/uploads/${req.file.filename}`;
+      res.status(200).json({ url: imageUrl, message: "Upload successful" });
+  } catch (err) {
+      res.status(500).send("Server error");
+      console.log(err)
+  }
+})
 
 router.patch("/auth/updateAccount/:id",async(req,res)=>{
   const {id}=req.params

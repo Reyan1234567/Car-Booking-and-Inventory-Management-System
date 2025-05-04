@@ -281,7 +281,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (licenseImage.isEmpty() && LicenseUri == null) {
+                    if (licenseImage=="null" && LicenseUri == null) {
                         Text(
                             text = "License Photo",
                             style = MaterialTheme.typography.titleLarge,
@@ -317,20 +317,24 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
             // Save Button
             Button(
                 onClick = {
-                    if (ProfileUri != null) {
-                        viewModel.uploadImage(uri = ProfileUri!!, context = context)
+                    if(LicenseUri != null) {
+                        viewModel.uploadImage(uri = LicenseUri!!, context = context)
                     }
+                    if (ProfileUri != null) {
+                        viewModel.uploadImage(uri = Uri.parse(profileImage), context = context)
+                    }
+
                     val userId = runBlocking { viewModel.getUserId().toString() }
-                    val email = runBlocking { viewModel.getEmail().toString() }
-                    val phoneNumber = runBlocking { viewModel.getPhoneNumber().toString() }
-                    val profilePhoto = runBlocking { viewModel.getProfilePhoto().toString() }
-                    val licensePhoto = runBlocking { viewModel.getLicensePhoto().toString() }
+//                    val email = runBlocking { viewModel.getEmail().toString() }
+//                    val phoneNumber = runBlocking { viewModel.getPhoneNumber().toString() }
+//                    val profilePhoto = runBlocking { viewModel.getProfilePhoto().toString() }
+//                    val licensePhoto = runBlocking { viewModel.getLicensePhoto().toString() }
                     val body = ProfilePageRequest(
-                        username = userId,
+                        username = username,
                         email = email,
-                        profilePhoto = profilePhoto,
-                        licensePhoto = licensePhoto,
-                        phoneNumber = phoneNumber
+                        profilePhoto = profileImage,
+                        licensePhoto = licenseImage,
+                        phoneNumber = contactNumber
                     )
                     runBlocking { viewModel.editAccount(userId, body) }
                 },

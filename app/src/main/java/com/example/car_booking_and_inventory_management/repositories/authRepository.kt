@@ -51,13 +51,13 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         suspend fun getAccessToken() {
             tokenManager.getAccessToken()
         }
-        suspend fun getProfilePhoto() {
-            tokenManager.getProfilePhoto()
+        suspend fun getProfilePhoto():String? {
             Log.v(TAG,"from the repo's function ${tokenManager.getProfilePhoto().toString()}")
+            return tokenManager.getProfilePhoto()
         }
 
-        suspend fun getLicensePhoto() {
-            tokenManager.getLicensePhoto()
+        suspend fun getLicensePhoto():String? {
+            return tokenManager.getLicensePhoto()
         }
 
         suspend fun getId(){
