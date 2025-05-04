@@ -17,11 +17,23 @@ data class Car(
     val luggageCapacity: String = "Not specified",
     val imageUrl: String = "", // Empty string for no image
     val dailyRate: Int = 50, // Reasonable default rate
-    val hourlyRate: Int = 10,
-    val notAvailableOn: List<AvailabilityPeriod> = emptyList() // Empty list instead of null
-) {
-    data class AvailabilityPeriod(
-        val startDate: Date = Date(), // Current date as default
-        val endDate: Date = Date()
+)
+
+data class CarResponse(
+    val id:String?,
+    val plate:String?,
+    val name: String ?,
+    val make: String?,
+    val price: Int?,
+    val model: String?,
+    val year: Int?, // Reasonable default year
+    val category: String?,
+    val type: String ?,
+    val transmissionType: String ?,
+    val fuelType: String ?,
+    val passengerCapacity: Int ?, // Typical default
+    val luggageCapacity: String ?,
+    val imageUrl: String ?, // Empty string for no image
+    val dailyRate: Int?, // Reasonable default rate
     )
-}
+

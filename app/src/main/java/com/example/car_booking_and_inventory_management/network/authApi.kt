@@ -3,6 +3,8 @@ package com.example.car_booking_and_inventory_management.network
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
+import com.example.car_booking_and_inventory_management.data.ProfilePageRequest
+import com.example.car_booking_and_inventory_management.data.ProfilePageResult
 import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshRequest
 import com.example.car_booking_and_inventory_management.data.RefreshResult
@@ -13,8 +15,10 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface authApi {
@@ -35,6 +39,10 @@ interface authApi {
     suspend fun uploadProfile(
         @Part image:MultipartBody.Part
     ):Response<UploadResponse>
+
+    @PATCH("auth/updateAccount/{id}")
+    suspend fun editAccount(@Path("id") userId: String, @Body body: ProfilePageRequest):Response<ProfilePageResult>
+
 }
 
 

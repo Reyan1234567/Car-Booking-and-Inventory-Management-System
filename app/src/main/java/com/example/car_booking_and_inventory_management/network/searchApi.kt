@@ -1,8 +1,10 @@
 package com.example.car_booking_and_inventory_management.network
 
-import com.example.car_booking_and_inventory_management.data.Booking
+import com.example.car_booking_and_inventory_management.data.BookingRequest
+import com.example.car_booking_and_inventory_management.data.BookingResponse
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.Location
 import com.example.car_booking_and_inventory_management.data.Username
 import retrofit2.Response
@@ -20,10 +22,10 @@ interface searchApi {
     suspend fun getLocations(@Query("search") search:String):Response<List<Location>>
 
     @POST("api/filteredCars")
-    suspend fun getFilteredCars(@Body filters:CarFilters):Response<List<Car>>
+    suspend fun getFilteredCars(@Body filters:CarFilters):Response<List<CarResponse>>
 
     @POST("api/booking")
-    suspend fun createBooking(@Body booking: Booking):Response<Booking>
+    suspend fun createBooking(@Body booking: BookingRequest):Response<BookingResponse>
 
     @GET("api/checkLegitimacy")
     suspend fun checkLegitimacy(@Query("username") username:String):Response<Username>

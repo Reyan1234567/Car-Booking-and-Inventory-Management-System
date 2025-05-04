@@ -14,6 +14,7 @@ class TokenManager(private val context: Context) {
     companion object {
         val ACCESS_TOKEN = stringPreferencesKey("ACCESS_TOKEN")
         val REFRESH_TOKEN = stringPreferencesKey("REFRESH_TOKEN")
+        val ID= stringPreferencesKey("ID")
         val USER_NAME= stringPreferencesKey("USER_NAME")
         val EMAIL= stringPreferencesKey("EMAIL")
         val PROFILE_PHOTO= stringPreferencesKey("PROFILE_PHOTO")
@@ -23,11 +24,12 @@ class TokenManager(private val context: Context) {
         val LAST_NAME= stringPreferencesKey("LAST_NAME")
     }
 
-    suspend fun saveUserInfo(accessToken: String, refreshToken: String, username:String, email:String, phoneNumber:String, profilePhoto:String, licensePhoto:String, firstName:String, lastName:String) {
+    suspend fun saveUserInfo(id:String, accessToken: String, refreshToken: String, username:String, email:String, phoneNumber:String, profilePhoto:String, licensePhoto:String, firstName:String, lastName:String) {
         context.dataStore.edit {
             it[ACCESS_TOKEN] = accessToken
             it[REFRESH_TOKEN] = refreshToken
             it[USER_NAME]=username
+            it[ID]=id
             it[EMAIL]=email
             it[PHONE_NUMBER]=phoneNumber
             it[PROFILE_PHOTO]=profilePhoto
@@ -46,6 +48,9 @@ class TokenManager(private val context: Context) {
 
     suspend fun getUsername(): String?=
         context.dataStore.data.first()[USER_NAME]
+
+    suspend fun getuserId(): String?=
+        context.dataStore.data.first()[ID]
 
     suspend fun getEmail(): String?=
         context.dataStore.data.first()[EMAIL]
@@ -71,4 +76,5 @@ class TokenManager(private val context: Context) {
             it.clear()
         }
     }
+
 }

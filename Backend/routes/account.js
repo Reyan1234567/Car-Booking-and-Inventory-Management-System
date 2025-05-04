@@ -5,6 +5,8 @@ import User from "../models/users.js";
 import { config } from "dotenv";
 import Refresh from "../models/refresh.js";
 import checkAccessToken from "../middleware/checkAccessToken.js";
+import {upload} from "../middleware/multer.js"
+import Image from "../models/ProfileImages.js"
 
 const router = Router();
 config();
@@ -115,6 +117,20 @@ router.post("/auth/signin", async (req, res) => {
         lastName: user.lastName,
       },
     });
+    console.log({
+      accessToken,
+      refreshToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        profilePhoto: user.profilePhoto,
+        licensePhoto: user.licensePhoto,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    })
   } catch (error) {
     console.error("Signin error:", error);
     res.status(500).send("Internal server error");
@@ -233,11 +249,32 @@ router.post('/upload', upload.single('image'), async (req, res) => {
       const imageUrl = `http://${req.get('host')}/uploads/${req.file.filename}`;
       res.status(200).json({ url: imageUrl, message: "Upload successful" });
   } catch (err) {
-      res.status(500).json({ error: "Server error" });
+      res.status(500).send("Server error");
+      console.log(err)
   }
 });
 
 
-router.use('/uploads', express.static('uploads'));
+router.patch("/auth/updateAccount/:id",async(req,res)=>{
+  const {id}=req.params
+  const updates=req.body
+
+  try{
+    const update=User.findByIdAndUpdate(
+      id,updates,{new:true, runValidator:true}
+    )
+    if(update!=null){
+      res.status(200).send("Update successful")
+    }
+    else{
+      res.status(404).send("some error happened")
+    }
+  }
+  catch(e){
+    res.status(400).send(e.message)
+    console.log(e)
+  }
+})
+
 
 export default router;

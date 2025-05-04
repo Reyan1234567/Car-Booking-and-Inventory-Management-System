@@ -1,9 +1,13 @@
 package com.example.car_booking_and_inventory_management.repositories
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.DataStore.TokenManager
 import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
+import com.example.car_booking_and_inventory_management.data.ProfilePageRequest
+import com.example.car_booking_and_inventory_management.data.ProfilePageResult
 import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshResult
 import com.example.car_booking_and_inventory_management.data.UploadResponse
@@ -16,6 +20,7 @@ import javax.inject.Inject
 class authRepository (private val api: authApi, private val tokenManager: TokenManager) {
 
     suspend fun saveUserInfo(
+        id:String,
         accesstToken: String,
         refreshToken: String,
         username: String,
@@ -27,6 +32,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         lastName:String
     ) {
         tokenManager.saveUserInfo(
+            id,
             accesstToken,
             refreshToken,
             username,
@@ -45,13 +51,26 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         suspend fun getAccessToken() {
             tokenManager.getAccessToken()
         }
+        suspend fun getProfilePhoto() {
+            tokenManager.getProfilePhoto()
+            Log.v(TAG,"from the repo's function ${tokenManager.getProfilePhoto().toString()}")
+        }
+
+        suspend fun getLicensePhoto() {
+            tokenManager.getLicensePhoto()
+        }
+
+        suspend fun getId(){
+            tokenManager.getuserId()
+        }
 
         suspend fun getRefreshToken() {
             tokenManager.getRefreshToken()
         }
 
-        suspend fun getUsername() {
-            tokenManager.getUsername()
+        suspend fun getUsername():String? {
+            return tokenManager.getUsername()
+//            Log.v(TAG,"from the repo's function ${tokenManager.getUsername().toString()}")
         }
 
         suspend fun clearTokens() {
@@ -77,5 +96,22 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         suspend fun uploadProfile(image:MultipartBody.Part):Response<UploadResponse>{
             return api.uploadProfile(image)
         }
+
+    suspend fun getEmail(): String? {
+        return tokenManager.getEmail()
+    }
+
+    suspend fun getPhoneNumber(): String? {
+        return tokenManager.getPhoneNumber()
+    }
+
+    suspend fun editAccount(id:String, body: ProfilePageRequest):Response<ProfilePageResult>{
+        return api.editAccount(id,body)
+    }
+
+    suspend fun logout(){
+        tokenManager.clearTokens()
+    }
+
 }
 

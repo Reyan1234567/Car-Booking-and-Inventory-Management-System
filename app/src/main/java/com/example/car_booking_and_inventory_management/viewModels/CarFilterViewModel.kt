@@ -15,9 +15,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
-import com.example.car_booking_and_inventory_management.data.Booking
+import com.example.car_booking_and_inventory_management.data.BookingRequest
+import com.example.car_booking_and_inventory_management.data.BookingResponse
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.Username
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -34,25 +36,26 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     private val _carsGetResponse1= MutableStateFlow<Result<List<Location>>?>(null)
     val carsGetResponse1: StateFlow<Result<List<Location>>?> =_carsGetResponse1.asStateFlow()
 
-    private val _carsFilterResponse= MutableStateFlow<Result<List<Car>>?>(null)
-    val carsFilterResponse: StateFlow<Result<List<Car>>?> =_carsFilterResponse.asStateFlow()
+    private val _carsFilterResponse= MutableStateFlow<Result<List<CarResponse>>?>(null)
+    val carsFilterResponse: StateFlow<Result<List<CarResponse>>?> =_carsFilterResponse.asStateFlow()
 
 
     private val _legitmacyResponse= MutableStateFlow<Result<Username>?>(null)
     val legitmacyResponse:StateFlow<Result<Username>?> =_legitmacyResponse.asStateFlow()
 
-    private val _bookingCreationResponse= MutableStateFlow<Result<Booking>?>(null)
-    val bookingCreationResponse:StateFlow<Result<Booking>?> =_bookingCreationResponse.asStateFlow()
+    private val _bookingCreationResponse= MutableStateFlow<Result<BookingResponse>?>(null)
+    val bookingCreationResponse:StateFlow<Result<BookingResponse>?> =_bookingCreationResponse.asStateFlow()
 
     var isLoading by mutableStateOf(false)
 
+    var id by mutableStateOf("")
     var pickUp by  mutableStateOf("Click to select destination")
     var dropOff by  mutableStateOf("Click to select destination")
     var startDate by  mutableStateOf("Click to select Date")
     var startTime by  mutableStateOf("Click to select time")
     var endDate by  mutableStateOf("Click to select Date")
     var endTime by  mutableStateOf("Click to select time")
-
+    var dailyRate by mutableStateOf(0)
     var showDropOff by mutableStateOf(false)
     private set
 
@@ -166,7 +169,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     }
 
 
-    fun createBooking(booking: Booking){
+    fun createBooking(booking: BookingRequest){
         viewModelScope.launch{
             try{
                 val result=repository.createBooking(booking)
@@ -182,5 +185,9 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
                 _bookingCreationResponse.value=Result.failure(e)
             }
         }
+    }
+
+    suspend fun getuserId():String?{
+       return repository.getuserId()
     }
 }

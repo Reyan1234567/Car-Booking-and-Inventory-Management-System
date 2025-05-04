@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
+import com.example.car_booking_and_inventory_management.data.ProfilePageRequest
+import com.example.car_booking_and_inventory_management.data.ProfilePageResult
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
@@ -42,20 +44,28 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
     private val _profileUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
     val profileUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
 
+    private val _updateResponse=MutableStateFlow<Result<ProfilePageResult>?>(null)
+    val updateResponse:StateFlow<Result<ProfilePageResult>?> =_updateResponse.asStateFlow()
+
+
+
     var isLoading1 = MutableStateFlow(false)
     var isLoading3=MutableStateFlow(false)
 ////////////////////////////////////////////////////////////////////
     var firstname by mutableStateOf("")
+    var id by mutableStateOf("")
     var lastname by mutableStateOf("")
     var birthDate by mutableStateOf("")
     var phoneNumber by mutableStateOf("")
     var email by mutableStateOf("")
     var username by mutableStateOf("")
     var password by mutableStateOf("")
-
+/////////////////////////////////////////////////////
+    var profilePhoto by mutableStateOf("")
+    var licensePhoto by mutableStateOf("")
+///////////////////////////////////////////////////
     var isLoading2 =MutableStateFlow(false)
-
- ///////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////
             fun login(user: LoginInput){
                 viewModelScope.launch{
                     try{
@@ -66,6 +76,7 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                             Log.v(TAG, response.body().toString())
                             response.body()?.let {
                                 repository.saveUserInfo(
+                                    id=it.user.id,
                                     accesstToken = it.accessToken,
                                     refreshToken =it.refreshToken,
                                     username = it.user.username,
@@ -76,6 +87,7 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                                     firstName=it.user.firstName,
                                     lastName=it.user.lastName
                                 )
+                                Log.v(TAG,"from the viewModel's save function ${it.user.username}")
                             }
 
                         }
@@ -203,6 +215,50 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                 }
             }
         }
+    }
+
+    suspend fun getProfilePhoto() {
+       return repository.getProfilePhoto()
+    }
+
+    suspend fun getLicensePhoto() {
+        return repository.getProfilePhoto()
+    }
+
+    suspend fun getUsername():String?{
+        Log.v(TAG, "from the viewModel's get function ${repository.getUsername()}")
+        return repository.getUsername()
+    }
+
+    suspend fun getEmail(): String? {
+        return repository.getEmail()
+    }
+
+    suspend fun getPhoneNumber(): String? {
+        return repository.getPhoneNumber()
+    }
+
+    suspend fun getUserId(){
+        return repository.getId()
+    }
+
+    suspend fun editAccount(id:String, body:ProfilePageRequest) {
+        var result=repository.editAccount(id,body)
+        try {
+            if(result.isSuccessful && result.body()!=null){
+                _updateResponse.value=Result.success(result.body()!!)
+            }
+            else{
+                _updateResponse.value=Result.failure((Exception(result.errorBody()?.string())))
+            }
+        }
+        catch(e:Exception){
+            _updateResponse.value=Result.failure(e)
+        }
+    }
+
+    suspend fun logout(){
+        repository.logout()
     }
 
 }

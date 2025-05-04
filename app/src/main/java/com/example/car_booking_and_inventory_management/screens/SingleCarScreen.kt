@@ -49,39 +49,74 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.car_booking_and_inventory_management.R
-import com.example.car_booking_and_inventory_management.data.Booking
+import com.example.car_booking_and_inventory_management.data.BookingRequest
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.ui.theme.Inter
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 import kotlinx.coroutines.runBlocking
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.time.times
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,viewModel: CarFilterViewModel,plate:String) {
+fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,viewModel: CarFilterViewModel, plate:String) {
 
     val legitmacyCheck=viewModel.legitmacyResponse.collectAsState()
     val legit=legitmacyCheck.value
 
     val snackbarHostState= remember { SnackbarHostState() }
     val viewModelResult=viewModel.carsFilterResponse.collectAsState()
-    var theInfoIwantInAnArray by remember { mutableStateOf(emptyList<Car>()) }
-    var theInfoIwant by remember { mutableStateOf(Car()) }
+    var theInfoIwantInAnArray by remember { mutableStateOf(emptyList<CarResponse>()) }
+    var theInfoIwant by remember { mutableStateOf(CarResponse(
+        null,
+        plate = null,
+        name = null,
+        make = null,
+        price = null,
+        model = null,
+        year = null,
+        category = null,
+        type = null,
+        transmissionType = null,
+        fuelType = null,
+        passengerCapacity = null,
+        luggageCapacity = null,
+        imageUrl = null,
+        dailyRate = null
+    )) }
 
     var bookingResult=viewModel.bookingCreationResponse.collectAsState()
 
     viewModelResult.value?.onSuccess{info->
         theInfoIwantInAnArray=info.filter{
-        it.plate==plate
+        it.id==plate
         }
         theInfoIwant=theInfoIwantInAnArray[0]
     }?.onFailure {
 
     }
+    var sdf=SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    var difference=sdf.parse(viewModel.endDate)?.time?.minus(sdf.parse(viewModel.startDate)?.time!!);
+    var dateFormat= difference?.div((8600000))
+    var EstimatedPrice= dateFormat?.let { theInfoIwant.dailyRate?.times(it) }
 
     LaunchedEffect(legit) {
         legit?.onSuccess{
-            var booking= Booking()
+            var booking= BookingRequest(
+                userId=viewModel.getuserId().toString(),
+                carId=plate,
+                startDate = viewModel.startDate,
+                endDate = viewModel.endDate,
+                pickupTime = viewModel.startTime,
+                dropoffTime = viewModel.endTime,
+                pickupLocationName = viewModel.pickUp,
+                dropoffLocationName = viewModel.dropOff,
+                estimatedTotalPrice = EstimatedPrice?.toDouble()?:0.0
+            )
             viewModel.createBooking(booking)
         }?.onFailure {
             navController.navigate("profile")
@@ -116,11 +151,13 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                         .height(300.dp)
                 )
                 Spacer(modifier.padding(8.dp))
-                Text(
-                    text = theInfoIwant.name,
-                    style = TextStyle(fontFamily = Vold, fontSize = 20.sp),
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+                theInfoIwant.name?.let { it1 ->
+                    Text(
+                        text = it1,
+                        style = TextStyle(fontFamily = Vold, fontSize = 20.sp),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -178,7 +215,7 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                                         modifier = Modifier.height(16.dp)
                                     )
                                     Spacer(modifier = Modifier.padding(2.dp))
-                                    Text(theInfoIwant.luggageCapacity)
+                                    theInfoIwant?.luggageCapacity?.let { it1 -> Text(it1) }
                                 }
 
                                 Row {
@@ -188,18 +225,18 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                                         modifier = Modifier.height(16.dp)
                                     )
                                     Spacer(modifier = Modifier.padding(2.dp))
-                                    Text(theInfoIwant.category)
+                                    theInfoIwant.category?.let{Text(it)}
                                 }
                             }
                             Spacer(modifier = Modifier.padding(8.dp))
                             Column() {
                                 Text("vehicle Type", style = TextStyle(fontFamily = Vold))
-                                Text(theInfoIwant.type)
+                                theInfoIwant.type?.let{Text(it)}
                             }
                             Spacer(modifier = Modifier.padding(8.dp))
                             Column() {
                                 Text("Fuel Type", style = TextStyle(fontFamily = Vold))
-                                Text(theInfoIwant.fuelType)
+                                theInfoIwant.fuelType?.let{Text(it)}
                             }
                         }
                     }

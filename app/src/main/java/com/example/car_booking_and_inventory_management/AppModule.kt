@@ -21,6 +21,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    const val BASE_URL="http://192.168.157.147:4000/"
+
     @Provides
     @Singleton
     fun provideTokenManager(@ApplicationContext context: Context): TokenManager {
@@ -40,7 +42,7 @@ object AppModule {
     @Provides
     fun providesRetrofit(okHttpClient:OkHttpClient):Retrofit{
         return Retrofit.Builder()
-            .baseUrl("http://192.168.157.147:4000/")
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -92,7 +94,7 @@ fun provideAuthInterceptor(
     tokenManager: TokenManager
 ): AuthInterceptor {
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.157.147:4000/")
+        .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 

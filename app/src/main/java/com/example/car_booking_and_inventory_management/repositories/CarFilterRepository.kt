@@ -1,20 +1,26 @@
 package com.example.car_booking_and_inventory_management.repositories
 
 import com.example.car_booking_and_inventory_management.DataStore.TokenManager
-import com.example.car_booking_and_inventory_management.data.Booking
+import com.example.car_booking_and_inventory_management.data.BookingRequest
+import com.example.car_booking_and_inventory_management.data.BookingResponse
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarFilters
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.Location
 import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.network.searchApi
 import retrofit2.Response
 
 class CarFilterRepository(private val api:searchApi, private val tokenManager: TokenManager){
+    suspend fun getuserId():String?{
+        return tokenManager.getuserId()
+    }
+
     suspend fun getCars(): Response<List<Car>>{
        return api.getAllCars()
     }
 
-    suspend fun getFilteredCars(body:CarFilters): Response<List<Car>> {
+    suspend fun getFilteredCars(body:CarFilters): Response<List<CarResponse>> {
         return api.getFilteredCars(body)
     }
 
@@ -30,7 +36,7 @@ class CarFilterRepository(private val api:searchApi, private val tokenManager: T
         return api.checkLegitimacy(username)
     }
 
-    suspend fun createBooking(booking:Booking): Response<Booking>{
+    suspend fun createBooking(booking: BookingRequest): Response<BookingResponse>{
         return api.createBooking(booking)
     }
 

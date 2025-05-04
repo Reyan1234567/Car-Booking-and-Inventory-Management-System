@@ -25,6 +25,8 @@ import com.example.car_booking_and_inventory_management.screens.Signup2
 import com.example.car_booking_and_inventory_management.viewModels.SignupViewModel
 import com.example.car_booking_and_inventory_management.screens.LoginScreen
 import com.example.car_booking_and_inventory_management.screens.ProfileScreen
+import com.example.car_booking_and_inventory_management.screens.ProfileScreen1
+//import com.example.car_booking_and_inventory_management.screens.ProfileScreen1
 import com.example.car_booking_and_inventory_management.screens.SearchScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen1
 import com.example.car_booking_and_inventory_management.screens.SearchViewScreen
@@ -75,13 +77,13 @@ class MainActivity : ComponentActivity() {
                         val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
                         SearchViewScreen(modifier = Modifier,navController, viewModel)
                     }
-                    composable(route="singleCar/{plate}") {backStackEntry->
-                        val plate=backStackEntry.arguments?.getString("plate")
+                    composable(route="singleCar/{id}") {backStackEntry->
+                        val id=backStackEntry.arguments?.getString("id")
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("home")
                         }
                         val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
-                        SingleCarScreen(modifier = Modifier,navController, viewModel,plate!!)
+                        SingleCarScreen(modifier = Modifier,navController, viewModel,id!!)
                     }
                 }
                 composable(route="history"){
@@ -92,13 +94,20 @@ class MainActivity : ComponentActivity() {
                     startDestination="firstPage",
                     route="sign_up_flow"
                 ){
+                    composable(route="profile1"){backStackEntry->
+                        val parentEntry=remember(backStackEntry){
+                            navController.getBackStackEntry("sign_up_flow")
+                        }
+                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
+                        ProfileScreen(navController=navController, viewModel=viewModel)
+                    }
                     composable(route="profile"){backStackEntry->
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("sign_up_flow")
                         }
                         val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        ProfileScreen(navController=navController, viewModel)
-                }
+                        ProfileScreen1(navController=navController, viewModel=viewModel)
+                    }
                     composable(route="firstPage"){ backStackEntry->
                         val parentEntry=remember(backStackEntry){
                             navController.getBackStackEntry("sign_up_flow")

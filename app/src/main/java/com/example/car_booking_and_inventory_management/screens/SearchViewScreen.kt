@@ -3,7 +3,6 @@ package com.example.car_booking_and_inventory_management.screens
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,12 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MailOutline
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -46,13 +43,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.FilterItem
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
@@ -87,26 +83,26 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
     var CarSearchs=viewModel.carsFilterResponse.collectAsState()
     var carsearchs=CarSearchs.value
 
-    var searchResultArray by remember { mutableStateOf(emptyList<Car>()) }
+    var searchResultArray by remember { mutableStateOf(emptyList<CarResponse>()) }
 
     var filterFlag by remember { mutableStateOf("") }
 
         val finalResults = searchResultArray.filter { car ->
             val matchesSearch = search.isBlank() ||
-                    car.name.contains(search, ignoreCase = true) ||
-                    car.make.contains(search, ignoreCase = true) ||
-                    car.model.contains(search, ignoreCase = true) ||
-                    car.category.contains(search, ignoreCase = true) ||
-                    car.type.contains(search, ignoreCase = true) ||
-                    car.transmissionType.contains(search, ignoreCase = true)
+                    car.name?.contains(search, ignoreCase = true) ?: false ||
+                    car.make?.contains(search, ignoreCase = true) ?: false ||
+                    car.model?.contains(search, ignoreCase = true) ?: false ||
+                    car.category?.contains(search, ignoreCase = true) ?: false ||
+                    car.type?.contains(search, ignoreCase = true) ?: false ||
+                    car.transmissionType?.contains(search, ignoreCase = true) ?: false
 
             val matchesFilter = filterFlag.isBlank() ||
-                    car.name.contains(filterFlag, ignoreCase = true) ||
-                    car.make.contains(filterFlag, ignoreCase = true) ||
-                    car.model.contains(filterFlag, ignoreCase = true) ||
-                    car.category.contains(filterFlag, ignoreCase = true) ||
-                    car.type.contains(filterFlag, ignoreCase = true) ||
-                    car.transmissionType.contains(filterFlag, ignoreCase = true)
+                    car.name?.contains(filterFlag, ignoreCase = true) ?: false ||
+                    car.make?.contains(filterFlag, ignoreCase = true) ?: false ||
+                    car.model?.contains(filterFlag, ignoreCase = true) ?: false ||
+                    car.category?.contains(filterFlag, ignoreCase = true) ?: false ||
+                    car.type?.contains(filterFlag, ignoreCase = true) ?: false ||
+                    car.transmissionType?.contains(filterFlag, ignoreCase = true) ?: false
 
             matchesSearch && matchesFilter
         }
@@ -183,10 +179,10 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
                 searchResultArray=cars
                 if(finalResults!= emptyList<Car>()){
                     items(finalResults){car->
-                        CarDisplay(modifier=Modifier,car,{
-                            Log.v(TAG, car.plate)
+                        CarDisplay(modifier =Modifier,car) {
+                            car.plate?.let { Log.v(TAG, it) }
                             navController.navigate("singleCar/${car.plate}")
-                        })
+                        }
                     }
                 }
                 else{
@@ -226,7 +222,7 @@ fun FilterItems(
 
 
 @Composable
-fun CarDisplay(modifier: Modifier = Modifier, car:Car, onClick: () -> Unit) {
+fun CarDisplay(modifier: Modifier = Modifier, car: CarResponse, onClick: () -> Unit) {
     Card(
         modifier = Modifier.padding(8.dp).clickable{
             onClick()
@@ -240,7 +236,7 @@ fun CarDisplay(modifier: Modifier = Modifier, car:Car, onClick: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceBetween
        ){
             Column() {
-                Text(text = car.name, style = TextStyle(fontSize = 20.sp, fontFamily = Vold))
+                car.name?.let { Text(text = it, style = TextStyle(fontSize = 20.sp, fontFamily = Vold)) }
                 Spacer(modifier = Modifier.padding(6.dp))
                 Row(horizontalArrangement = Arrangement.Start) {
                     Icon(
@@ -249,7 +245,7 @@ fun CarDisplay(modifier: Modifier = Modifier, car:Car, onClick: () -> Unit) {
                         modifier=Modifier.width(15.dp)
                     )
                     Spacer(modifier = Modifier.padding(2.dp))
-                    Text(text = car.luggageCapacity)
+                    car.luggageCapacity?.let { Text(text = it) }
 
                     Spacer(modifier = Modifier.padding(12.dp))
 
@@ -264,10 +260,12 @@ fun CarDisplay(modifier: Modifier = Modifier, car:Car, onClick: () -> Unit) {
                 Spacer(modifier = Modifier.padding(6.dp))
                 Text("Type", style = TextStyle(fontSize = 16.sp, fontFamily = Vold))
                 Spacer(modifier = Modifier.padding(2.dp))
-                Text(
-                    text = car.type,
-                    style = TextStyle(fontSize = 16.sp, fontFamily = Vold, color = Color(0xFF554234))
-                )
+                car.type?.let {
+                    Text(
+                        text = it,
+                        style = TextStyle(fontSize = 16.sp, fontFamily = Vold, color = Color(0xFF554234))
+                    )
+                }
 
                 Spacer(modifier = Modifier.padding(8.dp))
 
