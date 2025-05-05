@@ -304,7 +304,10 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
                     onClick = {
                         var username= runBlocking{ (viewModel.getUsername()) }
                         if(username!=null){
-                            viewModel.checkLegitimacy(username = username)
+                            val valid=viewModel.checkLegitimacy(username = username)
+                        }
+                        else{
+                            runBlocking{ snackbarHostState.showSnackbar("You need to login first") }
                         }
                     },
                     modifier

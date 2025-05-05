@@ -108,16 +108,20 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
     val uploadResult = viewModel.profileUploadResult.collectAsState()
     val isLoading = viewModel.isLoading3.collectAsState()
 
-    var backEnabler by remember { mutableStateOf(username != UN ||
-            email != EM ||
-            contactNumber != CN ||
-            ProfileUri != null ||
-            LicenseUri != null) }
+    var backEnabler by remember { mutableStateOf(false)}
 
-    BackHandler(enabled = backEnabler){
+    LaunchedEffect(username,email,contactNumber,ProfileUri,LicenseUri) {
+        if (username != UN || email != EM || contactNumber != CN || ProfileUri != null || LicenseUri != null) {
+            backEnabler = true
+        } else {
+            backEnabler = false
+        }
+    }
+
+    BackHandler(enabled = backEnabler, onBack = {
         runBlocking{ snackbarHostState.showSnackbar("Save your changes before exiting") }
         backEnabler = false
-    }
+    })
 
     LaunchedEffect(uploadResult.value) {
         val result = uploadResult.value
@@ -287,6 +291,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
+
                     } else {
                         Image(
                             painter = rememberImagePainter(LicenseUri ?: licenseImage),
@@ -297,7 +302,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                     }
                 }
 
-                // Upload Button inside the card
                 Box{
                     Button(
                         onClick = { Licencselauncher.launch("image/*") },
@@ -307,7 +311,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE36911))
                     ) {
-                        Text("Upload")
+                        Text("Upload", color = Color.Black)
                     }
                 }
             }

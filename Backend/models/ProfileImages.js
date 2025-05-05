@@ -7,5 +7,5 @@ const profileImageSchema = new mongoose.Schema({
     uploadDate: { type: Date, default: Date.now }
 });
 
-const profileImage = mongoose.model('Image', profileImageSchema);
+const profileImage = mongoose.model('ProfileImage', profileImageSchema);
 export default profileImage

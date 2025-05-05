@@ -5,8 +5,9 @@ config()
 
 const checkAccessToken=(req,res,next)=>{
     const {authorization}=req.headers
+    console.log(authorization)
     if(!authorization||!authorization.split(" ")[1]){
-        res.status(401).json({"error":"Unauthorized"})
+        return res.status(401).json({"error":"Unauthorized"})
     }
     console.log(`IN THE MIDDLEWARE:${authorization}`)
 

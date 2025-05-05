@@ -22,7 +22,7 @@ class AuthInterceptor(
 
         val token=runBlocking{tokenManager.getAccessToken()}
         if(token==null){
-            Log.v(TAG, "shiiiii token is null")
+            Log.v(TAG, "shiiiii accesstoken is null")
             return chain.proceed(request)
         }
 

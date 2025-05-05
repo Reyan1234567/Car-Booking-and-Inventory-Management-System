@@ -7,5 +7,5 @@ const licenseImageSchema = new mongoose.Schema({
     uploadDate: { type: Date, default: Date.now }
 });
 
-const licenseImage = mongoose.model('Image', profileImageSchema);
+const licenseImage = mongoose.model('LicenseImage', licenseImageSchema);
 export default licenseImage
