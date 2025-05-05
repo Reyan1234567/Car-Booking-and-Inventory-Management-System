@@ -169,20 +169,29 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     }
 
 
-    fun createBooking(booking: BookingRequest){
-        viewModelScope.launch{
-            try{
-                val result=repository.createBooking(booking)
-              if(result.isSuccessful){
-                  _bookingCreationResponse.value=Result.success(result.body()!!)
-              }
-              else{
-                  _bookingCreationResponse.value=Result.failure(Exception("some error shit, I am burnt out!!!!"))
-              }
-            }
-            
-            catch(e:Exception){
-                _bookingCreationResponse.value=Result.failure(e)
+    fun createBooking(booking: BookingRequest) {
+        viewModelScope.launch {
+            try {
+                isLoading = true
+                val result = repository.createBooking(booking)
+                if (result.isSuccessful && result.body() != null) {
+                    _bookingCreationResponse.value = Result.success(result.body()!!)
+                    // Reset form fields after successful booking
+                    pickUp = "Click to select destination"
+                    dropOff = "Click to select destination"
+                    startDate = "Click to select Date"
+                    startTime = "Click to select time"
+                    endDate = "Click to select Date"
+                    endTime = "Click to select time"
+                } else {
+                    _bookingCreationResponse.value = Result.failure(
+                        Exception(result.errorBody()?.string() ?: "Booking creation failed")
+                    )
+                }
+            } catch (e: Exception) {
+                _bookingCreationResponse.value = Result.failure(e)
+            } finally {
+                isLoading = false
             }
         }
     }

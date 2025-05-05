@@ -1,11 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -22,13 +19,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -43,8 +38,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -60,17 +53,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
-import com.example.car_booking_and_inventory_management.data.ProfilePageRequest
+import com.example.car_booking_and_inventory_management.data.UploadResponse
+import com.example.car_booking_and_inventory_management.data.accountEdit
 import com.example.car_booking_and_inventory_management.ui.theme.Inter
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AuthViewModel
@@ -93,6 +82,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
     var LicenseUri by remember { mutableStateOf<Uri?>(null) }
     val snackbarHostState=remember{ SnackbarHostState() }
 
+
     val Profilelauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -105,10 +95,14 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
         LicenseUri = uri
     }
 
-    val uploadResult = viewModel.profileUploadResult.collectAsState()
+    val licenseResult = viewModel.profileUploadResult.collectAsState()
+    val profileResult = viewModel.licenseUploadResult.collectAsState()
     val isLoading = viewModel.isLoading3.collectAsState()
 
     var backEnabler by remember { mutableStateOf(false)}
+
+    var url by remember { mutableStateOf("") }
+    var id by remember { mutableStateOf("") }
 
     LaunchedEffect(username,email,contactNumber,ProfileUri,LicenseUri) {
         if (username != UN || email != EM || contactNumber != CN || ProfileUri != null || LicenseUri != null) {
@@ -123,14 +117,6 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
         backEnabler = false
     })
 
-    LaunchedEffect(uploadResult.value) {
-        val result = uploadResult.value
-        result?.onSuccess {
-            snackbarHostState.showSnackbar("Successfully uploaded")
-        }?.onFailure {
-            snackbarHostState.showSnackbar("${it.message}")
-        }
-    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -155,7 +141,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            if(backEnabler) {
+                            if (backEnabler) {
                                 navController.popBackStack()
                             } else {
                                 runBlocking { snackbarHostState.showSnackbar("Save your changes before exiting") }
@@ -322,22 +308,31 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
             Button(
                 onClick = {
                     if(LicenseUri != null) {
-                        viewModel.uploadImage(uri = LicenseUri!!, context = context)
+                        viewModel.uploadLicense(uri = LicenseUri!!, context = context)
+                        licenseResult.value?.onSuccess {
+                            url=it.url.toString()
+                            id=it._id.toString()
+                            runBlocking{ snackbarHostState.showSnackbar(it.message.toString()) }
+                        }?.onFailure {
+                            runBlocking { snackbarHostState.showSnackbar(it.message.toString()) }
+                        }
                     }
                     if (ProfileUri != null) {
-                        viewModel.uploadImage(uri = Uri.parse(profileImage), context = context)
-                    }
+                        viewModel.uploadProfile(uri = ProfileUri!!, context = context)
+                        profileResult.value?.onSuccess {
+                            url=it.url.toString()
+                            id=it._id.toString()
+                            runBlocking{ snackbarHostState.showSnackbar(it.message.toString()) }
+                        }?.onFailure {
+                            runBlocking { snackbarHostState.showSnackbar(it.message.toString()) }
+                        }                    }
 
                     val userId = runBlocking { viewModel.getUserId().toString() }
-//                    val email = runBlocking { viewModel.getEmail().toString() }
-//                    val phoneNumber = runBlocking { viewModel.getPhoneNumber().toString() }
-//                    val profilePhoto = runBlocking { viewModel.getProfilePhoto().toString() }
-//                    val licensePhoto = runBlocking { viewModel.getLicensePhoto().toString() }
-                    val body = ProfilePageRequest(
+                    val body = accountEdit(
                         username = username,
                         email = email,
-                        profilePhoto = profileImage,
-                        licensePhoto = licenseImage,
+                        profileImage = url,
+                        licenceImage = id,
                         phoneNumber = contactNumber
                     )
                     runBlocking { viewModel.editAccount(userId, body) }

@@ -1,6 +1,7 @@
 package com.example.car_booking_and_inventory_management.DataStore
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -46,30 +47,44 @@ class TokenManager(private val context: Context) {
         }
     }
 
-    suspend fun getUsername(): String?=
-        context.dataStore.data.first()[USER_NAME]
-
-    suspend fun getuserId(): String?=
-        context.dataStore.data.first()[ID]
-
-    suspend fun getEmail(): String?=
-        context.dataStore.data.first()[EMAIL]
-
-    suspend fun getPhoneNumber(): String?=
-        context.dataStore.data.first()[PHONE_NUMBER]
-
-    suspend fun getProfilePhoto(): String?=
-        context.dataStore.data.first()[PROFILE_PHOTO]
-
-    suspend fun getLicensePhoto(): String?=
-        context.dataStore.data.first()[LICENSE_PHOTO]
-
-    suspend fun getAccessToken(): String?=
-        context.dataStore.data.first()[ACCESS_TOKEN]
+    suspend fun getUsername(): String? {
+        return context.dataStore.data.first()[USER_NAME]
+        Log.v("TokenManager", "Username: ${context.dataStore.data.first()[USER_NAME]}")
+    }
 
 
-    suspend fun getRefreshToken(): String? =
-        context.dataStore.data.first()[REFRESH_TOKEN]
+    suspend fun getuserId(): String? {
+        Log.v("TokenManager", "ID: ${context.dataStore.data.first()[ID]}")
+        return context.dataStore.data.first()[ID]
+    }
+
+    suspend fun getEmail(): String? {
+        Log.v("TokenManager", "Email: ${context.dataStore.data.first()[EMAIL]}")
+        return context.dataStore.data.first()[EMAIL]
+    }
+
+    suspend fun getPhoneNumber(): String? {
+        Log.v("TokenManager", "Phone Number: ${context.dataStore.data.first()[PHONE_NUMBER]}")
+        return context.dataStore.data.first()[PHONE_NUMBER]
+    }
+    suspend fun getProfilePhoto(): String? {
+        return context.dataStore.data.first()[PROFILE_PHOTO]
+    }
+
+    suspend fun getLicensePhoto(): String? {
+        Log.v("TokenManager", "License Photo: ${context.dataStore.data.first()[LICENSE_PHOTO]}")
+        return context.dataStore.data.first()[LICENSE_PHOTO]
+    }
+
+    suspend fun getAccessToken(): String? {
+        Log.v("TokenManager", "Access Token: ${context.dataStore.data.first()[ACCESS_TOKEN]}")
+        return context.dataStore.data.first()[ACCESS_TOKEN]
+    }
+
+
+    suspend fun getRefreshToken(): String? {
+        Log.v("TokenManager", "Refresh Token: ${context.dataStore.data.first()[REFRESH_TOKEN]}")
+        return context.dataStore.data.first()[REFRESH_TOKEN]}
 
     suspend fun clearTokens() {
         context.dataStore.edit {

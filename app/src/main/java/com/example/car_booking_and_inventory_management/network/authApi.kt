@@ -10,6 +10,7 @@ import com.example.car_booking_and_inventory_management.data.RefreshRequest
 import com.example.car_booking_and_inventory_management.data.RefreshResult
 import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
+import com.example.car_booking_and_inventory_management.data.accountEdit
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -35,13 +36,19 @@ interface authApi {
     suspend fun checkAccessToken():Response<LoginResult>
 
     @Multipart
-    @POST("upload")
+    @POST("profileUpload")
     suspend fun uploadProfile(
         @Part image:MultipartBody.Part
     ):Response<UploadResponse>
 
+    @Multipart
+    @POST("licenseUpload")
+    suspend fun uploadLicense(
+        @Part image:MultipartBody.Part
+    ):Response<UploadResponse>
+
     @PATCH("auth/updateAccount/{id}")
-    suspend fun editAccount(@Path("id") userId: String, @Body body: ProfilePageRequest):Response<ProfilePageResult>
+    suspend fun editAccount(@Path("id") userId: String, @Body body: accountEdit):Response<ProfilePageResult>
 
 }
 

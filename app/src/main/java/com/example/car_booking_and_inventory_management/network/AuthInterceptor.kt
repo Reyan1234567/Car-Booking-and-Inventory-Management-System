@@ -41,13 +41,13 @@ class AuthInterceptor(
         }
 
         if(response.code==401 && errorBody=="Unauthorized - Token expired"){
-            Log.v(TAG, "in the if statement")
+            Log.v(TAG, "in the if statement of the 401")
             response.close()
 
             val refreshToken=runBlocking{tokenManager.getRefreshToken()}
             Log.v(TAG, refreshToken.toString())
             if (refreshToken == null) {
-                Log.v(TAG, "shiiiii refresh token is null")
+                Log.v(TAG, "shiiiii refresh refreshtoken is null")
                 return response
             }
 
@@ -61,7 +61,7 @@ class AuthInterceptor(
             }
 
             if(newTokenResponse?.body()==null){
-                Log.v(TAG, "shiiiii new token is null")
+                Log.v(TAG, "shiiiii new accesstoken is null")
                 return response
             }
             Log.v(TAG, "in the if statement of newTokenResponse")

@@ -12,6 +12,7 @@ import com.example.car_booking_and_inventory_management.data.Refresh
 import com.example.car_booking_and_inventory_management.data.RefreshResult
 import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
+import com.example.car_booking_and_inventory_management.data.accountEdit
 import com.example.car_booking_and_inventory_management.network.authApi
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -21,7 +22,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
 
     suspend fun saveUserInfo(
         id:String,
-        accesstToken: String,
+        accessToken: String,
         refreshToken: String,
         username: String,
         email: String,
@@ -33,7 +34,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
     ) {
         tokenManager.saveUserInfo(
             id,
-            accesstToken,
+            accessToken,
             refreshToken,
             username,
             email,
@@ -52,7 +53,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
             tokenManager.getAccessToken()
         }
         suspend fun getProfilePhoto():String? {
-            Log.v(TAG,"from the repo's function ${tokenManager.getProfilePhoto().toString()}")
+            Log.v(TAG,"getprofile from the repo's function ${tokenManager.getProfilePhoto().toString()}")
             return tokenManager.getProfilePhoto()
         }
 
@@ -60,8 +61,9 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
             return tokenManager.getLicensePhoto()
         }
 
-        suspend fun getId(){
-            tokenManager.getuserId()
+        suspend fun getId():String? {
+            Log.v(TAG,"getId from the repo's function ${tokenManager.getuserId().toString()}")
+            return tokenManager.getuserId()
         }
 
         suspend fun getRefreshToken() {
@@ -97,6 +99,10 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
             return api.uploadProfile(image)
         }
 
+    suspend fun uploadLicense(image:MultipartBody.Part):Response<UploadResponse>{
+        return api.uploadProfile(image)
+    }
+
     suspend fun getEmail(): String? {
         return tokenManager.getEmail()
     }
@@ -105,7 +111,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         return tokenManager.getPhoneNumber()
     }
 
-    suspend fun editAccount(id:String, body: ProfilePageRequest):Response<ProfilePageResult>{
+    suspend fun editAccount(id:String, body: accountEdit):Response<ProfilePageResult>{
         return api.editAccount(id,body)
     }
 

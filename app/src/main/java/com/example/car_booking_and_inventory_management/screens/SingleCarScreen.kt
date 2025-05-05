@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -63,7 +65,7 @@ import kotlin.time.times
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,viewModel: CarFilterViewModel, plate:String) {
+fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,viewModel: CarFilterViewModel, id:String) {
 
     val legitmacyCheck=viewModel.legitmacyResponse.collectAsState()
     val legit=legitmacyCheck.value
@@ -92,8 +94,9 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
     var bookingResult=viewModel.bookingCreationResponse.collectAsState()
 
     viewModelResult.value?.onSuccess{info->
+        Log.v(TAG, "the info is $info")
         theInfoIwantInAnArray=info.filter{
-        it.id==plate
+        it._id==id
         }
         theInfoIwant=theInfoIwantInAnArray[0]
     }?.onFailure {
@@ -108,7 +111,7 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
         legit?.onSuccess{
             var booking= BookingRequest(
                 userId=viewModel.getuserId().toString(),
-                carId=plate,
+                carId=id,
                 startDate = viewModel.startDate,
                 endDate = viewModel.endDate,
                 pickupTime = viewModel.startTime,

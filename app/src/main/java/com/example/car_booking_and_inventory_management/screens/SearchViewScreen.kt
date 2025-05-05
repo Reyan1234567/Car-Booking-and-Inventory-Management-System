@@ -177,11 +177,11 @@ fun SearchViewScreen(modifier: Modifier = Modifier, navController: NavController
         carsearchs?.onSuccess {cars->
             LazyColumn(modifier=Modifier.padding(2.dp), horizontalAlignment = Alignment.CenterHorizontally){
                 searchResultArray=cars
-                if(finalResults!= emptyList<Car>()){
+                if(finalResults!= emptyList<CarResponse>()){
                     items(finalResults){car->
                         CarDisplay(modifier =Modifier,car) {
                             car.plate?.let { Log.v(TAG, it) }
-                            navController.navigate("singleCar/${car.plate}")
+                            navController.navigate("singleCar/${car._id}")
                         }
                     }
                 }

@@ -7,16 +7,14 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.LoginInput
 import com.example.car_booking_and_inventory_management.data.LoginResult
-import com.example.car_booking_and_inventory_management.data.ProfilePageRequest
 import com.example.car_booking_and_inventory_management.data.ProfilePageResult
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.data.UploadResponse
-import com.example.car_booking_and_inventory_management.data.Username
+import com.example.car_booking_and_inventory_management.data.accountEdit
 import com.example.car_booking_and_inventory_management.repositories.authRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.Result
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -43,6 +40,9 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
 
     private val _profileUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
     val profileUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
+
+    private val _licenseUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
+    val licenseUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
 
     private val _updateResponse=MutableStateFlow<Result<ProfilePageResult>?>(null)
     val updateResponse:StateFlow<Result<ProfilePageResult>?> =_updateResponse.asStateFlow()
@@ -77,7 +77,7 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                             response.body()?.let {
                                 repository.saveUserInfo(
                                     id=it.user.id,
-                                    accesstToken = it.accessToken,
+                                    accessToken = it.accessToken,
                                     refreshToken =it.refreshToken,
                                     username = it.user.username,
                                     email = it.user.email,
@@ -97,7 +97,7 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                         }
                     }
                     catch(e:Exception){
-                        _loginResult.value=Result.failure(Exception("Network error: ${e.message}"))
+                        _loginResult.value=Result.failure(Exception("Network error"))
                     }
                     finally {
                         isLoading1.value = false
@@ -193,7 +193,7 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
         }
     }
 
-    fun uploadImage(context:Context, uri: Uri, partName:String="image" ){
+    fun uploadProfile(context:Context, uri: Uri, partName:String="image" ){
         viewModelScope.launch {
             isLoading3.value=true
             val multipart=createMultipartBody(context,uri)
@@ -217,45 +217,78 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
         }
     }
 
+    fun uploadLicense(context:Context, uri: Uri, partName:String="image" ){
+        viewModelScope.launch {
+            isLoading3.value=true
+            val multipart=createMultipartBody(context,uri)
+            if(multipart!=null){
+                try {
+                    val response=repository.uploadProfile(multipart)
+                    if(response.isSuccessful && response.body()!=null){
+                        _licenseUploadResult.value= Result.success(response.body()!!)
+                    }
+                    else{
+                        _licenseUploadResult.value= Result.failure(Exception(response.errorBody()?.string()))
+                    }
+                }
+                catch (e:Exception){
+                    _licenseUploadResult.value= Result.failure(e)
+                }
+                finally {
+                    isLoading3.value=false
+                }
+            }
+        }
+    }
+
     suspend fun getProfilePhoto():String?{
-        Log.v(TAG, "from the viewModel's get function ${repository.getProfilePhoto()}")
+        Log.v(TAG, "getProfile from the viewModel's get function ${repository.getProfilePhoto()}")
        return repository.getProfilePhoto()
     }
 
     suspend fun getLicensePhoto():String?{
-        Log.v(TAG, "from the viewModel's get function ${repository.getLicensePhoto()}")
+        Log.v(TAG, "getLicense from the viewModel's get function ${repository.getLicensePhoto()}")
         return repository.getLicensePhoto()
     }
 
     suspend fun getUsername():String?{
-        Log.v(TAG, "from the viewModel's get function ${repository.getUsername()}")
+        Log.v(TAG, "getUsername from the viewModel's get function ${repository.getUsername()}")
         return repository.getUsername()
     }
 
     suspend fun getEmail(): String? {
+        Log.v(TAG, "getEmail from the viewModel's get function ${repository.getEmail()}")
         return repository.getEmail()
     }
 
     suspend fun getPhoneNumber(): String? {
+        Log.v(TAG, "getPhoneNumber from the viewModel's get function ${repository.getPhoneNumber()}")
         return repository.getPhoneNumber()
     }
 
-    suspend fun getUserId(){
+    suspend fun getUserId(): String? {
+        Log.v(TAG, "getUserId from the viewModel's get function ${repository.getId()}")
         return repository.getId()
     }
 
-    suspend fun editAccount(id:String, body:ProfilePageRequest) {
-        var result=repository.editAccount(id,body)
-        try {
-            if(result.isSuccessful && result.body()!=null){
-                _updateResponse.value=Result.success(result.body()!!)
+    suspend fun editAccount(id:String, body: accountEdit) {
+        viewModelScope.launch {
+            try {
+                val result = repository.editAccount(id, body)
+                if (result.isSuccessful && result.body() != null) {
+                    _updateResponse.value = Result.success(result.body()!!)
+                    // Update local state
+//                    username = body.username
+//                    email = body.email
+//                    phoneNumber = body.phoneNumber
+//                    profilePhoto = body.profilePhoto
+//                    licensePhoto = body.licensePhoto
+                } else {
+                    _updateResponse.value = Result.failure(Exception(result.errorBody()?.string() ?: "Update failed"))
+                }
+            } catch (e: Exception) {
+                _updateResponse.value = Result.failure(e)
             }
-            else{
-                _updateResponse.value=Result.failure((Exception(result.errorBody()?.string())))
-            }
-        }
-        catch(e:Exception){
-            _updateResponse.value=Result.failure(e)
         }
     }
 
