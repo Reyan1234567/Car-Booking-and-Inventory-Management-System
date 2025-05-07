@@ -1,12 +1,13 @@
 package com.example.car_booking_and_inventory_management.repositories
 
+import com.example.car_booking_and_inventory_management.DataStore.TokenManager
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import com.example.car_booking_and_inventory_management.network.Admin
 import retrofit2.Response
 
-class AdminRepository(val admin:Admin) {
+class AdminRepository(val admin:Admin, tokenManager: TokenManager) {
     suspend fun getBookings(): Response<List<BookingTable>> {
         return admin.getBookings()
     }

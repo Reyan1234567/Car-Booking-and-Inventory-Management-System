@@ -66,10 +66,18 @@ fun LoginScreen(
     LaunchedEffect(loginState.value) {
 
         loginState.value?.onSuccess {loginData->
-            snackbarHostState.showSnackbar("Login successful! Welcome ${loginData.user.firstName}")
-            navController.navigate("home") {
-                popUpTo("login") { inclusive = true }
+            if(loginData.user.role=="admin"){
+                navController.navigate("admin") {
+                    popUpTo("login") { inclusive = true }
+                }
             }
+            else if(loginData.user.role=="user"){
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
+            }
+
+            snackbarHostState.showSnackbar("Login successful! Welcome ${loginData.user.firstName}")
         }?.onFailure {
             snackbarHostState.showSnackbar("Login failed: ${it.message}")        }
     }

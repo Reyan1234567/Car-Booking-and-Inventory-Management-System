@@ -14,5 +14,6 @@ data class Username(
     val profilePhoto:String,
     val licensePhoto:String,
     val firstName:String,
-    val lastName:String
+    val lastName:String,
+    val role:String
 )

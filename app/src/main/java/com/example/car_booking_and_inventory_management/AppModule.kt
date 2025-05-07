@@ -2,9 +2,11 @@ package com.example.car_booking_and_inventory_management
 
 import android.content.Context
 import com.example.car_booking_and_inventory_management.DataStore.TokenManager
+import com.example.car_booking_and_inventory_management.network.Admin
 import com.example.car_booking_and_inventory_management.network.AuthInterceptor
 import com.example.car_booking_and_inventory_management.network.authApi
 import com.example.car_booking_and_inventory_management.network.searchApi
+import com.example.car_booking_and_inventory_management.repositories.AdminRepository
 import com.example.car_booking_and_inventory_management.repositories.CarFilterRepository
 import com.example.car_booking_and_inventory_management.repositories.authRepository
 import dagger.Module
@@ -59,13 +61,11 @@ object AppModule {
         return retrofit.create(searchApi::class.java)
     }
 
+    @Provides
+    fun provideAdminApi(retrofit: Retrofit):Admin{
+        return retrofit.create(Admin::class.java)
+    }
 
-//    @Provides
-//    @Singleton
-//    fun provideAuthApi(tokenManager: TokenManager): authApi {
-//        return authApi.provideRetrofit(tokenManager).create(authApi::class.java)
-//    }
-//
     @Provides
     @Singleton
     fun provideAuthRepository(api: authApi, tokenManager: TokenManager): authRepository {
@@ -77,15 +77,12 @@ object AppModule {
     fun provideLocationFilterRepository(api: searchApi, tokenManager: TokenManager): CarFilterRepository {
         return CarFilterRepository(api, tokenManager)
     }
-//
-//}
 
-//@Provides
-//@Singleton // AuthInterceptor should typically be a singleton
-//fun provideAuthInterceptor(tokenManager: TokenManager): AuthInterceptor {
-//    // Assuming your AuthInterceptor constructor takes TokenManager
-//    return AuthInterceptor(tokenManager)
-//}
+    @Provides
+    @Singleton
+    fun provideAdminRespository(api:Admin, tokenManager: TokenManager):AdminRepository{
+        return AdminRepository(api, tokenManager)
+    }
 
 
 @Provides

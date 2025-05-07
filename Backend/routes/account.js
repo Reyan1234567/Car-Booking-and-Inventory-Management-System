@@ -110,8 +110,8 @@ router.post("/auth/signin", async (req, res) => {
     const PP=await profilePhoto.find({_id:user.profilePhoto})
     const LP=await licensePhoto.find({_id:user.licensePhoto})
     console.log("PP and Lp"+ PP[0],LP[0])
-    const placeHolder=PP?PP[0].url:""
-    const otherPlaceHolder=LP?LP[0].url:""
+    const placeHolder=PP?PP[0].url:null
+    const otherPlaceHolder=LP?LP[0].url:null
     res.status(200).json({
       accessToken,
       refreshToken,
@@ -124,6 +124,7 @@ router.post("/auth/signin", async (req, res) => {
         licensePhoto: otherPlaceHolder,
         firstName: user.firstName,
         lastName: user.lastName,
+        role:user.role
       },
     });
     console.log({
