@@ -2,8 +2,8 @@ package com.example.car_booking_and_inventory_management
 
 import android.content.Context
 import com.example.car_booking_and_inventory_management.DataStore.TokenManager
-import com.example.car_booking_and_inventory_management.network.Admin
 import com.example.car_booking_and_inventory_management.network.AuthInterceptor
+import com.example.car_booking_and_inventory_management.network.adminApi
 import com.example.car_booking_and_inventory_management.network.authApi
 import com.example.car_booking_and_inventory_management.network.searchApi
 import com.example.car_booking_and_inventory_management.repositories.AdminRepository
@@ -62,8 +62,8 @@ object AppModule {
     }
 
     @Provides
-    fun provideAdminApi(retrofit: Retrofit):Admin{
-        return retrofit.create(Admin::class.java)
+    fun provideAdminApi(retrofit: Retrofit): adminApi {
+        return retrofit.create(adminApi::class.java)
     }
 
     @Provides
@@ -80,7 +80,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAdminRepository(api:Admin, tokenManager: TokenManager):AdminRepository{
+    fun provideAdminRepository(api:adminApi, tokenManager: TokenManager):AdminRepository{
         return AdminRepository(api, tokenManager)
     }
 

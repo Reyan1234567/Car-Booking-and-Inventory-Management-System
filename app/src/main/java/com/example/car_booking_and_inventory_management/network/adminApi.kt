@@ -6,7 +6,7 @@ import com.example.car_booking_and_inventory_management.data.UsersTable
 import retrofit2.Response
 import retrofit2.http.GET
 
-interface Admin {
+interface adminApi {
     @GET("bookings")
     suspend fun getBookings(): Response<List<BookingTable>>
 
