@@ -33,16 +33,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.parser.Section
 import coil.compose.rememberImagePainter
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
+import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dashboard(modifier: Modifier = Modifier) {
+fun DashboardPage(modifier: Modifier = Modifier,navController:NavController, viewModel: AdminViewModel) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -122,8 +124,3 @@ fun Dashboard(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun Dash() {
-    Dashboard()
-}

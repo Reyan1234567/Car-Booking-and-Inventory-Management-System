@@ -69,12 +69,30 @@ router.get("/booking/:id", async (req, res) => {
 router.get("/bookings", async (req, res) => {
   try {
     const bookings = await Booking.find();
+    if(!bookings||bookings.length===0){
+      return res.status(404).send("can't find bookings")
+    }
     res.status(200).send(bookings);
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
   }
 });
+
+router.get("/total_bookings",async (req,res)=>{
+  try{
+    const bookings=await Booking.findAll()
+    if(!bookings||bookings.length===0){
+      res.status(404).send("No Bookngs found!")
+    }
+    else{
+      res.status(200).send(bookings.length)
+    }
+  }
+  catch(e){
+    res.status(404).send("Some booking error")
+  }
+})
 
 router.put("/booking/:id", async (req, res) => {
   const { id } = req.params;

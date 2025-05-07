@@ -32,16 +32,41 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
+import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserScreen(modifier: Modifier = Modifier) {
+fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    var listOfUsers by remember { mutableStateOf(listOf<UsersTable>()) }
+
+    val result = viewModel.UserResponse.collectAsState()
+    LaunchedEffect(result.value) {
+        val Result = result.value
+        Result?.onSuccess {
+            listOfUsers = it
+        }?.onFailure {
+            snackbarHostState.showSnackbar("${it}")
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(" ") },
@@ -80,17 +105,18 @@ fun UserScreen(modifier: Modifier = Modifier) {
                 Spacer(modifier=Modifier.padding(5.dp))
                 LazyRow(){
                     item{ UsersTableHeader() }
-
-//                    UserList.mapIndexed{index, user->
-//                        TableRow(user)
-//                    }
+                    if (listOfUsers.isEmpty()) {
+                        item { Text("No Users Present") }
+                    } else {
+                        items(listOfUsers.size) { index ->
+                            UsersTableRow(listOfUsers[index])
+                        }
+                    }
                 }
             }
         }
     }
 }
-
-
 
 @Composable
 fun UsersTableHeader(modifier: Modifier = Modifier) {
@@ -136,13 +162,3 @@ fun UsersTableRow(user: UsersTable, modifier: Modifier = Modifier, onEditClick: 
     }
 }
 
-
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-private fun Ccc() {
-    Booking()
-}

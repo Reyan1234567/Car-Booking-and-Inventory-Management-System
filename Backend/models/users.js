@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  role:{requried:true, type:String, default:"user"},
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   phoneNumber: { type: String, required: true, trim:true, unique:true },

@@ -9,7 +9,7 @@ const router=Router()
 router.use(checkAccessToken)
 //Get All cars
 router.get("/cars",async (req,res)=>{
-    const response=await Cars.findA()
+    const response=await Cars.find()
     try{
         if(!response){
             return res.status(401).send("No Cars found")
@@ -57,6 +57,21 @@ router.put("cars/:id",async(req,res)=>{
     }
 })
 
+router.get("/total_cars",async (req,res)=>{
+    try{
+      const cars=await Cars.findAll()
+      if(!cars||cars.length===0){
+        res.status(404).send("No Cars found!")
+      }
+      else{
+        res.status(200).send(cars.length)
+      }
+    }
+    catch(e){
+      res.status(404).send("Some car error")
+    }
+  })
+  
 
 
 router.post("/api/filteredCars", async (req, res) => {

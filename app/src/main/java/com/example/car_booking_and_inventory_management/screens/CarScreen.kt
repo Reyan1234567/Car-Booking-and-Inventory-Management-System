@@ -1,8 +1,5 @@
 package com.example.car_booking_and_inventory_management.screens
 
-import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
-import android.util.Log
 import android.widget.TableRow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,49 +21,44 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
-import com.example.car_booking_and_inventory_management.data.BookingTable
+import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
-
-
-@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
-    var snackbarHostState = SnackbarHostState()
-    var listOfBookings by remember { mutableStateOf(listOf(BookingTable())) }
+fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    var listOfCars by remember { mutableStateOf(listOf<Car>()) }
 
-    var result = viewModel.BookingsResponse
+    val result = viewModel.CarsResponse.collectAsState()
     LaunchedEffect(result.value) {
         val Result = result.value
         Result?.onSuccess {
-            listOfBookings = it
+            listOfCars = it
         }?.onFailure {
-            Log.v(TAG, it.toString())
             snackbarHostState.showSnackbar("${it}")
         }
-
     }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -106,19 +97,15 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
                 .fillMaxSize()
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                Text("Booking", style = TextStyle(fontSize = 30.sp, fontFamily = Vold))
+                Text("Cars", style = TextStyle(fontSize = 30.sp, fontFamily = Vold))
                 Spacer(modifier = Modifier.padding(5.dp))
-                LazyRow() {
-                    item {
-                        BookingTableHeader()
-                        if (listOfBookings.isEmpty()) {
-                            Text("No Bookings Present")
-                        } else {
-                            listOfBookings.mapIndexed { index, booking ->
-                                BookingTableRow(booking, onEditClick = {
-//                                    navController.navigate("")
-                                })
-                            }
+                LazyRow {
+                    item { CarsTableHeader() }
+                    if (listOfCars.isEmpty()) {
+                        item { Text("No Cars Present") }
+                    } else {
+                        items(listOfCars.size) { index ->
+                            CarsTableRow(listOfCars[index])
                         }
                     }
                 }
@@ -127,59 +114,52 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
     }
 }
 
-    @Composable
-    fun BookingTableHeader(modifier: Modifier = Modifier) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(Color.LightGray)
-                .padding(8.dp)
-        ) {
-            Text("Start Date", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("End Date", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Pickup", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Dropoff", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Pickup Time", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Dropoff Time", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Status", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Plate", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("User", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Edit", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        }
-    }
-
-
-    @Composable
-    fun BookingTableRow(
-        booking: BookingTable,
-        modifier: Modifier = Modifier,
-        onEditClick: () -> Unit
+@Composable
+fun CarsTableHeader(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.LightGray)
+            .padding(8.dp)
     ) {
-        Row(
+        Text("Plate", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
+        Text("Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
+        Text("Make", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
+        Text("Model", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
+        Text("Year", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
+        Text("Category", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
+        Text("Type", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
+        Text("Daily Rate", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
+        Spacer(modifier = Modifier.weight(0.1f)) // for edit button
+    }
+}
+
+@Composable
+fun CarsTableRow(car: Car, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(8.dp)
+    ) {
+        Text(car.plate, modifier = Modifier.weight(0.15f))
+        Text(car.name, modifier = Modifier.weight(0.15f))
+        Text(car.make, modifier = Modifier.weight(0.15f))
+        Text(car.model, modifier = Modifier.weight(0.15f))
+        Text(car.year.toString(), modifier = Modifier.weight(0.1f))
+        Text(car.category, modifier = Modifier.weight(0.15f))
+        Text(car.type, modifier = Modifier.weight(0.15f))
+        Text(car.dailyRate.toString(), modifier = Modifier.weight(0.15f))
+        IconButton(
+            onClick = onEditClick,
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(8.dp)
+                .weight(0.1f)
+                .background(Color.Yellow)
         ) {
-            Text(booking.startDate, modifier.weight(0.1f))
-            Text(booking.endDate, modifier.weight(0.1f))
-            Text(booking.pickupLocationName, modifier.weight(0.1f))
-            Text(booking.dropoffLocationName, modifier.weight(0.1f))
-            Text(booking.pickupTime, modifier.weight(0.1f))
-            Text(booking.dropoffTime, modifier.weight(0.1f))
-            Text(booking.bookingStatus, modifier.weight(0.1f))
-            Text(booking.carPlate, modifier.weight(0.1f))
-            Text(booking.username, modifier.weight(0.1f))
-            IconButton(onClick = onEditClick, modifier = Modifier.background(Color.Yellow)) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = ""
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = "Edit"
+            )
         }
     }
-
-
-
-
-
+} 

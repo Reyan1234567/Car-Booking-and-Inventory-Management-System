@@ -35,7 +35,7 @@ var bottomNavs=listOf(
     ),
     BottomNavItem(
         title = "Booking",
-        route="booking",
+        route="bookings",
         selectedIcon = Icons.Filled.DateRange,
         unselectedIcon = Icons.Outlined.DateRange,
         hasNews = false,

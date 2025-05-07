@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import androidx.lifecycle.viewModelScope
+import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.repositories.AdminRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +28,9 @@ class AdminViewModel(private val repository:AdminRepository): ViewModel() {
 
     private val _TotalUsersResponse = MutableStateFlow<Result<Int>?>(null)
     val TotalUsersResponse: StateFlow<Result<Int>?> = _TotalUsersResponse.asStateFlow()
+
+    private val _CarsResponse = MutableStateFlow<Result<List<Car>>?>(null)
+    val CarsResponse: StateFlow<Result<List<Car>>?> = _CarsResponse.asStateFlow()
 
     fun getBookings(){
         viewModelScope.launch{
@@ -58,6 +62,22 @@ class AdminViewModel(private val repository:AdminRepository): ViewModel() {
             } catch (e: Exception) {
                 _UserResponse.value = Result.failure(e)
                 Log.v("UserViewModel", e.toString())
+            }
+        }
+    }
+
+    fun getCars() {
+        viewModelScope.launch {
+            try {
+                val result = repository.getCars()
+                if (result.isSuccessful && result.body() != null) {
+                    _CarsResponse.value = Result.success(result.body()!!)
+                } else {
+                    _CarsResponse.value = Result.failure(Exception(result.errorBody()?.string()))
+                }
+            } catch (e: Exception) {
+                _CarsResponse.value = Result.failure(e)
+                Log.v(TAG, e.toString())
             }
         }
     }

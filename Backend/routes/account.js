@@ -61,9 +61,12 @@ router.post("/auth/signup", async (req, res) => {
   }
 });
 
-router.get("/getUsers", checkAccessToken, async (req, res) => {
+router.get("/users", checkAccessToken, async (req, res) => {
   try {
     const response = await User.find();
+    if(!response||response.length===0){
+      return res.status(404).send("No Users found")
+    }
     res.send(response);
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -355,6 +358,33 @@ router.patch("/auth/updateAccount/:id",async (req, res) => {
     console.error("Update error:", e);
     res.status(400).send(e.message);
   }
+
+
+router.get("/total_users",async (req,res)=>{
+  try{
+    const users=await User.findAll()
+    if(!users||users.length===0){
+      res.status(404).send("No User found!")
+    }
+    else{
+      res.status(200).send(users.length)
+    }
+  }
+  catch(e){
+    res.status(404).send("Some user error")
+  }
+})
+
+
+
+
+
+
+
+
+
+
+
 });
 
 
