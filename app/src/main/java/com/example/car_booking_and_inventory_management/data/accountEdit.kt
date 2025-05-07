@@ -15,3 +15,11 @@ data class accountEdit(
         "licensePhoto" to licensePhoto
     ).filterValues { it != null }
 }
+
+data class UsersTable(
+        var username:String,
+        var email:String,
+        var firstname:String,
+        var lastname:String,
+        var phoneNumber:String,
+)

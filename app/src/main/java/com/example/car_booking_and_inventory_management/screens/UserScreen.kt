@@ -35,12 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingTable
+import com.example.car_booking_and_inventory_management.data.UsersTable
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Booking(modifier: Modifier = Modifier) {
-    
+fun UserScreen(modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -76,13 +76,13 @@ fun Booking(modifier: Modifier = Modifier) {
             .padding(innerPadding)
             .fillMaxSize()){
             Column(modifier=Modifier.padding(20.dp)){
-                Text("Booking", style= TextStyle(fontSize = 30.sp, fontFamily = Vold))
+                Text("Users", style= TextStyle(fontSize = 30.sp, fontFamily = Vold))
                 Spacer(modifier=Modifier.padding(5.dp))
                 LazyRow(){
-                    item{ BookingTableHeader() }
+                    item{ UsersTableHeader() }
 
-//                    BookingList.mapIndexed{index, booking->
-//                        BookingTableRow(booking)
+//                    UserList.mapIndexed{index, user->
+//                        TableRow(user)
 //                    }
                 }
             }
@@ -93,50 +93,50 @@ fun Booking(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun BookingTableHeader(modifier: Modifier = Modifier) {
+fun UsersTableHeader(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(Color.LightGray)
             .padding(8.dp)
     ) {
-        Text("Start Date", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("End Date", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Pickup", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Dropoff", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Pickup Time", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Dropoff Time", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Status", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Plate", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("User", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Edit", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
+        Text("Username", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
+        Text("Email", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.3f))
+        Text("First Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
+        Text("Last Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
+        Text("Phone", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
+        Spacer(modifier = Modifier.weight(0.1f)) // for edit button
     }
 }
 
-
 @Composable
-fun BookingTableRow(booking: BookingTable, modifier: Modifier = Modifier, onEditClick:()->Unit) {
-    Row(modifier=Modifier
-        .fillMaxWidth()
-        .background(Color.White)
-        .padding(8.dp)){
-        Text(booking.startDate,modifier.weight(0.1f))
-        Text(booking.endDate,modifier.weight(0.1f))
-        Text(booking.pickupLocationName,modifier.weight(0.1f))
-        Text(booking.dropoffLocationName,modifier.weight(0.1f))
-        Text(booking.pickupTime,modifier.weight(0.1f))
-        Text(booking.dropoffTime,modifier.weight(0.1f))
-        Text(booking.bookingStatus,modifier.weight(0.1f))
-        Text(booking.carPlate,modifier.weight(0.1f))
-        Text(booking.username,modifier.weight(0.1f))
-        IconButton(onClick = onEditClick, modifier=Modifier.background(Color.Yellow)){
+fun UsersTableRow(user: UsersTable, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(8.dp)
+    ) {
+        Text(user.username, modifier = Modifier.weight(0.2f))
+        Text(user.email, modifier = Modifier.weight(0.3f))
+        Text(user.firstname, modifier = Modifier.weight(0.2f))
+        Text(user.lastname, modifier = Modifier.weight(0.2f))
+        Text(user.phoneNumber, modifier = Modifier.weight(0.2f))
+        IconButton(
+            onClick = onEditClick,
+            modifier = Modifier
+                .weight(0.1f)
+                .background(Color.Yellow)
+        ) {
             Icon(
                 imageVector = Icons.Filled.Edit,
-                contentDescription=""
+                contentDescription = "Edit"
             )
         }
     }
 }
+
+
 
 
 
