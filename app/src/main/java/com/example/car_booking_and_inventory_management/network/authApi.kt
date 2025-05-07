@@ -11,6 +11,7 @@ import com.example.car_booking_and_inventory_management.data.RefreshResult
 import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.data.accountEdit
+import com.example.car_booking_and_inventory_management.data.saveResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -48,7 +49,7 @@ interface authApi {
     ):Response<UploadResponse>
 
     @PATCH("auth/updateAccount/{id}")
-    suspend fun editAccount(@Path("id") userId: String, @Body body: accountEdit):Response<ProfilePageResult>
+    suspend fun editAccount(@Path("id") userId: String, @Body body: accountEdit):Response<saveResponse>
 
 }
 

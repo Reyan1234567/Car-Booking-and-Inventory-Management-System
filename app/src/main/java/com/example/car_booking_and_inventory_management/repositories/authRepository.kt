@@ -13,6 +13,7 @@ import com.example.car_booking_and_inventory_management.data.RefreshResult
 import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.Username
 import com.example.car_booking_and_inventory_management.data.accountEdit
+import com.example.car_booking_and_inventory_management.data.saveResponse
 import com.example.car_booking_and_inventory_management.network.authApi
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -114,7 +115,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         return tokenManager.getPhoneNumber()
     }
 
-    suspend fun editAccount(id:String, body: accountEdit):Response<ProfilePageResult>{
+    suspend fun editAccount(id:String, body: accountEdit):Response<saveResponse>{
         return api.editAccount(id,body)
     }
 

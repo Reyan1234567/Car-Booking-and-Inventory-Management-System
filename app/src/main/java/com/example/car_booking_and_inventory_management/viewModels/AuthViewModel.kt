@@ -17,6 +17,7 @@ import com.example.car_booking_and_inventory_management.data.ProfilePageResult
 import com.example.car_booking_and_inventory_management.data.Signup
 import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.accountEdit
+import com.example.car_booking_and_inventory_management.data.saveResponse
 import com.example.car_booking_and_inventory_management.repositories.authRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,6 +57,9 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
 
     private val _accessTokenResponse= MutableStateFlow<Result<LoginResult>?>(null)
     val accessTokenResponse:StateFlow<Result<LoginResult>?> =_accessTokenResponse.asStateFlow()
+
+    private val _saveResult=MutableStateFlow<Result<saveResponse>?>(null)
+    val saveResult:StateFlow<Result<saveResponse>?> = _saveResult.asStateFlow()
 
 //    private val _profileUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
 //    val profileUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
@@ -199,7 +203,7 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                 _state.value=_state.value.copy(isLoading = true)
                 _state.value=_state.value.copy(isntBackable=true)
                 try{
-                    repository.editAccount(
+                   val result=repository.editAccount(
                         id=repository.getId() ?: "",
                         body=accountEdit(
                             username = _state.value.username,
@@ -209,10 +213,17 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                             licensePhoto = licenseId
                         )
                     )
+                    if(result.isSuccessful && result.body()!=null){
+                        _saveResult.value=Result.success(result.body()!!)
+                    }
+                    else{
+                        _saveResult.value=Result.failure(Exception(result.errorBody()?.string()))
+                    }
                     repository.editFromSave(_state.value.username, _state.value.email, _state.value.phoneNumber, _state.value.profileImageUrl, _state.value.licenseImageUrl)
 
                 }
                 catch (e:Exception){
+                    _saveResult.value=Result.failure(e)
                     _state.value=_state.value.copy(
                         error = e.message)
                 }

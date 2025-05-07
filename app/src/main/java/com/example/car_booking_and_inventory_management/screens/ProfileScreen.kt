@@ -77,7 +77,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val snackbarHostState=remember{ SnackbarHostState() }
-
+    val saveResult=viewModel.saveResult.collectAsState()
 
     val Profilelauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -94,6 +94,15 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
     LaunchedEffect(state.error) {
         state.error?.let {
             snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    LaunchedEffect(saveResult){
+        val result=saveResult.value
+        result?.onSuccess {
+            snackbarHostState.showSnackbar("changes saved successfully")
+        }?.onFailure {
+            snackbarHostState.showSnackbar(it.message.toString())
         }
     }
 
@@ -300,10 +309,16 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
             Button(
                 onClick = {
                     runBlocking{
-                        val profileId:UploadResponse=viewModel.uploadProfile(context)
-                        Log.v(TAG, profileId.toString()+" "+profileId.id)
-                        val licenseId:UploadResponse=viewModel.uploadLicense(context)
-                        Log.v(TAG, licenseId.toString()+" "+licenseId.id)
+                        var profileId=UploadResponse()
+                        var licenseId=UploadResponse()
+                        if(state.profileUri!=null){
+                            profileId=viewModel.uploadProfile(context)
+                            Log.v(TAG, profileId.toString()+" "+profileId.id)
+                        }
+                        if(state.licenseUri!=null){
+                            licenseId=viewModel.uploadLicense(context)
+                            Log.v(TAG, licenseId.toString()+" "+licenseId.id)
+                        }
                         viewModel.saveProfile(profileId.id, licenseId.id)
                     }
 
