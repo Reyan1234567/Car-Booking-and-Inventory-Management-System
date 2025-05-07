@@ -5,19 +5,16 @@ import connect from "./config/db.js"
 import routes from "./routes/route.js"
 const app=express()
 
-app.use(express.json())
-app.use(cors({
-    origin: 'http://10.0.2.2:4000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.use(routes)
 config()
-
 connect()
 
+app.use(express.json())
+app.use(cors());  // Allow all origins during development
+
+// Serve static files before routes
 app.use('/uploads', express.static('uploads'));
+
+app.use(routes)
 
 const PORT=process.env.PORT
 app.listen(PORT,'0.0.0.0',()=>{

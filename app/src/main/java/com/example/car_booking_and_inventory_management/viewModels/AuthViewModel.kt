@@ -4,6 +4,8 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,6 +31,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(private val repository: authRepository): ViewModel(){
+    data class ProfileState(
+        val id:String="",
+        val username:String="",
+        val phoneNumber:String="",
+        val email:String="",
+        val profileImageUrl:String?=null,
+        val licenseImageUrl:String?=null,
+        val profileUri:Uri?=null,
+        val licenseUri:Uri?=null,
+        val isLoading:Boolean=false,
+        val error:String?=null,
+        val isntBackable:Boolean=false
+    )
+
+    private val _state = MutableStateFlow(ProfileState())
+    val state: StateFlow<ProfileState> =_state.asStateFlow()
+
     private val _loginResult= MutableStateFlow<Result<LoginResult>?>(null)
     val loginResult: StateFlow<Result<LoginResult>?> = _loginResult.asStateFlow()
 
@@ -38,14 +57,14 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
     private val _accessTokenResponse= MutableStateFlow<Result<LoginResult>?>(null)
     val accessTokenResponse:StateFlow<Result<LoginResult>?> =_accessTokenResponse.asStateFlow()
 
-    private val _profileUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
-    val profileUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
-
-    private val _licenseUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
-    val licenseUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
-
-    private val _updateResponse=MutableStateFlow<Result<ProfilePageResult>?>(null)
-    val updateResponse:StateFlow<Result<ProfilePageResult>?> =_updateResponse.asStateFlow()
+//    private val _profileUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
+//    val profileUploadResult:StateFlow<Result<UploadResponse>?> = _profileUploadResult.asStateFlow()
+//
+//    private val _licenseUploadResult=MutableStateFlow<Result<UploadResponse>?>(null)
+//    val licenseUploadResult:StateFlow<Result<UploadResponse>?> = _licenseUploadResult.asStateFlow()
+//
+//    private val _updateResponse=MutableStateFlow<Result<ProfilePageResult>?>(null)
+//    val updateResponse:StateFlow<Result<ProfilePageResult>?> =_updateResponse.asStateFlow()
 
 
 
@@ -66,6 +85,143 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
 ///////////////////////////////////////////////////
     var isLoading2 =MutableStateFlow(false)
  ////////////////////////////////////////////////////
+            init {
+                loadInitialDate()
+            }
+
+            private fun loadInitialDate(){
+                viewModelScope.launch {
+                    _state.value=_state.value.copy(
+                        id=repository.getId() ?: "",
+                        username=repository.getUsername() ?: "",
+                        phoneNumber=repository.getPhoneNumber() ?: "",
+                        email=repository.getEmail() ?: "",
+                        profileImageUrl=repository.getProfilePhoto(),
+                        licenseImageUrl=repository.getLicensePhoto()
+                    )
+                }
+            }
+            fun updateField(field:String, value:String){
+                _state.value=_state.value.copy(isntBackable=true)
+                _state.value = when(field){
+                    "username"->
+                        _state.value.copy(username=value)
+                    "phoneNumber"->_state.value.copy(phoneNumber=value)
+                    "email"->_state.value.copy(email=value)
+                    "profileUri"->_state.value.copy(profileUri=Uri.parse(value))
+                    "licenseUri"->_state.value.copy(licenseUri=Uri.parse(value))
+                    else->_state.value
+                }
+
+            }
+
+            fun updateState(field:String,value:Uri?){
+                _state.value=_state.value.copy(isntBackable=true)
+                _state.value = when(field){
+                    "profileUri"->_state.value.copy(profileUri=value)
+                    "licenseUri"->_state.value.copy(licenseUri=value)
+                    else->_state.value
+                }
+            }
+
+            suspend fun uploadProfile(context:Context):UploadResponse{
+                Log.v(TAG, "Inside the uploadProfile function")
+                val uri = _state.value.profileUri ?: run {
+                    _state.value = _state.value.copy(error = "No image selected")
+                    return UploadResponse()
+                }
+                    _state.value=_state.value.copy(isLoading=true)
+                    try{
+                        val multipart = createMultipartBody(context, uri) ?: run {
+                            _state.value = _state.value.copy(error = "Failed to create upload data")
+                            return UploadResponse()
+                        }
+                        val result= repository.uploadProfile(multipart)
+                        if(result.isSuccessful){
+                            _state.value=_state.value.copy(
+                                profileImageUrl=result.body()?.url,
+                                profileUri=null
+                            )
+                            return result.body()?: UploadResponse()
+                        }
+                        else{
+                            _state.value=_state.value.copy(
+                                error=result.errorBody()?.string(),
+                                profileUri=null
+                            )
+                            return UploadResponse()
+                        }
+                    }
+                    finally {
+                        _state.value=_state.value.copy(isLoading=false)
+                    }
+
+            }
+
+    suspend fun uploadLicense(context:Context):UploadResponse{
+        Log.v(TAG, "Inside the uploadLicense function")
+        val uri = _state.value.licenseUri ?: run {
+            _state.value = _state.value.copy(error = "No image selected")
+            return UploadResponse()
+        }
+        _state.value=_state.value.copy(isLoading=true)
+        try{
+            val multipart = createMultipartBody(context, uri) ?: run {
+                _state.value = _state.value.copy(error = "Failed to create upload data")
+                return UploadResponse()
+            }
+            Log.v(TAG,multipart.toString())
+            val result= repository.uploadLicense(multipart)
+            if(result.isSuccessful){
+                _state.value=_state.value.copy(
+                    licenseImageUrl =result.body()?.url,
+                    licenseUri =null
+                )
+                return result.body()?: UploadResponse()
+            }
+            else{
+                _state.value=_state.value.copy(
+                    error=result.errorBody()?.string(),
+                    licenseUri =null
+                )
+                return UploadResponse()
+            }
+        }
+        finally {
+            _state.value=_state.value.copy(isLoading=false)
+        }
+    }
+        fun updateBackable(state:Boolean){
+            _state.value=_state.value.copy(isntBackable=state)
+        }
+
+            suspend fun saveProfile(profileId:String?,licenseId:String?){
+                _state.value=_state.value.copy(isLoading = true)
+                _state.value=_state.value.copy(isntBackable=true)
+                try{
+                    repository.editAccount(
+                        id=repository.getId() ?: "",
+                        body=accountEdit(
+                            username = _state.value.username,
+                            email = _state.value.email,
+                            phoneNumber = _state.value.phoneNumber,
+                            profilePhoto = profileId,
+                            licensePhoto = licenseId
+                        )
+                    )
+                    repository.editFromSave(_state.value.username, _state.value.email, _state.value.phoneNumber, _state.value.profileImageUrl, _state.value.licenseImageUrl)
+
+                }
+                catch (e:Exception){
+                    _state.value=_state.value.copy(
+                        error = e.message)
+                }
+                finally {
+                  _state.value=_state.value.copy(isLoading = false)
+                  _state.value=_state.value.copy(isntBackable=false)
+                }
+            }
+
             fun login(user: LoginInput){
                 viewModelScope.launch{
                     try{
@@ -193,104 +349,104 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
         }
     }
 
-    fun uploadProfile(context:Context, uri: Uri, partName:String="image" ){
-        viewModelScope.launch {
-            isLoading3.value=true
-            val multipart=createMultipartBody(context,uri)
-            if(multipart!=null){
-                try {
-                   val response=repository.uploadProfile(multipart)
-                    if(response.isSuccessful && response.body()!=null){
-                        _profileUploadResult.value= Result.success(response.body()!!)
-                    }
-                    else{
-                        _profileUploadResult.value= Result.failure(Exception(response.errorBody()?.string()))
-                    }
-                }
-                catch (e:Exception){
-                    _profileUploadResult.value= Result.failure(e)
-                }
-                finally {
-                    isLoading3.value=false
-                }
-            }
-        }
-    }
+//    fun uploadProfile(context:Context, uri: Uri, partName:String="image" ){
+//        viewModelScope.launch {
+//            isLoading3.value=true
+//            val multipart=createMultipartBody(context,uri)
+//            if(multipart!=null){
+//                try {
+//                   val response=repository.uploadProfile(multipart)
+//                    if(response.isSuccessful && response.body()!=null){
+//                        _profileUploadResult.value= Result.success(response.body()!!)
+//                    }
+//                    else{
+//                        _profileUploadResult.value= Result.failure(Exception(response.errorBody()?.string()))
+//                    }
+//                }
+//                catch (e:Exception){
+//                    _profileUploadResult.value= Result.failure(e)
+//                }
+//                finally {
+//                    isLoading3.value=false
+//                }
+//            }
+//        }
+//    }
 
-    fun uploadLicense(context:Context, uri: Uri, partName:String="image" ){
-        viewModelScope.launch {
-            isLoading3.value=true
-            val multipart=createMultipartBody(context,uri)
-            if(multipart!=null){
-                try {
-                    val response=repository.uploadProfile(multipart)
-                    if(response.isSuccessful && response.body()!=null){
-                        _licenseUploadResult.value= Result.success(response.body()!!)
-                    }
-                    else{
-                        _licenseUploadResult.value= Result.failure(Exception(response.errorBody()?.string()))
-                    }
-                }
-                catch (e:Exception){
-                    _licenseUploadResult.value= Result.failure(e)
-                }
-                finally {
-                    isLoading3.value=false
-                }
-            }
-        }
-    }
+//    fun uploadLicense(context:Context, uri: Uri, partName:String="image" ){
+//        viewModelScope.launch {
+//            isLoading3.value=true
+//            val multipart=createMultipartBody(context,uri)
+//            if(multipart!=null){
+//                try {
+//                    val response=repository.uploadLicense(multipart)
+//                    if(response.isSuccessful && response.body()!=null){
+//                        _licenseUploadResult.value= Result.success(response.body()!!)
+//                    }
+//                    else{
+//                        _licenseUploadResult.value= Result.failure(Exception(response.errorBody()?.string()))
+//                    }
+//                }
+//                catch (e:Exception){
+//                    _licenseUploadResult.value= Result.failure(e)
+//                }
+//                finally {
+//                    isLoading3.value=false
+//                }
+//            }
+//        }
+//    }
 
-    suspend fun getProfilePhoto():String?{
-        Log.v(TAG, "getProfile from the viewModel's get function ${repository.getProfilePhoto()}")
-       return repository.getProfilePhoto()
-    }
+//    suspend fun getProfilePhoto():String?{
+//        Log.v(TAG, "getProfile from the viewModel's get function ${repository.getProfilePhoto()}")
+//       return repository.getProfilePhoto()
+//    }
+//
+//    suspend fun getLicensePhoto():String?{
+//        Log.v(TAG, "getLicense from the viewModel's get function ${repository.getLicensePhoto()}")
+//        return repository.getLicensePhoto()
+//    }
+//
+//    suspend fun getUsername():String?{
+//        Log.v(TAG, "getUsername from the viewModel's get function ${repository.getUsername()}")
+//        return repository.getUsername()
+//    }
+//
+//    suspend fun getEmail(): String? {
+//        Log.v(TAG, "getEmail from the viewModel's get function ${repository.getEmail()}")
+//        return repository.getEmail()
+//    }
+//
+//    suspend fun getPhoneNumber(): String? {
+//        Log.v(TAG, "getPhoneNumber from the viewModel's get function ${repository.getPhoneNumber()}")
+//        return repository.getPhoneNumber()
+//    }
+//
+//    suspend fun getUserId(): String? {
+//        Log.v(TAG, "getUserId from the viewModel's get function ${repository.getId()}")
+//        return repository.getId()
+//    }
 
-    suspend fun getLicensePhoto():String?{
-        Log.v(TAG, "getLicense from the viewModel's get function ${repository.getLicensePhoto()}")
-        return repository.getLicensePhoto()
-    }
-
-    suspend fun getUsername():String?{
-        Log.v(TAG, "getUsername from the viewModel's get function ${repository.getUsername()}")
-        return repository.getUsername()
-    }
-
-    suspend fun getEmail(): String? {
-        Log.v(TAG, "getEmail from the viewModel's get function ${repository.getEmail()}")
-        return repository.getEmail()
-    }
-
-    suspend fun getPhoneNumber(): String? {
-        Log.v(TAG, "getPhoneNumber from the viewModel's get function ${repository.getPhoneNumber()}")
-        return repository.getPhoneNumber()
-    }
-
-    suspend fun getUserId(): String? {
-        Log.v(TAG, "getUserId from the viewModel's get function ${repository.getId()}")
-        return repository.getId()
-    }
-
-    suspend fun editAccount(id:String, body: accountEdit) {
-        viewModelScope.launch {
-            try {
-                val result = repository.editAccount(id, body)
-                if (result.isSuccessful && result.body() != null) {
-                    _updateResponse.value = Result.success(result.body()!!)
+//    suspend fun editAccount(id:String, body: accountEdit) {
+//        viewModelScope.launch {
+//            try {
+//                val result = repository.editAccount(id, body)
+//                if (result.isSuccessful && result.body() != null) {
+//                    _updateResponse.value = Result.success(result.body()!!)
                     // Update local state
 //                    username = body.username
 //                    email = body.email
 //                    phoneNumber = body.phoneNumber
 //                    profilePhoto = body.profilePhoto
 //                    licensePhoto = body.licensePhoto
-                } else {
-                    _updateResponse.value = Result.failure(Exception(result.errorBody()?.string() ?: "Update failed"))
-                }
-            } catch (e: Exception) {
-                _updateResponse.value = Result.failure(e)
-            }
-        }
-    }
+//                } else {
+//                    _updateResponse.value = Result.failure(Exception(result.errorBody()?.string() ?: "Update failed"))
+//                }
+//            } catch (e: Exception) {
+//                _updateResponse.value = Result.failure(e)
+//            }
+//        }
+//    }
 
     suspend fun logout(){
         repository.logout()

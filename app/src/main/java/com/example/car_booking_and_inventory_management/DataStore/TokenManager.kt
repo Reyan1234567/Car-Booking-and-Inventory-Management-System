@@ -40,6 +40,15 @@ class TokenManager(private val context: Context) {
         }
     }
 
+    suspend fun editFromSave(username: String,email: String , phoneNumber: String, licensePhoto: String?, profilePhoto: String?){
+        context.dataStore.edit {
+            it[USER_NAME]=username
+            it[EMAIL]=email
+            it[PHONE_NUMBER]=phoneNumber
+            it[LICENSE_PHOTO]=licensePhoto?:""
+            it[PROFILE_PHOTO]=profilePhoto?:""
+        }
+    }
     suspend fun saveTokens(accessToken: String, refreshToken: String){
         context.dataStore.edit{
             it[ACCESS_TOKEN]=accessToken

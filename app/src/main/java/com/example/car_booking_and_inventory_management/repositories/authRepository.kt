@@ -46,6 +46,9 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         )
     }
 
+    suspend fun editFromSave(username: String,email: String,phoneNumber: String,licensePhoto: String?,profilePhoto: String?){
+        tokenManager.editFromSave(username,email,phoneNumber,licensePhoto,profilePhoto)
+    }
 //    suspend fun saveUserInfo(username: String) {
 //        tokenManager.saveUserInfo(username)
 //    }
@@ -100,7 +103,7 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         }
 
     suspend fun uploadLicense(image:MultipartBody.Part):Response<UploadResponse>{
-        return api.uploadProfile(image)
+        return api.uploadLicense(image)
     }
 
     suspend fun getEmail(): String? {

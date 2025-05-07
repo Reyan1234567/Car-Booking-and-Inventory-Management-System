@@ -3,7 +3,7 @@ import {config} from "dotenv"
 
 config()
 
-const checkAccessToken=(req,res,next)=>{
+const checkAccessToken=async(req,res,next)=>{
     const {authorization}=req.headers
     console.log(authorization)
     if(!authorization||!authorization.split(" ")[1]){

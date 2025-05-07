@@ -6,9 +6,9 @@ import { config } from "dotenv";
 import Refresh from "../models/refresh.js";
 import checkAccessToken from "../middleware/checkAccessToken.js";
 import {upload} from "../middleware/multer.js"
-import profileImage from "../models/ProfileImages.js";
-import licenseImage from "../models/LicenseImages.js";
-
+import profilePhoto from "../models/profilePhotos.js";
+import licensePhoto from "../models/licensePhotos.js";
+import verifyOwnership from "../middleware/verifyOwnership.js";
 const router = Router();
 config();
 
@@ -101,9 +101,14 @@ router.post("/auth/signin", async (req, res) => {
       { expiresIn: "3d" }
     );
 
+    console.log("User.profile and all of that "+ user.licensePhoto+ user.profilePhoto)
     // Save refresh token
     await new Refresh({ refreshToken: refreshToken, username: user._id }).save();
-
+    const PP=await profilePhoto.find({_id:user.profilePhoto})
+    const LP=await licensePhoto.find({_id:user.licensePhoto})
+    console.log("PP and Lp"+ PP[0],LP[0])
+    const placeHolder=PP?PP[0].url:""
+    const otherPlaceHolder=LP?LP[0].url:""
     res.status(200).json({
       accessToken,
       refreshToken,
@@ -112,8 +117,8 @@ router.post("/auth/signin", async (req, res) => {
         username: user.username,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        profilePhoto: user.profilePhoto,
-        licensePhoto: user.licensePhoto,
+        profilePhoto:placeHolder,
+        licensePhoto: otherPlaceHolder,
         firstName: user.firstName,
         lastName: user.lastName,
       },
@@ -126,8 +131,8 @@ router.post("/auth/signin", async (req, res) => {
         username: user.username,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        profilePhoto: user.profilePhoto,
-        licensePhoto: user.licensePhoto,
+        profilePhoto: placeHolder,
+        licensePhoto: otherPlaceHolder,
         firstName: user.firstName,
         lastName: user.lastName,
       },
@@ -211,6 +216,7 @@ router.get("/checkAccessToken",checkAccessToken,(req,res)=>{
 
 // check if the user's Legitmacy
 router.get("/api/checkLegitimacy",checkAccessToken,async (req, res) => {
+  console.log("In the checkLegitmacy function")
   const { username } = req.query;
 
   try {
@@ -233,22 +239,23 @@ router.get("/api/checkLegitimacy",checkAccessToken,async (req, res) => {
 
 
 router.post('/profileUpload', upload.single('image'), async (req, res) => {
+  console.log("in the profileUpload")
   try {
       if (!req.file) {
           return res.status(400).json({ error: "No file uploaded" });
       }
-
+      const imageUrl = `http://${req.get('host')}/uploads/${req.file.filename}`;
       // Save to MongoDB
-      const newImage = new profileImage({
+      const newImage = new profilePhoto({
           filename: req.file.filename,
           path: req.file.path,
-          size: req.file.size
+          size: req.file.size,
+          url:imageUrl
       });
       await newImage.save();
 
-      // Return public URL
-      const imageUrl = `http://${req.get('host')}/uploads/${req.file.filename}`;
       res.status(200).json({ url: imageUrl, message: "Upload successful", id: newImage._id });
+      console.log({ url: imageUrl, message: "Upload successful", id: newImage._id })
   } catch (err) {
       res.status(500).send("Server error");
       console.log(err)
@@ -256,33 +263,60 @@ router.post('/profileUpload', upload.single('image'), async (req, res) => {
 });
 
 router.post('/licenseUpload', upload.single('image'), async (req, res) => {
+  console.log("in the licenseUpload")
   try {
       if (!req.file) {
           return res.status(400).json({ error: "No file uploaded" });
       }
 
+      const imageUrl = `http://${req.get('host')}/uploads/${req.file.filename}`;
+
       // Save to MongoDB
-      const newImage = new licenseImage({
+      const newImage = new licensePhoto({
           filename: req.file.filename,
           path: req.file.path,
-          size: req.file.size
+          size: req.file.size,
+          url:imageUrl
       });
       await newImage.save();
 
       // Return public URL
-      const imageUrl = `http://${req.get('host')}/uploads/${req.file.filename}`;
-      res.status(200).json({ url: imageUrl, message: "Upload successful" });
+      res.status(200).json({ url: imageUrl, message: "Upload successful", id: newImage._id });
   } catch (err) {
       res.status(500).send("Server error");
       console.log(err)
   }
 })
 
-router.patch("/auth/updateAccount/:id", async (req, res) => {
+router.patch("/auth/updateAccount/:id",async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
+  console.log("updates.profilePhoto"+updates.profilePhoto)
+  console.log("updates.licensePhoto"+updates.licensePhoto)
+
+  
   try {
+    if(updates.profilePhoto){
+    const PP=await profilePhoto.findOne({_id:updates.profilePhoto})
+    if(PP){
+      updates.profilePhoto=PP._id 
+    }
+      else delete updates.profilePhoto
+  }
+
+  if(updates.licensePhoto){
+    const LP=await licensePhoto.findOne({_id:updates.licensePhoto})
+    if(LP){
+      updates.licensePhoto=LP._id
+    }
+    else delete updates.licensePhoto
+  }
+  console.log("UPDATES",updates, updates.profilePhoto, updates.licensePhoto)
+
+    console.log("Attempting to update account with ID:", id);
+    console.log("Update data:", updates);
+
     const updatedUser = await User.findByIdAndUpdate(
       id,
       updates,
@@ -290,12 +324,32 @@ router.patch("/auth/updateAccount/:id", async (req, res) => {
     );
 
     if (!updatedUser) {
+      console.log("User not found with ID:", id);
       return res.status(404).send("User not found");
     }
+    const pp=await profilePhoto.findOne({_id:updatedUser.profilePhoto})
+    const lp=await licensePhoto.findOne({_id:updatedUser.licensePhoto})
+    console.log("pp and lp", pp.url, lp.url)
+
+    console.log("Successfully updated user:", {
+      id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      phoneNumber: updatedUser.phoneNumber,
+      profilePhoto: pp?pp.url:updatedUser.profilePhoto,
+      licensePhoto: lp?lp.url:updatedUser.licensePhoto
+    });
 
     res.status(200).json({
       message: "Update successful",
-      user: updatedUser
+      user: {
+      id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      phoneNumber: updatedUser.phoneNumber,
+      profilePhoto: pp?pp.url:updatedUser.profilePhoto,
+      licensePhoto: lp?lp.url:updatedUser.licensePhoto
+      }
     });
   } catch (e) {
     console.error("Update error:", e);

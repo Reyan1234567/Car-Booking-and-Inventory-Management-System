@@ -1,6 +1,7 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,12 +67,8 @@ fun ProfileScreen1(
     navController: NavController,
     viewModel:AuthViewModel
 ) {
-    var username by remember { mutableStateOf(runBlocking { viewModel.getUsername()}) }
-    var email by remember { mutableStateOf(runBlocking { viewModel.getEmail() }) }
-    var contactNumber by remember { mutableStateOf(runBlocking { viewModel.getPhoneNumber()}) }
 
-    val profileImage = runBlocking { viewModel.getProfilePhoto()}
-    val licenseImage = runBlocking { viewModel.getLicensePhoto()}
+    val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     var logoutScreen by remember { mutableStateOf(false) }
@@ -117,16 +115,17 @@ fun ProfileScreen1(
                             .clickable {
                                 logoutScreen = true
                             }
-                            ,tint=Color.Red
+                            ,tint=Color(0xFFC90000)
                     )
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))
 
                 // Profile Image (Placeholder)
-                if (profileImage != "null") {
+                if (state.profileImageUrl != "") {
+                    Log.v("TAG", "profile image url: ${state.profileImageUrl}")
                     Image(
-                        painter = rememberImagePainter(BASE_URL + profileImage), // Replace with your drawable
+                        painter = rememberImagePainter(state.profileImageUrl), // Replace with your drawable
                         contentDescription = "Profile Image",
                         modifier = Modifier
                             .size(120.dp)
@@ -153,7 +152,7 @@ fun ProfileScreen1(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    username?.let { it1 ->
+                    state.username?.let { it1 ->
                         Text(
                             text = it1, // Replace with actual data
                             style = MaterialTheme.typography.headlineMedium,
@@ -161,7 +160,7 @@ fun ProfileScreen1(
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    email?.let { it1 ->
+                    state.email?.let { it1 ->
                         Text(
                             text = it1, // Replace with actual data
                             style = MaterialTheme.typography.bodyLarge,
@@ -169,7 +168,7 @@ fun ProfileScreen1(
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    contactNumber?.let { it1 ->
+                    state.phoneNumber?.let { it1 ->
                         Text(
                             text = it1, // Replace with actual data
                             style = MaterialTheme.typography.bodyLarge,
@@ -186,12 +185,16 @@ fun ProfileScreen1(
                         .fillMaxWidth()
                         .height(150.dp)
                         .padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFE59F6A),
+                    ),
                     shape = RoundedCornerShape(12.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    if (licenseImage != "null") {
+                    if (state.licenseImageUrl != "") {
+                        Log.v("TAG", "license image url: ${state.licenseImageUrl}")
                         Image(
-                            painter = rememberImagePainter(BASE_URL + licenseImage),
+                            painter = rememberImagePainter( state.licenseImageUrl), // Replace with your drawable
                             modifier = Modifier.size(350.dp),
                             contentScale = ContentScale.Crop,
                             contentDescription = ""
@@ -222,6 +225,11 @@ fun ProfileScreen1(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE36911),
+                        contentColor = Color.White
+                    )
                 ) {
                     Text(text = "Edit Profile", fontSize = 16.sp)
                 }
@@ -313,12 +321,3 @@ fun LogoutConfirmationScreen(
     }
 }
 
-// Preview
-//@Preview(showBackground = true)
-//@Composable
-//fun LogoutConfirmationScreenPreview() {
-//    LogoutConfirmationScreen(
-//        onConfirmLogout = {},
-//        onCancel = {}
-//    )
-//}

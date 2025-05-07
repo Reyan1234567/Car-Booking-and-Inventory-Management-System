@@ -1,7 +1,10 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -58,63 +61,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.example.car_booking_and_inventory_management.AppModule.BASE_URL
 import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.accountEdit
 import com.example.car_booking_and_inventory_management.ui.theme.Inter
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AuthViewModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: AuthViewModel) {
-    var username by remember { mutableStateOf(runBlocking { viewModel.getUsername().toString() }) }
-    val UN = runBlocking { viewModel.getUsername().toString() }
-    var email by remember { mutableStateOf(runBlocking { viewModel.getEmail().toString() }) }
-    val EM = runBlocking { viewModel.getEmail().toString() }
-    var contactNumber by remember { mutableStateOf(runBlocking { viewModel.getPhoneNumber().toString() }) }
-    val CN = runBlocking { viewModel.getPhoneNumber().toString() }
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
-    val profileImage = runBlocking { viewModel.getProfilePhoto().toString() }
-    val licenseImage = runBlocking { viewModel.getLicensePhoto().toString() }
-    var ProfileUri by remember { mutableStateOf<Uri?>(null) }
-    var LicenseUri by remember { mutableStateOf<Uri?>(null) }
     val snackbarHostState=remember{ SnackbarHostState() }
 
 
     val Profilelauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        ProfileUri = uri
+        viewModel.updateState("profileUri", uri)
     }
 
     val Licencselauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        LicenseUri = uri
+        viewModel.updateState("licenseUri", uri)
     }
 
-    val licenseResult = viewModel.profileUploadResult.collectAsState()
-    val profileResult = viewModel.licenseUploadResult.collectAsState()
-    val isLoading = viewModel.isLoading3.collectAsState()
-
-    var backEnabler by remember { mutableStateOf(false)}
-
-    var url by remember { mutableStateOf("") }
-    var id by remember { mutableStateOf("") }
-
-    LaunchedEffect(username,email,contactNumber,ProfileUri,LicenseUri) {
-        if (username != UN || email != EM || contactNumber != CN || ProfileUri != null || LicenseUri != null) {
-            backEnabler = true
-        } else {
-            backEnabler = false
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(it)
         }
     }
 
-    BackHandler(enabled = backEnabler, onBack = {
-        runBlocking{ snackbarHostState.showSnackbar("Save your changes before exiting") }
-        backEnabler = false
+    BackHandler(enabled = state.isntBackable, onBack = {
+        Toast.makeText(context, "Save changes before exiting", Toast.LENGTH_SHORT).show()
+        viewModel.updateBackable(false)
     })
 
 
@@ -141,7 +126,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            if (backEnabler) {
+                            if (state.isntBackable) {
                                 navController.popBackStack()
                             } else {
                                 runBlocking { snackbarHostState.showSnackbar("Save your changes before exiting") }
@@ -170,9 +155,9 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                 contentAlignment = Alignment.BottomEnd
             ) {
                 when {
-                    ProfileUri != null -> {
+                    state.profileUri != null -> {
                         Image(
-                            painter = rememberImagePainter(ProfileUri),
+                            painter = rememberImagePainter(state.profileUri),
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .fillMaxSize()
@@ -180,9 +165,9 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                             contentScale = ContentScale.Crop
                         )
                     }
-                    profileImage.isNotEmpty() -> {
+                    state.profileImageUrl!=null -> {
                         Image(
-                            painter = rememberImagePainter(profileImage),
+                            painter = rememberImagePainter(state.profileImageUrl),
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .fillMaxSize()
@@ -202,7 +187,7 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                 }
 
                 Icon(
-                    imageVector = if (ProfileUri != null || profileImage.isNotEmpty()) Icons.Default.Edit else Icons.Default.Add,
+                    imageVector = if (state.profileUri != null || state.profileImageUrl!=null) Icons.Default.Edit else Icons.Default.Add,
                     contentDescription = "Profile Picture Action",
                     modifier = Modifier
                         .size(24.dp)
@@ -223,8 +208,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
+                    value = state.username,
+                    onValueChange = { viewModel.updateField("username",it) },
                     label = { Text("Username") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -234,8 +219,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                 )
 
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = state.email,
+                    onValueChange = {viewModel.updateField("email",it) },
                     label = { Text("Email") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -245,8 +230,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                 )
 
                 OutlinedTextField(
-                    value = contactNumber,
-                    onValueChange = { contactNumber = it },
+                    value = state.phoneNumber,
+                    onValueChange = { viewModel.updateField("phoneNumber",it) },
                     label = { Text("Phone Number") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -271,33 +256,40 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (licenseImage=="null" && LicenseUri == null) {
+                    if (state.licenseImageUrl==null && state.licenseUri == null) {
                         Text(
                             text = "License Photo",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
+                        Button(
+                            onClick = { Licencselauncher.launch("image/*") },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(8.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE36911))
+                        ) {
+                            Text("Upload", color = Color.Black)
+                        }
 
                     } else {
                         Image(
-                            painter = rememberImagePainter(LicenseUri ?: licenseImage),
+                            painter = rememberImagePainter(state.licenseUri ?: state.licenseImageUrl),
                             contentDescription = "License Photo",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
-                    }
-                }
-
-                Box{
-                    Button(
-                        onClick = { Licencselauncher.launch("image/*") },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(8.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE36911))
-                    ) {
-                        Text("Upload", color = Color.Black)
+                        Button(
+                            onClick = { Licencselauncher.launch("image/*") },
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(8.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE36911))
+                        ) {
+                            Text("Change upload", color = Color.Black)
+                        }
                     }
                 }
             }
@@ -307,37 +299,16 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
             // Save Button
             Button(
                 onClick = {
-                    if(LicenseUri != null) {
-                        viewModel.uploadLicense(uri = LicenseUri!!, context = context)
-                        licenseResult.value?.onSuccess {
-                            url=it.url.toString()
-                            id=it._id.toString()
-                            runBlocking{ snackbarHostState.showSnackbar(it.message.toString()) }
-                        }?.onFailure {
-                            runBlocking { snackbarHostState.showSnackbar(it.message.toString()) }
-                        }
+                    runBlocking{
+                        val profileId:UploadResponse=viewModel.uploadProfile(context)
+                        Log.v(TAG, profileId.toString()+" "+profileId.id)
+                        val licenseId:UploadResponse=viewModel.uploadLicense(context)
+                        Log.v(TAG, licenseId.toString()+" "+licenseId.id)
+                        viewModel.saveProfile(profileId.id, licenseId.id)
                     }
-                    if (ProfileUri != null) {
-                        viewModel.uploadProfile(uri = ProfileUri!!, context = context)
-                        profileResult.value?.onSuccess {
-                            url=it.url.toString()
-                            id=it._id.toString()
-                            runBlocking{ snackbarHostState.showSnackbar(it.message.toString()) }
-                        }?.onFailure {
-                            runBlocking { snackbarHostState.showSnackbar(it.message.toString()) }
-                        }                    }
 
-                    val userId = runBlocking { viewModel.getUserId().toString() }
-                    val body = accountEdit(
-                        username = username,
-                        email = email,
-                        profileImage = url,
-                        licenceImage = id,
-                        phoneNumber = contactNumber
-                    )
-                    runBlocking { viewModel.editAccount(userId, body) }
                 },
-                enabled = backEnabler,
+                enabled = state.isntBackable,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp),
@@ -353,62 +324,3 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
 
 
 
-/*
-@Composable
-fun ProfileField(label: String, value: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .padding(vertical = 4.dp)
-    ) {
-        Text(text = label, fontSize = 14.sp, style = TextStyle(fontFamily = Vold))
-        TextField(
-            value = value,
-            onValueChange = {
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(2.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                containerColor = Color.LightGray
-            )
-
-        )
-    }
-}}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProfileField(label: String, value: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .padding(vertical = 4.dp)
-    ) {
-        Text(text = label, fontSize = 14.sp, style = TextStyle(fontFamily = Vold))
-        TextField(
-            value = value,
-            onValueChange = {
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(2.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                containerColor = Color.LightGray
-            )
-
-        )
-    }
-}*/
-
-//@Preview(showBackground = true)
-//@Composable
-//private fun screen() {
-//    ProfileScreen()
-//}

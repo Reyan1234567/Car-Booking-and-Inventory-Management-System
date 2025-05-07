@@ -1,5 +1,6 @@
 import Booking from "../models/bookings.js";
 import Car from "../models/cars.js"
+import User from "../models/users.js";
 import { Router } from "express";
 import checkAccessToken from "../middleware/checkAccessToken.js";
 
@@ -9,6 +10,7 @@ router.use(checkAccessToken)
 
 router.post("booking", async (req, res) => {
   const { body } = req;
+  const id=req.user._id
   try {
   //   const convertToDate = (stringDate) => {
   //     const [date, month, year] = stringDate.split("/");
@@ -25,7 +27,8 @@ router.post("booking", async (req, res) => {
   //   const EstimatedCar=(ChosenCar.hourlyRate*difference)
     const response = new Booking(body);
     const newBooking = await response.save();
-
+    const user=User.find({id})
+    user.history.push(newBooking._id)
     res.status(200).send(newBooking);
   } catch (err) {
     console.log(err);
