@@ -79,7 +79,7 @@ fun Dashboard(modifier: Modifier = Modifier) {
         ){
             Text("Dashboard",style= TextStyle(
                 fontFamily = Vold,
-                fontSize = 24.sp
+                fontSize = 30.sp
                 ),
                 modifier = Modifier.padding(20.dp)
             )

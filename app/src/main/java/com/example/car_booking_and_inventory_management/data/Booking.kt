@@ -43,3 +43,22 @@ data class BookingResponse(
 
     val remark: String
 )
+
+data class BookingTable(
+    val bookingStatus: String = "Pending", // "Confirmed", "Pending", "Cancelled"
+    val username: String = "",
+    val carPlate: String = "",
+
+    val startDate: String = "",
+    val endDate: String = "",
+
+    val pickupTime: String = "",
+    val dropoffTime: String = "",
+
+    val pickupLocationName: String = "",
+
+    val dropoffLocationName: String = "",
+    val estimatedTotalPrice: Double = 0.0,
+
+    val remark: String = ""
+)
