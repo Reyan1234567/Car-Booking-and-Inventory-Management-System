@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AdminViewModel(private val repository:AdminRepository): ViewModel() {
-    private val _BookingsResponse= MutableStateFlow<Result<BookingTable>?>(null)
-    val BookingsResponse: StateFlow<Result<BookingTable>?> =_BookingsResponse.asStateFlow()
+    private val _BookingsResponse= MutableStateFlow<Result<List<BookingTable>>?>(null)
+    val BookingsResponse: StateFlow<Result<List<BookingTable>>?> =_BookingsResponse.asStateFlow()
 
-    private val _UserResponse = MutableStateFlow<Result<UsersTable>?>(null)
-    val UserResponse: StateFlow<Result<UsersTable>?> = _UserResponse.asStateFlow()
+    private val _UserResponse = MutableStateFlow<Result<List<UsersTable>>?>(null)
+    val UserResponse: StateFlow<Result<List<UsersTable>>?> = _UserResponse.asStateFlow()
 
     private val _TotalBookingsResponse = MutableStateFlow<Result<Int>?>(null)
     val TotalBookingsResponse: StateFlow<Result<Int>?> = _TotalBookingsResponse.asStateFlow()

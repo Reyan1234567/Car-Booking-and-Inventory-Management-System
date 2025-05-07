@@ -6,11 +6,11 @@ import com.example.car_booking_and_inventory_management.network.Admin
 import retrofit2.Response
 
 class AdminRepository(val admin:Admin) {
-    suspend fun getBookings(): Response<BookingTable> {
+    suspend fun getBookings(): Response<List<BookingTable>> {
         return admin.getBookings()
     }
 
-    suspend fun getUsers():Response<UsersTable>{
+    suspend fun getUsers():Response<List<UsersTable>>{
         return admin.getUsers()
     }
 

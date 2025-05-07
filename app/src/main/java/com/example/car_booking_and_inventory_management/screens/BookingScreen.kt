@@ -1,5 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
+import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.TableRow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,12 +22,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -39,13 +48,26 @@ import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Booking(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
-    LaunchedEffect(Unit) {
+    var snackbarHostState=SnackbarHostState()
+    var listOfBookings by remember {mutableStateOf(listOf(BookingTable()))}
+
+    var result=viewModel.BookingsResponse
+    LaunchedEffect(result.value) {
+        val Result=result.value
+        Result?.onSuccess {
+            listOfBookings=it
+        }?.onFailure {
+            Log.v(TAG, it.toString())
+            snackbarHostState.showSnackbar("${it}")
+        }
 
     }
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(" ") },
@@ -84,11 +106,14 @@ fun Booking(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
                 Spacer(modifier=Modifier.padding(5.dp))
                 LazyRow(){
                     item{ BookingTableHeader() }
-
-//                    BookingList.mapIndexed{index, booking->
-//                        BookingTableRow(booking)
-//                    }
-                }
+                    if(listOfBookings.isEmpty()){
+                        Text("No Bookings Present")
+                    }
+                    else{
+                        listOfBookings.mapIndexed{index, booking->
+                          BookingTableRow(booking)
+                    }
+                    }
             }
         }
     }

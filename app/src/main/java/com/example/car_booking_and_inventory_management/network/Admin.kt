@@ -7,10 +7,10 @@ import retrofit2.http.GET
 
 interface Admin {
     @GET("bookings")
-    suspend fun getBookings(): Response<BookingTable>
+    suspend fun getBookings(): Response<List<BookingTable>>
 
     @GET("users")
-    suspend fun getUsers():Response<UsersTable>
+    suspend fun getUsers():Response<List<UsersTable>>
 
     @GET("total_bookings")
     suspend fun getTotalBookings():Response<Int>
