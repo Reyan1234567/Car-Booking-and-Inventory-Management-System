@@ -2,13 +2,20 @@ package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -65,18 +73,50 @@ fun Dashboard(modifier: Modifier = Modifier) {
             )
         },
         bottomBar = { BottomNavbar2(navController = rememberNavController()) }
-    ){
+    ){innerPadding->
         Column(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(innerPadding).fillMaxHeight()
         ){
             Text("Dashboard",style= TextStyle(
                 fontFamily = Vold,
                 fontSize = 24.sp
-                    )
+                ),
+                modifier = Modifier.padding(20.dp)
             )
             Row(modifier=Modifier.fillMaxWidth()){
-                Box(){}
-                Box(){}
+                Card(modifier=Modifier.padding(20.dp)){
+                    Column(modifier=Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                        Text("Total Booking",style = TextStyle(fontSize = 20.sp, fontFamily = Vold))
+                        Text("80", style = TextStyle(fontSize = 50.sp, fontFamily = Vold))
+                    }
+                }
+                Card(modifier=Modifier.padding(20.dp)){
+                    Column(modifier=Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                        Text("Total Cars",style = TextStyle(fontSize = 20.sp, fontFamily = Vold))
+                        Text("80", style = TextStyle(fontSize = 50.sp, fontFamily = Vold))
+                    }
+                }
+            }
+            Card(modifier=Modifier.fillMaxWidth().padding(20.dp)){
+                Row(modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
+                    Column(modifier=Modifier.padding(20.dp)){
+                        Text("Total Cars",style = TextStyle(fontSize = 20.sp, fontFamily = Vold))
+                        Text("80", style = TextStyle(fontSize = 50.sp, fontFamily = Vold))
+                    }
+                    Box(
+                        modifier = Modifier.padding(vertical = 16.dp)
+                            .height(80.dp)
+                            .width(1.dp)
+                            .background(Color.Black)
+                    )
+                    Column(modifier=Modifier.padding(20.dp)){
+                        Text("Total Cars",style = TextStyle(fontSize = 20.sp, fontFamily = Vold))
+                        Text("80", style = TextStyle(fontSize = 50.sp, fontFamily = Vold))
+                    }
+                }
+            }
+            Card(modifier=Modifier.fillMaxSize().padding(20.dp)){
+                Text("Revenue Chart", style=TextStyle(fontFamily = Vold, fontSize =16.sp), modifier = Modifier.padding(12.dp))
             }
         }
     }
