@@ -74,7 +74,7 @@ fun DashboardPage(modifier: Modifier = Modifier,navController:NavController, vie
                 },
             )
         },
-        bottomBar = { BottomNavbar2(navController = rememberNavController()) }
+        bottomBar = { BottomNavbar2(navController =navController) }
     ){innerPadding->
         Column(
             modifier = Modifier.padding(innerPadding).fillMaxHeight()

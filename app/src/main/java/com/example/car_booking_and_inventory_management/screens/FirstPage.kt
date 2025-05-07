@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +45,14 @@ fun FirstPage(modifier: Modifier = Modifier, navController: NavController,viewMo
     LaunchedEffect(checkStatus.value) {
         val result=checkStatus.value
         result?.onSuccess{
-            navController.navigate("home")
+            if(viewModel.role=="user"){
+                Log.v(TAG,viewModel.role)
+                navController.navigate("home")
+            }
+            else if(viewModel.role=="admin"){
+                Log.v(TAG,viewModel.role)
+                navController.navigate("admin")
+            }
         }?.onFailure {
             navController.navigate("login")
         }

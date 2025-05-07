@@ -31,7 +31,8 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
         profilePhoto: String,
         licensePhoto: String,
         firstName:String,
-        lastName:String
+        lastName:String,
+        role:String
     ) {
         tokenManager.saveUserInfo(
             id,
@@ -43,16 +44,19 @@ class authRepository (private val api: authApi, private val tokenManager: TokenM
             profilePhoto,
             licensePhoto,
             firstName,
-            lastName
+            lastName,
+            role
         )
     }
 
     suspend fun editFromSave(username: String,email: String,phoneNumber: String,licensePhoto: String?,profilePhoto: String?){
         tokenManager.editFromSave(username,email,phoneNumber,licensePhoto,profilePhoto)
     }
-//    suspend fun saveUserInfo(username: String) {
-//        tokenManager.saveUserInfo(username)
-//    }
+
+    suspend fun getRole():String?{
+        return tokenManager.getRole()
+    }
+
         suspend fun getAccessToken() {
             tokenManager.getAccessToken()
         }

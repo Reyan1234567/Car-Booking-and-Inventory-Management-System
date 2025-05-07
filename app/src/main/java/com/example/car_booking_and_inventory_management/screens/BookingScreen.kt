@@ -6,13 +6,16 @@ import android.util.Log
 import android.widget.TableRow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
@@ -42,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingTable
@@ -53,18 +57,20 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
+fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navController: NavController) {
     var snackbarHostState = SnackbarHostState()
-    var listOfBookings by remember { mutableStateOf(listOf(BookingTable())) }
+    var listOfBookings by remember { mutableStateOf(emptyList<BookingTable>()) }
 
     var result = viewModel.BookingsResponse
     LaunchedEffect(result.value) {
         val Result = result.value
         Result?.onSuccess {
             listOfBookings = it
+            Log.v(TAG,it.toString())
         }?.onFailure {
             Log.v(TAG, it.toString())
             snackbarHostState.showSnackbar("${it}")
+            Log.v(TAG,it.toString())
         }
 
     }
@@ -97,7 +103,7 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
             )
         },
         bottomBar = {
-            BottomNavbar2(navController = rememberNavController())
+            BottomNavbar2(navController = navController)
         }
     ) { innerPadding ->
         Column(
@@ -108,19 +114,17 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text("Booking", style = TextStyle(fontSize = 30.sp, fontFamily = Vold))
                 Spacer(modifier = Modifier.padding(5.dp))
-                LazyRow() {
-                    item {
-                        BookingTableHeader()
-                        if (listOfBookings.isEmpty()) {
-                            Text("No Bookings Present")
-                        } else {
-                            listOfBookings.mapIndexed { index, booking ->
-                                BookingTableRow(booking, onEditClick = {
+                        Column(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())){
+                            BookingTableHeader()
+                                if (listOfBookings.isEmpty()) {
+                                    Text("No Bookings Present")
+                                } else {
+                                    listOfBookings.mapIndexed { index, booking ->
+                                        BookingTableRow(booking, onEditClick = {
 //                                    navController.navigate("")
-                                })
-                            }
-                        }
-                    }
+                                        })
+                                    } }
+
                 }
             }
         }
@@ -132,19 +136,19 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .background(Color.LightGray)
+                .background(Color.DarkGray)
                 .padding(8.dp)
         ) {
-            Text("Start Date", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("End Date", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Pickup", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Dropoff", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Pickup Time", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Dropoff Time", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Status", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Plate", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("User", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-            Text("Edit", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
+            Text("Start Date", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("End Date", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("Pickup", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("Dropoff", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("Pickup Time", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("Dropoff Time", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("Status", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("Plate", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("User", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+            Text("Edit", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
         }
     }
 
@@ -158,18 +162,18 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(Color.LightGray)
                 .padding(8.dp)
         ) {
-            Text(booking.startDate, modifier.weight(0.1f))
-            Text(booking.endDate, modifier.weight(0.1f))
-            Text(booking.pickupLocationName, modifier.weight(0.1f))
-            Text(booking.dropoffLocationName, modifier.weight(0.1f))
-            Text(booking.pickupTime, modifier.weight(0.1f))
-            Text(booking.dropoffTime, modifier.weight(0.1f))
-            Text(booking.bookingStatus, modifier.weight(0.1f))
-            Text(booking.carPlate, modifier.weight(0.1f))
-            Text(booking.username, modifier.weight(0.1f))
+            Text(booking.startDate, modifier.width(120.dp))
+            Text(booking.endDate, modifier.width(120.dp))
+            Text(booking.pickupLocationName, modifier.width(120.dp))
+            Text(booking.dropoffLocationName, modifier.width(120.dp))
+            Text(booking.pickupTime, modifier.width(120.dp))
+            Text(booking.dropoffTime, modifier.width(120.dp))
+            Text(booking.bookingStatus, modifier.width(120.dp))
+            Text(booking.carPlate, modifier.width(120.dp))
+            Text(booking.username, modifier.width(120.dp))
             IconButton(onClick = onEditClick, modifier = Modifier.background(Color.Yellow)) {
                 Icon(
                     imageVector = Icons.Filled.Edit,

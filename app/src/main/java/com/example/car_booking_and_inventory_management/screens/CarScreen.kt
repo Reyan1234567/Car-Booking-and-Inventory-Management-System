@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.Car
@@ -45,7 +47,7 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel) {
+fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     var listOfCars by remember { mutableStateOf(listOf<Car>()) }
 
@@ -88,7 +90,7 @@ fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel) {
             )
         },
         bottomBar = {
-            BottomNavbar2(navController = rememberNavController())
+            BottomNavbar2(navController = navController)
         }
     ) { innerPadding ->
         Column(
@@ -122,15 +124,15 @@ fun CarsTableHeader(modifier: Modifier = Modifier) {
             .background(Color.LightGray)
             .padding(8.dp)
     ) {
-        Text("Plate", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
-        Text("Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
-        Text("Make", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
-        Text("Model", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
-        Text("Year", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-        Text("Category", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
-        Text("Type", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
-        Text("Daily Rate", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.15f))
-        Spacer(modifier = Modifier.weight(0.1f)) // for edit button
+        Text("Plate", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Name", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Make", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Model", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Year", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Category", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Type", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Daily Rate", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Spacer(modifier = Modifier.width(120.dp)) // for edit button
     }
 }
 
@@ -142,18 +144,18 @@ fun CarsTableRow(car: Car, modifier: Modifier = Modifier, onEditClick: () -> Uni
             .background(Color.White)
             .padding(8.dp)
     ) {
-        Text(car.plate, modifier = Modifier.weight(0.15f))
-        Text(car.name, modifier = Modifier.weight(0.15f))
-        Text(car.make, modifier = Modifier.weight(0.15f))
-        Text(car.model, modifier = Modifier.weight(0.15f))
-        Text(car.year.toString(), modifier = Modifier.weight(0.1f))
-        Text(car.category, modifier = Modifier.weight(0.15f))
-        Text(car.type, modifier = Modifier.weight(0.15f))
-        Text(car.dailyRate.toString(), modifier = Modifier.weight(0.15f))
+        Text(car.plate, modifier = Modifier.width(120.dp))
+        Text(car.name, modifier = Modifier.width(120.dp))
+        Text(car.make, modifier = Modifier.width(120.dp))
+        Text(car.model, modifier = Modifier.width(120.dp))
+        Text(car.year.toString(), modifier = Modifier.width(120.dp))
+        Text(car.category, modifier = Modifier.width(120.dp))
+        Text(car.type, modifier = Modifier.width(120.dp))
+        Text(car.dailyRate.toString(), modifier = Modifier.width(120.dp))
         IconButton(
             onClick = onEditClick,
             modifier = Modifier
-                .weight(0.1f)
+                .width(120.dp)
                 .background(Color.Yellow)
         ) {
             Icon(

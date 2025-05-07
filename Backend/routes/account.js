@@ -107,11 +107,11 @@ router.post("/auth/signin", async (req, res) => {
     console.log("User.profile and all of that "+ user.licensePhoto+ user.profilePhoto)
     // Save refresh token
     await new Refresh({ refreshToken: refreshToken, username: user._id }).save();
-    const PP=await profilePhoto.find({_id:user.profilePhoto})
-    const LP=await licensePhoto.find({_id:user.licensePhoto})
-    console.log("PP and Lp"+ PP[0],LP[0])
-    const placeHolder=PP?PP[0].url:null
-    const otherPlaceHolder=LP?LP[0].url:null
+    const PP=await profilePhoto.findOne({_id:user.profilePhoto})
+    const LP=await licensePhoto.findOne({_id:user.licensePhoto})
+    console.log("PP and Lp"+ PP,LP)
+    const placeHolder=PP?PP.url:null
+    const otherPlaceHolder=LP?LP.url:null
     res.status(200).json({
       accessToken,
       refreshToken,

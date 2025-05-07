@@ -51,128 +51,132 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val navController=rememberNavController()
-            NavHost(navController=navController, startDestination="sign_up_flow"){
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = "admin") {
                 navigation(
                     startDestination = "dashboard",
-                    route="admin"
-                ){
-                    composable(route="dashboard"){backStackEntry->
-                        val parentEntry=remember(backStackEntry){navController.getBackStackEntry("admin")
-                        val viewModel:AdminViewModel= hiltViewModel(parentEntry)
-                        DashboardPage(modifier=Modifier, navController, viewModel)
-                      }
+                    route = "admin"
+                ) {
+                    composable(route = "dashboard") { backStackEntry ->
+                        val parentEntry =
+                            remember(backStackEntry) { navController.getBackStackEntry("admin") }
+                        val viewModel: AdminViewModel = hiltViewModel(parentEntry)
+                        DashboardPage(modifier = Modifier, navController, viewModel)
                     }
 
                     composable(route = "users") { backStackEntry ->
-                        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("admin") }
+                        val parentEntry =
+                            remember(backStackEntry) { navController.getBackStackEntry("admin") }
                         val viewModel: AdminViewModel = hiltViewModel(parentEntry)
-                        UserScreen(modifier = Modifier, navController, viewModel)
+                        UserScreen(modifier = Modifier, viewModel, navController)
                     }
 
                     composable(route = "bookings") { backStackEntry ->
-                        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("admin") }
+                        val parentEntry =
+                            remember(backStackEntry) { navController.getBackStackEntry("admin") }
                         val viewModel: AdminViewModel = hiltViewModel(parentEntry)
-                        BookingScreen(modifier = Modifier, navController, viewModel)
+                        BookingScreen(modifier = Modifier, viewModel, navController)
                     }
 
                     composable(route = "cars") { backStackEntry ->
-                        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("admin") }
+                        val parentEntry =
+                            remember(backStackEntry) { navController.getBackStackEntry("admin") }
                         val viewModel: AdminViewModel = hiltViewModel(parentEntry)
-                        CarScreen(modifier = Modifier, navController, viewModel)
-                    }
-                navigation(
-                    startDestination = "carSearchFilter",
-                    route="home"
-                ){
-                    composable(route="carSearchFilter") {backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("home")
-                        }
-                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
-                        CarSearchFilter(modifier = Modifier,navController, viewModel)
-                    }
-                    composable(route="searchPickups") {backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("home")
-                        }
-                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
-                        SearchScreen(modifier = Modifier,navController, viewModel)
-                    }
-                    composable(route="searchDropOffs") {backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("home")
-                        }
-                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
-                        SearchScreen1(modifier = Modifier,navController, viewModel)
-                    }
-                    composable(route="searchResults") {backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("home")
-                        }
-                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
-                        SearchViewScreen(modifier = Modifier,navController, viewModel)
-                    }
-                    composable(route="singleCar/{id}") {backStackEntry->
-                        val id=backStackEntry.arguments?.getString("id")
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("home")
-                        }
-                        val viewModel:CarFilterViewModel= hiltViewModel(parentEntry)
-                        SingleCarScreen(modifier = Modifier,navController, viewModel,id!!)
+                        CarScreen(modifier = Modifier, viewModel, navController)
                     }
                 }
-                composable(route="history"){
+                    navigation(
+                        startDestination = "carSearchFilter",
+                        route = "home"
+                    ) {
+                        composable(route = "carSearchFilter") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("home")
+                            }
+                            val viewModel: CarFilterViewModel = hiltViewModel(parentEntry)
+                            CarSearchFilter(modifier = Modifier, navController, viewModel)
+                        }
+                        composable(route = "searchPickups") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("home")
+                            }
+                            val viewModel: CarFilterViewModel = hiltViewModel(parentEntry)
+                            SearchScreen(modifier = Modifier, navController, viewModel)
+                        }
+                        composable(route = "searchDropOffs") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("home")
+                            }
+                            val viewModel: CarFilterViewModel = hiltViewModel(parentEntry)
+                            SearchScreen1(modifier = Modifier, navController, viewModel)
+                        }
+                        composable(route = "searchResults") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("home")
+                            }
+                            val viewModel: CarFilterViewModel = hiltViewModel(parentEntry)
+                            SearchViewScreen(modifier = Modifier, navController, viewModel)
+                        }
+                        composable(route = "singleCar/{id}") { backStackEntry ->
+                            val id = backStackEntry.arguments?.getString("id")
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("home")
+                            }
+                            val viewModel: CarFilterViewModel = hiltViewModel(parentEntry)
+                            SingleCarScreen(modifier = Modifier, navController, viewModel, id!!)
+                        }
+                    }
+                    composable(route = "history") {
 
-                }
+                    }
 
-                navigation(
-                    startDestination="firstPage",
-                    route="sign_up_flow"
-                ){
-                    composable(route="profile1"){backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("sign_up_flow")
+                    navigation(
+                        startDestination = "firstPage",
+                        route = "sign_up_flow"
+                    ) {
+                        composable(route = "profile1") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("sign_up_flow")
+                            }
+                            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
+                            ProfileScreen(navController = navController, viewModel = viewModel)
                         }
-                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        ProfileScreen(navController=navController, viewModel=viewModel)
-                    }
-                    composable(route="profile"){backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("sign_up_flow")
+                        composable(route = "profile") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("sign_up_flow")
+                            }
+                            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
+                            ProfileScreen1(navController = navController, viewModel = viewModel)
                         }
-                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        ProfileScreen1(navController=navController, viewModel=viewModel)
-                    }
-                    composable(route="firstPage"){ backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("sign_up_flow")
+                        composable(route = "firstPage") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("sign_up_flow")
+                            }
+                            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
+                            FirstPage(modifier = Modifier, navController, viewModel)
                         }
-                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        FirstPage(modifier = Modifier,navController,viewModel)
-                    }
-                    composable(route="sign_up1"){ backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("sign_up_flow")
+                        composable(route = "sign_up1") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("sign_up_flow")
+                            }
+                            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
+                            Signup1(modifier = Modifier, navController, viewModel)
                         }
-                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        Signup1(modifier = Modifier,navController,viewModel)
-                    }
-                    composable(route="sign_up2") {backStackEntry->
-                        val parentEntry=remember(backStackEntry){
-                            navController.getBackStackEntry("sign_up_flow")
+                        composable(route = "sign_up2") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("sign_up_flow")
+                            }
+                            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
+                            Signup2(modifier = Modifier, navController, viewModel)
                         }
-                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        Signup2(modifier=Modifier,navController,viewModel)
-                    }
-                    composable(route="login"){backStackEntry->
-                        val parentEntry= remember (backStackEntry){
-                            navController.getBackStackEntry("sign_up_flow")
+                        composable(route = "login") { backStackEntry ->
+                            val parentEntry = remember(backStackEntry) {
+                                navController.getBackStackEntry("sign_up_flow")
+                            }
+                            val viewModel: AuthViewModel = hiltViewModel(parentEntry)
+                            LoginScreen(modifier = Modifier.fillMaxSize(), navController, viewModel)
                         }
-                        val viewModel:AuthViewModel= hiltViewModel(parentEntry)
-                        LoginScreen(modifier=Modifier.fillMaxSize(),navController,viewModel)
                     }
-                }
             }
         }
     }

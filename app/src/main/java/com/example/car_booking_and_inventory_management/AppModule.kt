@@ -80,7 +80,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAdminRespository(api:Admin, tokenManager: TokenManager):AdminRepository{
+    fun provideAdminRepository(api:Admin, tokenManager: TokenManager):AdminRepository{
         return AdminRepository(api, tokenManager)
     }
 

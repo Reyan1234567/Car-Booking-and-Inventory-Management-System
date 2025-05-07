@@ -23,9 +23,10 @@ class TokenManager(private val context: Context) {
         val PHONE_NUMBER= stringPreferencesKey("PHONE_NUMBER")
         val FIRST_NAME= stringPreferencesKey("FIRST_NAME")
         val LAST_NAME= stringPreferencesKey("LAST_NAME")
+        val ROLE= stringPreferencesKey("ROLE")
     }
 
-    suspend fun saveUserInfo(id:String, accessToken: String, refreshToken: String, username:String, email:String, phoneNumber:String, profilePhoto:String, licensePhoto:String, firstName:String, lastName:String) {
+    suspend fun saveUserInfo(id:String, accessToken: String, refreshToken: String, username:String, email:String, phoneNumber:String, profilePhoto:String, licensePhoto:String, firstName:String, lastName:String,role:String) {
         context.dataStore.edit {
             it[ACCESS_TOKEN] = accessToken
             it[REFRESH_TOKEN] = refreshToken
@@ -37,6 +38,7 @@ class TokenManager(private val context: Context) {
             it[LICENSE_PHOTO]=licensePhoto
             it[FIRST_NAME]=firstName
             it[LAST_NAME]=lastName
+            it[ROLE]=role
         }
     }
 
@@ -58,7 +60,10 @@ class TokenManager(private val context: Context) {
 
     suspend fun getUsername(): String? {
         return context.dataStore.data.first()[USER_NAME]
-        Log.v("TokenManager", "Username: ${context.dataStore.data.first()[USER_NAME]}")
+    }
+
+    suspend fun getRole():String?{
+        return context.dataStore.data.first()[ROLE]
     }
 
 

@@ -8,6 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -45,6 +46,8 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
         val error:String?=null,
         val isntBackable:Boolean=false
     )
+
+    var role by  mutableStateOf("")
 
     private val _state = MutableStateFlow(ProfileState())
     val state: StateFlow<ProfileState> =_state.asStateFlow()
@@ -105,6 +108,7 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                     )
                 }
             }
+
             fun updateField(field:String, value:String){
                 _state.value=_state.value.copy(isntBackable=true)
                 _state.value = when(field){
@@ -252,8 +256,11 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
                                     profilePhoto = it.user.profilePhoto,
                                     licensePhoto = it.user.licensePhoto,
                                     firstName=it.user.firstName,
-                                    lastName=it.user.lastName
+                                    lastName=it.user.lastName,
+                                    role=it.user.role
                                 )
+                                role=repository.getRole()?:"user"
+                                Log.v(TAG,"from the viewModel's save function $role")
                                 Log.v(TAG,"from the viewModel's save function ${it.user.username}")
                             }
 

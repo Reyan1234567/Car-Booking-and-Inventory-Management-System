@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -42,6 +43,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.collectAsState
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingTable
@@ -51,7 +53,7 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel) {
+fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     var listOfUsers by remember { mutableStateOf(listOf<UsersTable>()) }
 
@@ -94,7 +96,7 @@ fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel) {
             )
         },
         bottomBar = {
-            BottomNavbar2(navController = rememberNavController())
+            BottomNavbar2(navController = navController)
         }
     ){ innerPadding->
         Column(modifier = Modifier
@@ -126,12 +128,12 @@ fun UsersTableHeader(modifier: Modifier = Modifier) {
             .background(Color.LightGray)
             .padding(8.dp)
     ) {
-        Text("Username", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
-        Text("Email", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.3f))
-        Text("First Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
-        Text("Last Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
-        Text("Phone", fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.2f))
-        Spacer(modifier = Modifier.weight(0.1f)) // for edit button
+        Text("Username", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Email", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("First Name", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Last Name", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Text("Phone", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
+        Spacer(modifier = Modifier.width(120.dp)) // for edit button
     }
 }
 
@@ -143,15 +145,15 @@ fun UsersTableRow(user: UsersTable, modifier: Modifier = Modifier, onEditClick: 
             .background(Color.White)
             .padding(8.dp)
     ) {
-        Text(user.username, modifier = Modifier.weight(0.2f))
-        Text(user.email, modifier = Modifier.weight(0.3f))
-        Text(user.firstname, modifier = Modifier.weight(0.2f))
-        Text(user.lastname, modifier = Modifier.weight(0.2f))
-        Text(user.phoneNumber, modifier = Modifier.weight(0.2f))
+        Text(user.username, modifier = Modifier.width(120.dp))
+        Text(user.email, modifier = Modifier.width(120.dp))
+        Text(user.firstname, modifier = Modifier.width(120.dp))
+        Text(user.lastname, modifier = Modifier.width(120.dp))
+        Text(user.phoneNumber, modifier = Modifier.width(120.dp))
         IconButton(
             onClick = onEditClick,
             modifier = Modifier
-                .weight(0.1f)
+                .width(120.dp)
                 .background(Color.Yellow)
         ) {
             Icon(
