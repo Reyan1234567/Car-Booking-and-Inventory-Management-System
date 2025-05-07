@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -36,11 +37,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
+import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Booking(modifier: Modifier = Modifier) {
-    
+fun Booking(modifier: Modifier = Modifier, viewModel:AdminViewModel) {
+    LaunchedEffect(Unit) {
+
+    }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -116,6 +120,7 @@ fun BookingTableHeader(modifier: Modifier = Modifier) {
 
 @Composable
 fun BookingTableRow(booking: BookingTable, modifier: Modifier = Modifier, onEditClick:()->Unit) {
+
     Row(modifier=Modifier
         .fillMaxWidth()
         .background(Color.White)
