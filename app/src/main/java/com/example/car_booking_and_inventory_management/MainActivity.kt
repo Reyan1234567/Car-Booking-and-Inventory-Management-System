@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.example.car_booking_and_inventory_management.screens.BookingDetailScreen
 import com.example.car_booking_and_inventory_management.screens.BookingScreen
 import com.example.car_booking_and_inventory_management.screens.CarScreen
 import com.example.car_booking_and_inventory_management.screens.CarSearchFilter
@@ -52,7 +53,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "admin") {
+            NavHost(navController = navController, startDestination = "sign_up_flow") {
                 navigation(
                     startDestination = "dashboard",
                     route = "admin"
@@ -83,6 +84,33 @@ class MainActivity : ComponentActivity() {
                             remember(backStackEntry) { navController.getBackStackEntry("admin") }
                         val viewModel: AdminViewModel = hiltViewModel(parentEntry)
                         CarScreen(modifier = Modifier, viewModel, navController)
+                    }
+
+                    composable(route="bookingDetails/{id}"){backStackEntry->
+                        val id=backStackEntry.arguments?.getString("id")
+                        val parentEntry= remember(backStackEntry){
+                            navController.getBackStackEntry("admin")
+                        }
+                        val viewModel:AdminViewModel= hiltViewModel()
+                        BookingDetailScreen(Modifier, navController, viewModel, id?:"")
+                    }
+
+                    composable(route="userDetails/{id}"){backStackEntry->
+                        val id=backStackEntry.arguments?.getString("id")
+                        val parentEntry= remember(backStackEntry){
+                            navController.getBackStackEntry("admin")
+                        }
+                        val viewModel:AdminViewModel= hiltViewModel()
+                        UserDetailScreen(Modifier, navController, viewModel, id?:"")
+                    }
+
+                    composable(route="carDetails/{id}"){backStackEntry->
+                        val id=backStackEntry.arguments?.getString("id")
+                        val parentEntry= remember(backStackEntry){
+                            navController.getBackStackEntry("admin")
+                        }
+                        val viewModel:AdminViewModel= hiltViewModel()
+                        CarDetailScreen(Modifier, navController, viewModel, id?:"")
                     }
                 }
                     navigation(

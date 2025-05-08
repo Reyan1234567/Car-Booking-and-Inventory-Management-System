@@ -2,6 +2,7 @@ package com.example.car_booking_and_inventory_management.network
 
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import retrofit2.Response
 import retrofit2.http.GET
@@ -23,5 +24,5 @@ interface adminApi {
     suspend fun getTotalUsers():Response<Int>
 
     @GET("cars")
-    suspend fun getCars(): Response<List<Car>>
+    suspend fun getCars(): Response<List<CarResponse>>
 }

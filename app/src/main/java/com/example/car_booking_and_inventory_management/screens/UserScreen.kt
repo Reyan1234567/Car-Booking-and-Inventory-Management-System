@@ -3,6 +3,7 @@ package com.example.car_booking_and_inventory_management.screens
 import android.widget.TableRow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,9 +41,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
@@ -56,6 +59,7 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     var listOfUsers by remember { mutableStateOf(listOf<UsersTable>()) }
+    var message by remember { mutableStateOf("") }
 
     val result = viewModel.UserResponse.collectAsState()
     LaunchedEffect(result.value) {
@@ -66,7 +70,9 @@ fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navCont
             snackbarHostState.showSnackbar("${it}")
         }
     }
-
+    LaunchedEffect(Unit) {
+        viewModel.getUser()
+    }
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -105,13 +111,15 @@ fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navCont
             Column(modifier=Modifier.padding(20.dp)){
                 Text("Users", style= TextStyle(fontSize = 30.sp, fontFamily = Vold))
                 Spacer(modifier=Modifier.padding(5.dp))
-                LazyRow(){
-                    item{ UsersTableHeader() }
+                Column(modifier=Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())){
+                    UsersTableHeader()
                     if (listOfUsers.isEmpty()) {
-                        item { Text("No Users Present") }
+                        Text("No Users Present", style = TextStyle(fontFamily = Vold, fontSize = 24.sp), textAlign = TextAlign.Center)
                     } else {
-                        items(listOfUsers.size) { index ->
-                            UsersTableRow(listOfUsers[index])
+                        listOfUsers.forEach{User->
+                            UsersTableRow(User,modifier,{
+                                navController.navigate("userDetail/${User._id}")
+                            })
                         }
                     }
                 }

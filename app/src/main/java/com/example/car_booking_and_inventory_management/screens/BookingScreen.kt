@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,14 +53,13 @@ import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
-
-
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navController: NavController) {
     var snackbarHostState = SnackbarHostState()
     var listOfBookings by remember { mutableStateOf(emptyList<BookingTable>()) }
+    var message by remember { mutableStateOf("") }
 
     var result = viewModel.BookingsResponse
     LaunchedEffect(result.value) {
@@ -68,11 +68,14 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navCo
             listOfBookings = it
             Log.v(TAG,it.toString())
         }?.onFailure {
+            message="No Booking Present"
             Log.v(TAG, it.toString())
             snackbarHostState.showSnackbar("${it}")
             Log.v(TAG,it.toString())
         }
-
+    }
+    LaunchedEffect(Unit) {
+        viewModel.getBookings()
     }
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -117,14 +120,13 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navCo
                         Column(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())){
                             BookingTableHeader()
                                 if (listOfBookings.isEmpty()) {
-                                    Text("No Bookings Present")
+                                    Text(text=message, style = TextStyle(fontFamily = Vold, fontSize = 24.sp), textAlign = TextAlign.Center)
                                 } else {
                                     listOfBookings.mapIndexed { index, booking ->
                                         BookingTableRow(booking, onEditClick = {
-//                                    navController.navigate("")
+                                        navController.navigate("bookingDetail/${booking._id}")
                                         })
                                     } }
-
                 }
             }
         }

@@ -17,6 +17,7 @@ data class accountEdit(
 }
 
 data class UsersTable(
+        var _id:String,
         var username:String,
         var email:String,
         var firstname:String,

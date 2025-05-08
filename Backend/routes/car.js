@@ -3,7 +3,7 @@ import Cars from "../models/cars.js"
 import Bookings from "../models/bookings.js"
 import checkAccessToken from "../middleware/checkAccessToken.js";
 import carImage from "../models/CarImages.js";
-
+import {upload} from "../middleware/multer.js"
 const router=Router()
 
 

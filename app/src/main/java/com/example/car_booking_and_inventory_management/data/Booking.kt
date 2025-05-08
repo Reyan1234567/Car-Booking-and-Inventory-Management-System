@@ -45,6 +45,7 @@ data class BookingResponse(
 )
 
 data class BookingTable(
+    val _id: String="",
     val bookingStatus: String = "Pending", // "Confirmed", "Pending", "Cancelled"
     val username: String = "",
     val carPlate: String = "",

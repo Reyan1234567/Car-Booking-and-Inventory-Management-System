@@ -3,6 +3,7 @@ package com.example.car_booking_and_inventory_management.screens
 import android.widget.TableRow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,17 +32,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
@@ -49,18 +53,22 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 @Composable
 fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var listOfCars by remember { mutableStateOf(listOf<Car>()) }
-
+    var listOfCars by remember { mutableStateOf(listOf<CarResponse>()) }
+    var message by remember { mutableStateOf("") }
     val result = viewModel.CarsResponse.collectAsState()
     LaunchedEffect(result.value) {
         val Result = result.value
         Result?.onSuccess {
             listOfCars = it
         }?.onFailure {
+            message="No Cars Present"
             snackbarHostState.showSnackbar("${it}")
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.getCars()
+    }
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -101,13 +109,15 @@ fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navContr
             Column(modifier = Modifier.padding(20.dp)) {
                 Text("Cars", style = TextStyle(fontSize = 30.sp, fontFamily = Vold))
                 Spacer(modifier = Modifier.padding(5.dp))
-                LazyRow {
-                    item { CarsTableHeader() }
+                Column(modifier=Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+                    CarsTableHeader()
                     if (listOfCars.isEmpty()) {
-                        item { Text("No Cars Present") }
+                        Text(text=message, style = TextStyle(fontFamily = Vold, fontSize = 24.sp), textAlign = TextAlign.Center)
                     } else {
-                        items(listOfCars.size) { index ->
-                            CarsTableRow(listOfCars[index])
+                        listOfCars.forEach{Car->
+                            CarsTableRow(Car,modifier,{
+                                navController.navigate("bookingDetail/${Car._id}")
+                            })
                         }
                     }
                 }
@@ -137,20 +147,20 @@ fun CarsTableHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CarsTableRow(car: Car, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
+fun CarsTableRow(car: CarResponse, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(8.dp)
     ) {
-        Text(car.plate, modifier = Modifier.width(120.dp))
-        Text(car.name, modifier = Modifier.width(120.dp))
-        Text(car.make, modifier = Modifier.width(120.dp))
-        Text(car.model, modifier = Modifier.width(120.dp))
+        Text(car.plate?:"", modifier = Modifier.width(120.dp))
+        Text(car.name?:"", modifier = Modifier.width(120.dp))
+        Text(car.make?:"", modifier = Modifier.width(120.dp))
+        Text(car.model?:"", modifier = Modifier.width(120.dp))
         Text(car.year.toString(), modifier = Modifier.width(120.dp))
-        Text(car.category, modifier = Modifier.width(120.dp))
-        Text(car.type, modifier = Modifier.width(120.dp))
+        Text(car.category?:"", modifier = Modifier.width(120.dp))
+        Text(car.type?:"", modifier = Modifier.width(120.dp))
         Text(car.dailyRate.toString(), modifier = Modifier.width(120.dp))
         IconButton(
             onClick = onEditClick,

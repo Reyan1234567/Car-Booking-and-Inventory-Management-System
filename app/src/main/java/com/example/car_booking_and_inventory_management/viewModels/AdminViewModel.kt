@@ -7,6 +7,7 @@ import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.repositories.AdminRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,8 +33,8 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
     private val _TotalUsersResponse = MutableStateFlow<Result<Int>?>(null)
     val TotalUsersResponse: StateFlow<Result<Int>?> = _TotalUsersResponse.asStateFlow()
 
-    private val _CarsResponse = MutableStateFlow<Result<List<Car>>?>(null)
-    val CarsResponse: StateFlow<Result<List<Car>>?> = _CarsResponse.asStateFlow()
+    private val _CarsResponse = MutableStateFlow<Result<List<CarResponse>>?>(null)
+    val CarsResponse: StateFlow<Result<List<CarResponse>>?> = _CarsResponse.asStateFlow()
 
     fun getBookings(){
         viewModelScope.launch{
