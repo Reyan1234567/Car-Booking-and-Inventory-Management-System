@@ -483,4 +483,17 @@ router.get("user/id", async (req, res) => {
   }
 });
 
+router.get("history",async(req,res)=>{
+  const id=req.params.id
+  const user=await User.findOne({_id:id})
+  if(!user){
+    return res.status(404).send("User not found!")
+  }
+  const history=user.history
+  if(history.length===0){
+    return res.status(404).send("empty History")
+  }
+  res.status(200).send(history)
+})
+
 export default router;

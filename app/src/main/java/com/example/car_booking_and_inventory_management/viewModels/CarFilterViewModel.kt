@@ -203,7 +203,7 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
        return repository.getuserId()
     }
 
-    suspend fun getHistory(id:String){
+    fun getHistory(id:String){
         viewModelScope.launch {
             try {
                 val result=repository.getHistory(id)
