@@ -170,9 +170,160 @@ router.post("/api/filteredCars", async (req, res) => {
 
 });
 
+router.post("/carImageUpload", upload.single("image"), async (req, res) => {
+    console.log("Car image upload initiated");
+    try {
+      // 1. Check if file exists
+      if (!req.file) {
+        return res.status(400).json({ error: "No car image uploaded" });
+      }
+  
+      // 2. Create image URL
+      const imageUrl = `http://${req.get("host")}/uploads/${req.file.filename}`;
+      
+      // 3. Save to MongoDB
+      const newCarImage = new carImage({
+        filename: req.file.filename,
+        path: req.file.path,
+        size: req.file.size,
+        url: imageUrl,  
+      });
+  
+      await newCarImage.save();
+  
+      // 4. Send success response
+      const responseData = {
+        url: imageUrl,
+        message: "Car image upload successful",
+        id: newCarImage._id,
+        filename: req.file.filename,
+      };
+  
+      res.status(200).json(responseData);
+      console.log("Car image upload success:", responseData);
+  
+    } catch (err) {
+      console.error("Car image upload error:", err);
+      res.status(500).json({ 
+        error: "Server error during car image upload",
+        details: err.message 
+      });
+    }
+  });
+
+  router.post("/cars", async (req, res) => {
+    try {
+      // Individual field validation
+      if (!req.body.name) return res.status(400).json({ error: "Car name is required" });
+      if (!req.body.make) return res.status(400).json({ error: "Car make is required" });
+      if (!req.body.price) return res.status(400).json({ error: "Price is required" });
+      if (isNaN(req.body.price)) return res.status(400).json({ error: "Price must be a number" });
+      if (!req.body.model) return res.status(400).json({ error: "Model is required" });
+      if (!req.body.year) return res.status(400).json({ error: "Year is required" });
+      if (isNaN(req.body.year)) return res.status(400).json({ error: "Year must be a number" });
+      if (req.body.year < 1900 || req.body.year > new Date().getFullYear() + 1) {
+        return res.status(400).json({ error: "Invalid year" });
+      }
+      if (!req.body.transmissionType) return res.status(400).json({ error: "Transmission type is required" });
+      if (!req.body.fuelType) return res.status(400).json({ error: "Fuel type is required" });
+      if (!req.body.passengerCapacity) return res.status(400).json({ error: "Passenger capacity is required" });
+      if (isNaN(req.body.passengerCapacity)) return res.status(400).json({ error: "Passenger capacity must be a number" });
+      if (!req.body.luggageCapacity) return res.status(400).json({ error: "Luggage capacity is required" });
+      if (!req.body.dailyRate) return res.status(400).json({ error: "Daily rate is required" });
+      if (isNaN(req.body.dailyRate)) return res.status(400).json({ error: "Daily rate must be a number" });
+      if (!req.body.plate) return res.status(400).json({ error: "License plate is required" });
+  
+      // Check if image reference exists if provided
+      if (req.body.imageId) {
+        const imageExists = await carImage.findById(req.body.imageId);
+        if (!imageExists) {
+          return res.status(400).json({ error: "Referenced car image doesn't exist" });
+        }
+      }
+  
+      // Create new car
+      const newCar = new Cars({
+        name: req.body.name,
+        make: req.body.make,
+        price: req.body.price,
+        model: req.body.model,
+        year: req.body.year,
+        transmissionType: req.body.transmissionType,
+        fuelType: req.body.fuelType,
+        passengerCapacity: req.body.passengerCapacity,
+        luggageCapacity: req.body.luggageCapacity,
+        dailyRate: req.body.dailyRate,
+        plate: req.body.plate,
+        imageUrl: req.body.imageUrl || "",
+        image: req.body.imageId || null
+      });
+  
+      await newCar.save();
+  
+      res.status(201).json({
+        message: "Car created successfully",
+        car: newCar
+      });
+  
+    } catch (err) {
+      // Handle duplicate plate number
+      if (err.code === 11000 && err.keyPattern.plate) {
+        return res.status(400).json({ error: "This license plate already exists" });
+      }
+  
+      // Handle other errors
+      console.error("Car creation error:", err);
+      res.status(500).json({ error: "Server error", details: err.message });
+    }
+  });
+
+router.patch("/car",async(req,res)=>{
+    const id=req.params.id
+    const body=req.body
+
+    try{
+    const carId=Cars.findOne({id:id})
+    if(!carId){
+        console.log("carId doesn't exist")
+        return res.send("Car not found").status(404)
+    }
+      if (!req.body.name) return res.status(400).json({ error: "Car name is required" });
+      if (!req.body.make) return res.status(400).json({ error: "Car make is required" });
+      if (!req.body.price) return res.status(400).json({ error: "Price is required" });
+      if (isNaN(req.body.price)) return res.status(400).json({ error: "Price must be a number" });
+      if (!req.body.model) return res.status(400).json({ error: "Model is required" });
+      if (!req.body.year) return res.status(400).json({ error: "Year is required" });
+      if (isNaN(req.body.year)) return res.status(400).json({ error: "Year must be a number" });
+      if (req.body.year < 1900 || req.body.year > new Date().getFullYear() + 1) {
+        return res.status(400).json({ error: "Invalid year" });
+      }
+      if (!req.body.transmissionType) return res.status(400).json({ error: "Transmission type is required" });
+      if (!req.body.fuelType) return res.status(400).json({ error: "Fuel type is required" });
+      if (!req.body.passengerCapacity) return res.status(400).json({ error: "Passenger capacity is required" });
+      if (isNaN(req.body.passengerCapacity)) return res.status(400).json({ error: "Passenger capacity must be a number" });
+      if (!req.body.luggageCapacity) return res.status(400).json({ error: "Luggage capacity is required" });
+      if (!req.body.dailyRate) return res.status(400).json({ error: "Daily rate is required" });
+      if (isNaN(req.body.dailyRate)) return res.status(400).json({ error: "Daily rate must be a number" });
+      if (!req.body.plate) return res.status(400).json({ error: "License plate is required" });
+    if(!body.carImage){
+        delete body.carImage
+    }
+    const updates=Cars.findByIdAndUpdate(id, body,{
+        new:true,
+        runValidators:true
+    })
+    if(!updates){
+        return res.status(404).send("Car not found")
+    }
+    res.status(200).send(updates)
+    }
+    catch(err){
+        res.status(400).send(err.message)
+        console.log(err)
+    }
 
 
-
+})
 
 
 
