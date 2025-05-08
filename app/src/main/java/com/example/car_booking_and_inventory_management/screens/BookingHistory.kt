@@ -16,9 +16,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.car_booking_and_inventory_management.R
+import com.example.car_booking_and_inventory_management.viewModels.AuthViewModel
+import com.example.car_booking_and_inventory_management.viewModels.CarFilterViewModel
 
 @Composable
-fun BookingHistoryScreen() {
+fun BookingHistoryScreen(viewModel:CarFilterViewModel) {
+    val historyResult= viewModel.historyResponse.collectAsState().value
+    var historyArray by remember { mutableStateOf(emptyList<BookingResponse>()) }
+    LaunchedEffect(Unit) {
+        val id= viewModel.getuserId()
+        val result= viewModel.getHistory(id!!)
+    }
+
+    LaunchedEffect(historyResult){
+        if(historyResult.isSuccessful&&historyResult.body()!=null){
+            viewModel.historyResponse.value=Result.success(result.body()!!)
+        }
+        else{
+            viewModel.historyResponse.value=Result.failure(Exception(result.errorBody()?.string()))
+        }
+    }
+
     val bookings = listOf(
         Booking("AUDI A8L", "Completed", "Jan 03, 2025", R.drawable.audi),
         Booking("Volkswagen ID B", "Cancelled", "Feb 03, 2025", R.drawable.volkswagen),

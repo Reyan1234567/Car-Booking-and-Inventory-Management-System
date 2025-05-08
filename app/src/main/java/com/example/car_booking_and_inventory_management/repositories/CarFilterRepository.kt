@@ -40,6 +40,9 @@ class CarFilterRepository(private val api:searchApi, private val tokenManager: T
         return api.createBooking(booking)
     }
 
+    suspend fun getHistory(id:String):Response<List<BookingResponse>>{
+        return api.getHistory(id)
+    }
 //    suspend fun checkLegitimacy():Boolean{
 //        val license=tokenManager.getLicensePhoto()
 //        val profile=tokenManager.getProfilePhoto()

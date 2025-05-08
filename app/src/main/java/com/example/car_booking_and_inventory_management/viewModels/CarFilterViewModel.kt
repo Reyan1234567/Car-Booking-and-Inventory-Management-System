@@ -46,6 +46,9 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     private val _bookingCreationResponse= MutableStateFlow<Result<BookingResponse>?>(null)
     val bookingCreationResponse:StateFlow<Result<BookingResponse>?> =_bookingCreationResponse.asStateFlow()
 
+    private val _historyResponse=MutableStateFlow<Result<List<BookingResponse>>?>(null)
+    val historyResponse:StateFlow<Result<List<BookingResponse>>?> =_historyResponse.asStateFlow()
+
     var isLoading by mutableStateOf(false)
 
     var id by mutableStateOf("")
@@ -199,4 +202,22 @@ class CarFilterViewModel @Inject constructor(private val repository: CarFilterRe
     suspend fun getuserId():String?{
        return repository.getuserId()
     }
+
+    suspend fun getHistory(id:String){
+        viewModelScope.launch {
+            try {
+                val result=repository.getHistory(id)
+                if(result.isSuccessful && result.body()!=null){
+                    _historyResponse.value=Result.success(result.body()!!)
+                }
+                else{
+                    _historyResponse.value=Result.failure(Exception(result.errorBody()?.string()))
+                }
+            }
+            catch (e:Exception){
+                _historyResponse.value=Result.failure(e)
+            }
+        }
+    }
+
 }

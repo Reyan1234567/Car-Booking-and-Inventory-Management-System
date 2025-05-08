@@ -30,5 +30,8 @@ interface searchApi {
     @GET("api/checkLegitimacy")
     suspend fun checkLegitimacy(@Query("username") username:String):Response<Username>
 
+    @GET("history")
+    suspend fun getHistory(@Query("id") id:String):Response<List<BookingResponse>>
+
 
 }
