@@ -7,5 +7,5 @@ const carImageSchema = new mongoose.Schema({
     uploadDate: { type: Date, default: Date.now }
 });
 
-const carImage = mongoose.model('Image', profileImageSchema);
+const carImage = mongoose.model('carImage', carImageSchema);
 export default carImage

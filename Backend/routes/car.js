@@ -2,6 +2,7 @@ import {Router} from "express"
 import Cars from "../models/cars.js"
 import Bookings from "../models/bookings.js"
 import checkAccessToken from "../middleware/checkAccessToken.js";
+import carImage from "../models/CarImages.js";
 
 const router=Router()
 
@@ -10,11 +11,25 @@ router.use(checkAccessToken)
 //Get All cars
 router.get("/cars",async (req,res)=>{
     const response=await Cars.find()
+    const carsArray=[]
+    response.forEach((respons)=>{
+        if(respons.image!==null||respons.image!=undefined||respons.image==""){
+            const imageUrl=carImage.findOne(respons.image)
+            if(!imageUrl){
+                respons.image=""
+            }
+            else{
+                const carUrl=imageUrl.url
+                respons.image=carUrl
+            }
+        }
+        carsArray.push(respons)
+    })
     try{
-        if(!response){
+        if(!carsArray){
             return res.status(401).send("No Cars found")
         }
-        res.status(200).send(response)
+        res.status(200).send(carsArray)
     }
     catch(err){
         console.log(err)
@@ -25,12 +40,20 @@ router.get("/cars",async (req,res)=>{
 //Get a specific car
 router.get("cars/:id",async(req,res)=>{
     const {id}=req.params
-    const response=await Cars.findById(id)
+    const car=await Cars.findById(id)
     try{
         if(!response){
-            return res.status(401).send(`No car with id:${id}`)
+            return res.status(401).send(`No car found`)
         }
-        res.status(200).send(response)
+        const imageUrl=carImage.findOne(car.image)
+            if(!imageUrl){
+                car.image=""
+            }
+            else{
+                const carUrl=imageUrl.url
+                respons.image=carUrl
+            }
+        res.status(200).send(car)
     }
     catch(err){
         console.log(err)
@@ -38,11 +61,22 @@ router.get("cars/:id",async(req,res)=>{
     }
 })
 
-router.put("cars/:id",async(req,res)=>{
+router.patch("cars/:id",async(req,res)=>{
     const {id}=req.params
     const {body}=req
     try{
-        const updatedCar=await Cars.findByIdAndUpdate(id,body,{
+        const updates={}
+        
+        for(const key in body){
+            if(!body.hasOwnProperty(key)) {continue};
+            if(!body[key]){
+                continue
+            }
+            else{
+                updates[key]=body[key]
+            }
+        }
+        const updatedCar=await Cars.findByIdAndUpdate(id,updates,{
             new:true,
             runValidators:true
         })
@@ -116,8 +150,25 @@ router.post("/api/filteredCars", async (req, res) => {
         console.log(err);
         res.status(500).send(err.message); 
     }
-});
 
+    router.delete("car/:id",async(req,res)=>{
+        const id=req.params.id
+        const carToDelete=Cars.findOne({id:id})
+        if(!carToDelete){
+            return res.status(404).status("Not found")
+        }
+        const deletedCar=Cars.findByIdAndDelete(id)
+
+        if(!deletedCar){
+            return res.status(404).send("Car not found!")
+        }
+        res.status(200).send("Car Deleted")
+    })
+
+
+
+
+});
 
 
 

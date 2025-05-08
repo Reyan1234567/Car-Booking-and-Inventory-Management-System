@@ -8,7 +8,7 @@ const router = Router();
 
 router.use(checkAccessToken)
 
-router.post("booking", async (req, res) => {
+router.post("/booking", async (req, res) => {
   const { body } = req;
   const id=req.user._id
   try {
@@ -68,6 +68,7 @@ router.get("/booking/:id", async (req, res) => {
 
 router.get("/bookings", async (req, res) => {
   try {
+    
     const bookings = await Booking.find();
     if(!bookings||bookings.length===0){
       return res.status(404).send("can't find bookings")
@@ -94,13 +95,24 @@ router.get("/total_bookings",async (req,res)=>{
   }
 })
 
-router.put("/booking/:id", async (req, res) => {
+router.patch("/booking/:id", async (req, res) => {
   const { id } = req.params;
   const { body } = req;
   try {
-    const updatedBooking = await Booking.findByIdAndUpdate(id, body, {
-      new: true, // Return the updated document
-      runValidators: true, // Ensure the updated data adheres to the schema
+    const updates={};
+    for(const key in body){
+      if (!body.hasOwnProperty(key)) continue;
+
+      if(!body[key]){
+        continue
+      }
+      else{
+        updates[key]=body[key]
+      }
+    }
+    const updatedBooking = await Booking.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
     });
     if (!updatedBooking) {
       return res.status(404).send("Booking not found");
