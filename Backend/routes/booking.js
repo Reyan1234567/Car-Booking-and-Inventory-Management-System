@@ -124,4 +124,50 @@ router.patch("/booking/:id", async (req, res) => {
   }
 });
 
+
+router.get("/bookings",async(req,res)=>{
+  try{
+    const final=Booking.aggregate([
+    {$lookup:{
+      from:"users",
+      localField:"userId",
+      foreignField:"_id",
+      as:"userIds"
+    }},
+    {$unwind:"$userIds"},
+    {$lookup:{
+      from:"cars",
+      localField:"carId",
+      foreignField:"_id",
+      as:"carIds"
+    }},
+    {$unwind:"$carIds"},
+    {$lookup:{
+      from:"profilePhotos",
+      localField:"userIds.profilePhoto",
+      foreignField:"_id",
+      as:"profilePhotos"
+    }},
+    {$unwind:"$profilePhotos"},
+    {$lookup:{
+      from:"carImages",
+      localField:"carIds.image",
+      foreignField:"_id",
+      as:"carImages"
+    }},
+    {$project:{
+      _id:0,
+      userIds:0,
+      carIds:0,
+    }}
+  ])
+  if(!final){
+    return res.status(404).send("Not found!")
+  }
+  res.sendStatus(200)
+}
+catch(e){
+  res.status(400).send(e.message)
+}
+})
 export default router;

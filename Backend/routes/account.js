@@ -484,7 +484,7 @@ router.get("user/id", async (req, res) => {
   }
 });
 
-router.get("history",async(req,res)=>{
+router.get("/history",async(req,res)=>{
   const id=req.params.id
   try{
   const final=await User.aggregate([
@@ -496,21 +496,21 @@ router.get("history",async(req,res)=>{
       foreignField:"_id",
       as:"booking"
     }},
-    {$unwind:"booking"},
+    {$unwind:"$booking"},
     {$lookup:{
       from:"cars",
       localField:"booking.carId",
       foreignField:"_id",
       as:"car"
     }},
-    {$unwind:"car"},
+    {$unwind:"$car"},
     {$lookup:{
       from:"carImages",
       localField:"car.imageId",
       foreignField:"_id",
       as:"carImage"
     }},
-    {$unwind:"carImage"},
+    {$unwind:"$carImage"},
     {$project:{
       _id:0,
       booking:1,

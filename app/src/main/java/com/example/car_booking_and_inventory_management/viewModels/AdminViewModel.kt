@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import androidx.lifecycle.viewModelScope
+import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.repositories.AdminRepository
@@ -18,8 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AdminViewModel @Inject constructor(private val repository:AdminRepository): ViewModel() {
-    private val _BookingsResponse= MutableStateFlow<Result<List<BookingTable>>?>(null)
-    val BookingsResponse: StateFlow<Result<List<BookingTable>>?> =_BookingsResponse.asStateFlow()
+    private val _BookingsResponse= MutableStateFlow<Result<List<BookingCarUser>>?>(null)
+    val BookingsResponse: StateFlow<Result<List<BookingCarUser>>?> =_BookingsResponse.asStateFlow()
 
     private val _UserResponse = MutableStateFlow<Result<List<UsersTable>>?>(null)
     val UserResponse: StateFlow<Result<List<UsersTable>>?> = _UserResponse.asStateFlow()
