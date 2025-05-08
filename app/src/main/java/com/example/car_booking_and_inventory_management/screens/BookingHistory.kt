@@ -80,17 +80,15 @@ fun BookingCard(booking: BookingResponse) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(booking.carName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text(booking.status, fontSize = 14.sp, color = Color.White)
-            Text("Date: ${booking.date}", fontSize = 14.sp, color = Color.White)
-            Text("See More...", fontSize = 14.sp, color = Color.Black)
+            Text("Car ID: ${booking.carId}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("Status: ${booking.bookingStatus}", fontSize = 14.sp, color = Color.White)
+            Text("Start: ${booking.startDate}  End: ${booking.endDate}", fontSize = 14.sp, color = Color.White)
+            Text("Pickup: ${booking.pickupLocationName}", fontSize = 14.sp, color = Color.White)
+            Text("Dropoff: ${booking.dropoffLocationName}", fontSize = 14.sp, color = Color.White)
+            Text("Price: ${booking.estimatedTotalPrice ?: "N/A"}", fontSize = 14.sp, color = Color.White)
+            if (booking.remark.isNotEmpty()) {
+                Text("Remark: ${booking.remark}", fontSize = 14.sp, color = Color.White)
+            }
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        Image(
-            painter = painterResource(id = booking.imageResId),
-            contentDescription = "Car Image",
-            modifier = Modifier
-                .size(80.dp)
-        )
     }
 }

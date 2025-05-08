@@ -28,11 +28,11 @@ const userSchema = new mongoose.Schema({
   profilePhoto:{type:mongoose.Schema.Types.ObjectId, ref:"profilePhoto", default:""},
   birthDate: { type: String, required :true},
   history: [
-    {
+    { bookingId:{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",
       default:[]
-    },
+    }},
   ],
 });
 
