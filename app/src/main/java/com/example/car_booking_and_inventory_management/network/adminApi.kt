@@ -7,6 +7,7 @@ import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface adminApi {
     @GET("bookings")
@@ -26,4 +27,10 @@ interface adminApi {
 
     @GET("cars")
     suspend fun getCars(): Response<List<CarResponse>>
+
+    @GET("confirm")
+    suspend fun confirmBooking(@Query("_id") _id:String): Response<String>
+
+    @GET("cancel")
+    suspend fun cancelBooking(@Query("_id") _id:String): Response<String>
 }

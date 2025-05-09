@@ -33,4 +33,12 @@ class AdminRepository(private val api: adminApi, private val tokenManager: Token
     suspend fun getCars(): Response<List<CarResponse>> {
         return api.getCars()
     }
+
+    suspend fun confirm(id:String): Response<String>{
+        return api.confirmBooking(id)
+    }
+
+    suspend fun cancel(id:String): Response<String>{
+        return api.cancelBooking(id)
+    }
 }

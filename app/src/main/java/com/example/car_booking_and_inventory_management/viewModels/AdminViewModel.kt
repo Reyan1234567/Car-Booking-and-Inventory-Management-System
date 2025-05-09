@@ -37,6 +37,12 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
     private val _CarsResponse = MutableStateFlow<Result<List<CarResponse>>?>(null)
     val CarsResponse: StateFlow<Result<List<CarResponse>>?> = _CarsResponse.asStateFlow()
 
+    private val _cancelResult=MutableStateFlow<Result<String>?>(null)
+    val cancelResult:StateFlow<Result<String>?> = _cancelResult.asStateFlow()
+
+    private val _confirmResult=MutableStateFlow<Result<String>?>(null)
+    val confirmResult:StateFlow<Result<String>?> = _confirmResult.asStateFlow()
+
     fun getBookings(){
         viewModelScope.launch{
             var result=repository.getBookings()
@@ -134,4 +140,36 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
             }
         }
     }
+
+    fun cancel(bookingId: String) {
+    viewModelScope.launch {
+        try {
+            val result = repository.cancel(bookingId)
+            if (result.isSuccessful && result.body() != null) {
+                _cancelResult.value = Result.success("Booking canceled successfully")
+            } else {
+                _cancelResult.value = Result.failure(Exception(result.errorBody()?.string()))
+            }
+        } catch (e: Exception) {
+            _cancelResult.value = Result.failure(e)
+            Log.v(TAG, "Error canceling booking: ${e.message}")
+        }
+    }
+}
+
+fun confirm(bookingId: String) {
+    viewModelScope.launch {
+        try {
+            val result = repository.confirm(bookingId) // Assuming `confirmBooking` is defined in your repository
+            if (result.isSuccessful && result.body() != null) {
+                _confirmResult.value = Result.success("Booking confirmed successfully")
+            } else {
+                _confirmResult.value = Result.failure(Exception(result.errorBody()?.string()))
+            }
+        } catch (e: Exception) {
+            _confirmResult.value = Result.failure(e)
+            Log.v(TAG, "Error confirming booking: ${e.message}")
+        }
+    }
+}
 }

@@ -36,146 +36,146 @@ import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun BookingDetailScreen(modifier: Modifier, navController: NavController, viewModel: AdminViewModel, id:String) {
-    val bookingResult=viewModel.BookingsResponse.collectAsState().value
-    var bks by remember { mutableStateOf(emptyList<BookingCarUser>())}
-    var booking by remember { mutableStateOf<BookingCarUser>(null) }
-    LaunchedEffect(Unit) {
-        bookingResult?.onSuccess {
-            bks=it
-            booking=bks.first{bk->
-                bk._id==id
-            }
-        }
-    }
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title={Text("")},
-                modifier=Modifier.fillMaxWidth(),
-                navigationIcon = {
-                    IconButton(onClick={navController.popBackStack()}){
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowLeft,
-                            contentDescription =""
-                        )
-                    }
-                },
-                actions={
-                    IconButton(onClick={}){
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription =""
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFEA6307),
-                    titleContentColor = Color.Transparent
-                )
-            )
-        }
-    ){innerPadding->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(booking.carImage.url),
-                    contentDescription = "Car",
-                    modifier = Modifier
-                        .size(140.dp)
-                        .background(Color.White, shape = RoundedCornerShape(7.dp))
-                )
-                Image(
-                    painter = rememberAsyncImagePainter(booking.userImage.url),
-                    contentDescription = "User",
-                    modifier = Modifier
-                        .size(140.dp)
-                        .background(Color.White, shape = RoundedCornerShape(7.dp))
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "BookingId-1",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-
-
-            Divider(
-                color = Color.LightGray,
-                thickness = 1.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp)
-            )
-
-            DetailRow("Booking Id", "Customer Id", "bookingid-1", "customerid-1")
-            DetailRow("Pickup Date", "Vehicle Id", "2025-04-15", "vehicleid-1")
-            DetailRow("Pickup Location", "Pickup Time", "Downtown Addis Ababa", "2:30 PM")
-            DetailRow("Drop off Date", "Drop off Time", "2025-04-15", "2:30 PM")
-            DetailSingle("Drop off Location", "Downtown Addis Ababa Branch")
-
-
-            DetailRow("Total Price", "Payment Status", "150 ETB", "Pending")
-
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = "Status", fontSize = 14.sp, color = Color.Gray)
-                    Text(text = "Pending", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.width(40.dp))
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(text = "Approval", fontSize = 14.sp, color = Color.Gray)
-                    ActionButton("Approve", Color(0xFF4CAF50)) // Green
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                ActionButton("Edit", Color(0xFFFFC107))     // Yellow
-                ActionButton("Delete", Color(0xFFFF4B3E))   // Red
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-        }
-    }
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+//@Composable
+//fun BookingDetailScreen(modifier: Modifier, navController: NavController, viewModel: AdminViewModel, id:String) {
+//    val bookingResult=viewModel.BookingsResponse.collectAsState().value
+//    var bks by remember { mutableStateOf(emptyList<BookingCarUser>())}
+//    var booking by remember { mutableStateOf<BookingCarUser>(null) }
+//    LaunchedEffect(Unit) {
+//        bookingResult?.onSuccess {
+//            bks=it
+//            booking=bks.first{bk->
+//                bk._id==id
+//            }
+//        }
+//    }
+//    Scaffold(
+//        topBar = {
+//            CenterAlignedTopAppBar(
+//                title={Text("")},
+//                modifier=Modifier.fillMaxWidth(),
+//                navigationIcon = {
+//                    IconButton(onClick={navController.popBackStack()}){
+//                        Icon(
+//                            imageVector = Icons.Default.KeyboardArrowLeft,
+//                            contentDescription =""
+//                        )
+//                    }
+//                },
+//                actions={
+//                    IconButton(onClick={}){
+//                        Icon(
+//                            imageVector = Icons.Default.AccountCircle,
+//                            contentDescription =""
+//                        )
+//                    }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(
+//                    containerColor = Color(0xFFEA6307),
+//                    titleContentColor = Color.Transparent
+//                )
+//            )
+//        }
+//    ){innerPadding->
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(innerPadding)
+//                .verticalScroll(rememberScrollState())
+//        ) {
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceEvenly
+//            ) {
+//                Image(
+//                    painter = rememberAsyncImagePainter(booking.carImage.url),
+//                    contentDescription = "Car",
+//                    modifier = Modifier
+//                        .size(140.dp)
+//                        .background(Color.White, shape = RoundedCornerShape(7.dp))
+//                )
+//                Image(
+//                    painter = rememberAsyncImagePainter(booking.userImage.url),
+//                    contentDescription = "User",
+//                    modifier = Modifier
+//                        .size(140.dp)
+//                        .background(Color.White, shape = RoundedCornerShape(7.dp))
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.height(8.dp))
+//
+//            Text(
+//                text = "BookingId-1",
+//                fontSize = 20.sp,
+//                fontWeight = FontWeight.Bold,
+//                color = Color.Black,
+//                modifier = Modifier.align(Alignment.CenterHorizontally)
+//            )
+//
+//
+//            Divider(
+//                color = Color.LightGray,
+//                thickness = 1.dp,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(vertical = 12.dp)
+//            )
+//
+//            DetailRow("Booking Id", "Customer Id", "bookingid-1", "customerid-1")
+//            DetailRow("Pickup Date", "Vehicle Id", "2025-04-15", "vehicleid-1")
+//            DetailRow("Pickup Location", "Pickup Time", "Downtown Addis Ababa", "2:30 PM")
+//            DetailRow("Drop off Date", "Drop off Time", "2025-04-15", "2:30 PM")
+//            DetailSingle("Drop off Location", "Downtown Addis Ababa Branch")
+//
+//
+//            DetailRow("Total Price", "Payment Status", "150 ETB", "Pending")
+//
+//
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 16.dp, vertical = 8.dp),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Column(modifier = Modifier.weight(1f)) {
+//                    Text(text = "Status", fontSize = 14.sp, color = Color.Gray)
+//                    Text(text = "Pending", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+//                }
+//                Spacer(modifier = Modifier.width(40.dp))
+//                Column(
+//                    modifier = Modifier.weight(1f),
+//                    horizontalAlignment = Alignment.End
+//                ) {
+//                    Text(text = "Approval", fontSize = 14.sp, color = Color.Gray)
+//                    ActionButton("Approve", Color(0xFF4CAF50)) // Green
+//                }
+//            }
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 16.dp),
+//                horizontalArrangement = Arrangement.SpaceEvenly
+//            ) {
+//                ActionButton("Edit", Color(0xFFFFC107))     // Yellow
+//                ActionButton("Delete", Color(0xFFFF4B3E))   // Red
+//            }
+//
+//            Spacer(modifier = Modifier.height(32.dp))
+//
+//        }
+//    }
+//}
 
 @Composable
 fun DetailRow(
@@ -218,171 +218,183 @@ Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 }
 
 @Composable
-fun ActionButton(text: String, color: Color) {
-Button(
-onClick = { },
-colors = ButtonDefaults.buttonColors(containerColor = color)
+fun ActionButton(text: String, color: Color, onClick:()->Unit) {
+    Button(
+    onClick = { },
+    colors = ButtonDefaults.buttonColors(containerColor = color)
+    ) {
+    Text(text = text, color = Color.White)
+    }
+}
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun BookingDetailScreen(
+    modifier: Modifier,
+    navController: NavController,
+    viewModel: AdminViewModel,
+    id: String
 ) {
-Text(text = text, color = Color.White)
-}
-}
+    val bookingResult = viewModel.BookingsResponse.collectAsState().value
+    var bks by remember { mutableStateOf(emptyList<BookingCarUser>()) }
+    var booking by remember { mutableStateOf<BookingCarUser?>(null) }
 
+    LaunchedEffect(Unit) {
+        bookingResult?.onSuccess {
+            bks = it
+            booking = bks.firstOrNull { bk -> bk._id == id }
+        }
+    }
 
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-//@Composable
-//fun BookingDetailScreen(
-//    modifier: Modifier,
-//    navController: NavController,
-//    viewModel: AdminViewModel,
-//    id: String
-//) {
-//    val bookingResult = viewModel.BookingsResponse.collectAsState().value
-//    var bks by remember { mutableStateOf(emptyList<BookingCarUser>()) }
-//    var booking by remember { mutableStateOf<BookingCarUser?>(null) }
-//
-//    LaunchedEffect(Unit) {
-//        bookingResult?.onSuccess {
-//            bks = it
-//            booking = bks.firstOrNull { bk -> bk._id == id }
-//        }
-//    }
-//
-//    Scaffold(
-//        topBar = {
-//            CenterAlignedTopAppBar(
-//                title = { Text("") },
-//                modifier = Modifier.fillMaxWidth(),
-//                navigationIcon = {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(
-//                            imageVector = Icons.Default.KeyboardArrowLeft,
-//                            contentDescription = ""
-//                        )
-//                    }
-//                },
-//                actions = {
-//                    IconButton(onClick = {}) {
-//                        Icon(
-//                            imageVector = Icons.Default.AccountCircle,
-//                            contentDescription = ""
-//                        )
-//                    }
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = Color(0xFFEA6307),
-//                    titleContentColor = Color.Transparent
-//                )
-//            )
-//        }
-//    ) { innerPadding ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(innerPadding)
-//                .verticalScroll(rememberScrollState())
-//        ) {
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            booking?.let { booking ->
-//                // Display car and user images
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceEvenly
-//                ) {
-//                    Image(
-//                        painter = rememberAsyncImagePainter(booking.carImage.url),
-//                        contentDescription = "Car",
-//                        modifier = Modifier
-//                            .size(140.dp)
-//                            .background(Color.White, shape = RoundedCornerShape(7.dp))
-//                    )
-//                    Image(
-//                        painter = rememberAsyncImagePainter(booking.userImage.url),
-//                        contentDescription = "User",
-//                        modifier = Modifier
-//                            .size(140.dp)
-//                            .background(Color.White, shape = RoundedCornerShape(7.dp))
-//                    )
-//                }
-//
-//                Spacer(modifier = Modifier.height(8.dp))
-//
-//                // Booking ID
-//                Text(
-//                    text = "Booking ID: ${booking._id}",
-//                    fontSize = 20.sp,
-//                    fontWeight = FontWeight.Bold,
-//                    color = Color.Black,
-//                    modifier = Modifier.align(Alignment.CenterHorizontally)
-//                )
-//
-//                Divider(
-//                    color = Color.LightGray,
-//                    thickness = 1.dp,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(vertical = 12.dp)
-//                )
-//
-//                // Booking Details
-//                DetailRow("Booking ID", "Username", booking._id, booking.username)
-//                DetailRow("Pickup Date", "Dropoff Date", booking.startDate, booking.endDate)
-//                DetailRow("Pickup Time", "Dropoff Time", booking.pickupTime, booking.dropoffTime)
-//                DetailRow("Pickup Location", "Dropoff Location", booking.pickupLocationName, booking.dropoffLocationName)
-//                DetailRow("Total Price", "Payment Status", "${booking.estimatedTotalPrice} ETB", booking.bookingStatus)
-//
-//                Spacer(modifier = Modifier.height(24.dp))
-//
-//                // Status and Approval
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 16.dp, vertical = 8.dp),
-//                    horizontalArrangement = Arrangement.SpaceBetween,
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Column(modifier = Modifier.weight(1f)) {
-//                        Text(text = "Status", fontSize = 14.sp, color = Color.Gray)
-//                        Text(text = booking.bookingStatus, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-//                    }
-//                    Spacer(modifier = Modifier.width(40.dp))
-//                    Column(
-//                        modifier = Modifier.weight(1f),
-//                        horizontalAlignment = Alignment.End
-//                    ) {
-//                        Text(text = "Approval", fontSize = 14.sp, color = Color.Gray)
-//                        ActionButton("Approve", Color(0xFF4CAF50)) // Green
-//                    }
-//                }
-//
-//                Spacer(modifier = Modifier.height(24.dp))
-//
-//                // Edit and Delete Buttons
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 16.dp),
-//                    horizontalArrangement = Arrangement.SpaceEvenly
-//                ) {
-//                    ActionButton("Edit", Color(0xFFFFC107))     // Yellow
-//                    ActionButton("Delete", Color(0xFFFF4B3E))   // Red
-//                }
-//
-//                Spacer(modifier = Modifier.height(32.dp))
-//            } ?: run {
-//                // Show a loading or error message if booking is null
-//                Text(
-//                    text = "Loading booking details...",
-//                    fontSize = 16.sp,
-//                    color = Color.Gray,
-//                    modifier = Modifier.align(Alignment.CenterHorizontally)
-//                )
-//            }
-//        }
-//    }
-//}
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("") },
+                modifier = Modifier.fillMaxWidth(),
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowLeft,
+                            contentDescription = ""
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = ""
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFEA6307),
+                    titleContentColor = Color.Transparent
+                )
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            booking?.let { booking ->
+                // Display car and user images
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(booking.carImage.url),
+                        contentDescription = "Car",
+                        modifier = Modifier
+                            .size(140.dp)
+                            .background(Color.White, shape = RoundedCornerShape(7.dp))
+                    )
+                    Image(
+                        painter = rememberAsyncImagePainter(booking.userImage.url),
+                        contentDescription = "User",
+                        modifier = Modifier
+                            .size(140.dp)
+                            .background(Color.White, shape = RoundedCornerShape(7.dp))
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Booking ID
+                Text(
+                    text = "Booking ID: ${booking._id}",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+
+                Divider(
+                    color = Color.LightGray,
+                    thickness = 1.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
+                )
+
+                // Booking Details
+                DetailRow("Booking ID", "Username", booking._id, booking.username)
+                DetailRow("Pickup Date", "Dropoff Date", booking.startDate, booking.endDate)
+                DetailRow("Pickup Time", "Dropoff Time", booking.pickupTime, booking.dropoffTime)
+                DetailRow("Pickup Location", "Dropoff Location", booking.pickupLocationName, booking.dropoffLocationName)
+                DetailRow("Total Price", "Payment Status", "${booking.estimatedTotalPrice} ETB", booking.bookingStatus)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Status and Approval
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = "Status", fontSize = 14.sp, color = Color.Gray)
+                        Text(text = booking.bookingStatus, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Edit and Delete Buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick={
+                        viewModel.confirm(id)
+                    },colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFC107),
+                            contentColor=Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = false
+                    ){
+                        Text("Approve")
+                    }
+                    Button(onClick={
+                        viewModel.cancel(id)
+                    },colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFF4B3E),
+                        contentColor=Color.White
+                    ),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = false
+                    ){
+                        Text("Cancel")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+            } ?: run {
+                // Show a loading or error message if booking is null
+                Text(
+                    text = "Loading booking details...",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
+        }
+    }
+}
 
 
 
