@@ -5,6 +5,7 @@ data class ImageInfo(
     val filename: String = "",
     val path: String = "",
     val size: Int = 0,
+    val url:String="",
     val uploadDate: String = "",  // ISO date as string
     val __v: Int = 0
 )
