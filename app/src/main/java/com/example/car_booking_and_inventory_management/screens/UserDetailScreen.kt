@@ -44,14 +44,25 @@ fun UserDetailScreen(
     val userResult = viewModel.UserResponse.collectAsState().value
     var users by remember { mutableStateOf(emptyList<UserPPLP>()) }
     var user by remember { mutableStateOf<UserPPLP?>(null) }
+    var clicked by remember { mutableStateOf(false) }
+    val deleteUser = viewModel.deleteUserResult.collectAsState().value
 
     LaunchedEffect(Unit) {
+        viewModel.getUser()
         userResult?.onSuccess {
             users = it
             user = users.firstOrNull { usr -> usr._id == id }
-            Log.v(TAG,user.toString())
+        }
+    }
+
+    LaunchedEffect(deleteUser) {
+        deleteUser?.onSuccess {
+            clicked = true
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
         }?.onFailure {
-            Log.v(TAG,user.toString())
+            clicked = false
+            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -94,6 +105,7 @@ fun UserDetailScreen(
             user?.let { user ->
                 // Profile Image
                 if(user.PP?.url!=null){
+                    Log.v(TAG, user.PP.url)
                     Image(
                     painter = rememberAsyncImagePainter(user.PP.url),
                     contentDescription = "Profile",
@@ -160,11 +172,23 @@ fun UserDetailScreen(
                         contentDescription ="",
                         modifier=Modifier.size(140.dp).align(Alignment.CenterHorizontally) )
                 }
-
+                Button(
+                    onClick = {
+                        viewModel.deleteUser(id)
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE36300),
+                        contentColor = Color.White,
+                    ), shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Delete", style = TextStyle(fontFamily = Vold, fontSize = 16.sp))
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
             } ?: run {
-                // Show a loading or error message if user is null
                 Text(
                     text = "${userResult}",
                     fontSize = 16.sp,

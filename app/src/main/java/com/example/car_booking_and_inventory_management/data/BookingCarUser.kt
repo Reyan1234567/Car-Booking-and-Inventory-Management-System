@@ -1,33 +1,32 @@
 package com.example.car_booking_and_inventory_management.data
 
 data class ImageInfo(
-    val _id: String = "",
-    val filename: String = "",
-    val path: String = "",
-    val size: Int = 0,
-    val url:String="",
-    val uploadDate: String = "",  // ISO date as string
-    val __v: Int = 0
+    val _id: String?,
+    val filename: String?,
+    val path: String?,
+    val size: Int?,
+    val url:String?,
+    val uploadDate: String?,  // ISO date as string
 )
 
 data class BookingCarUser(
-    val _id: String = "",
-    val bookingStatus: String = "Pending", // "Confirmed", "Pending", "Cancelled"
-    val username: String = "",
-    val carPlate: String = "",
+    val _id: String,
+    val bookingStatus: String , // "Confirmed", "Pending", "Cancelled"
+    val username: String ,
+    val carPlate: String,
 
-    val startDate: String = "",
-    val endDate: String = "",
+    val startDate: String ,
+    val endDate: String ,
 
-    val pickupTime: String = "",
-    val dropoffTime: String = "",
+    val pickupTime: String ,
+    val dropoffTime: String ,
 
-    val pickupLocationName: String = "",
-    val dropoffLocationName: String = "",
-    val estimatedTotalPrice: Double = 0.0,
+    val pickupLocationName: String,
+    val dropoffLocationName: String ,
+    val estimatedTotalPrice: Double,
 
-    val remark: String = "",
+    val remark: String,
 
-    val userImage: ImageInfo = ImageInfo(),
-    val carImage: ImageInfo = ImageInfo()
+    val profilePhotos: ImageInfo?,
+    val carImages: ImageInfo?
 )

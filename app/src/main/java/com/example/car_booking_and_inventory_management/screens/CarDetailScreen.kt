@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -87,15 +88,26 @@ fun CarDetailScreen(
 
             car?.let { car ->
                 // Car Image
-                Image(
-                    painter = rememberAsyncImagePainter(car.CI),
-                    contentDescription = "Car",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(horizontal = 16.dp)
-                        .background(Color.White, shape = RoundedCornerShape(7.dp))
-                )
+                if(car.CI?.url != null){
+                    Image(
+                        painter = rememberAsyncImagePainter(car.CI.url),
+                        contentDescription = "Car",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(horizontal = 16.dp)
+                            .background(Color.White, shape = RoundedCornerShape(7.dp))
+                    )
+                }
+                else{
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Car",
+                        modifier = Modifier
+                            .size(140.dp)
+                            .background(Color.White, shape = RoundedCornerShape(7.dp))
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -125,6 +137,35 @@ fun CarDetailScreen(
                 DetailRow("Luggage Capacity", "Daily Rate", car.luggageCapacity ?: "", "${car.dailyRate} ETB")
 
                 Spacer(modifier = Modifier.height(32.dp))
+                Column{
+                    Button(
+                        onClick = {
+                        },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFE36300),
+                            contentColor = Color.White,
+                        ), shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Delete", style = TextStyle(fontFamily = Vold, fontSize = 16.sp))
+                    }
+                    Spacer(modifier=Modifier.padding(8.dp))
+                    Button(
+                        onClick = {
+                        },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFE0C600),
+                            contentColor = Color.White,
+                        ), shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Edit", style = TextStyle(fontFamily = Vold, fontSize = 16.sp))
+                    }
+                }
             } ?: run {
                 // Show a loading or error message if car is null
                 Text(

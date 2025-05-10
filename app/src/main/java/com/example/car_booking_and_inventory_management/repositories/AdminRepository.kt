@@ -44,7 +44,11 @@ class AdminRepository(private val api: adminApi, private val tokenManager: Token
         return api.cancelBooking(id)
     }
 
-    suspend fun delete(id:String): Response<String>{
+    suspend fun deleteBooking(id:String): Response<String>{
         return api.deleteBooking(id)
+    }
+
+    suspend fun deleteUser(id: String): Response<String> {
+        return api.deleteUser(id)
     }
 }

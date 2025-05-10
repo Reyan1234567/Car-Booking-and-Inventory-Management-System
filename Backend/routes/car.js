@@ -10,33 +10,33 @@ const router=Router()
 
 router.use(checkAccessToken)
 //Get All cars
-router.get("/cars",async (req,res)=>{
-    const response=await Cars.find()
-    const carsArray=[]
-    response.forEach((respons)=>{
-        if(respons.image!==null||respons.image!=undefined||respons.image==""){
-            const imageUrl=carImage.findOne(respons.image)
-            if(!imageUrl){
-                respons.image=""
-            }
-            else{
-                const carUrl=imageUrl.url
-                respons.image=carUrl
-            }
-        }
-        carsArray.push(respons)
-    })
-    try{
-        if(!carsArray){
-            return res.status(401).send("No Cars found")
-        }
-        res.status(200).send(carsArray)
-    }
-    catch(err){
-        console.log(err)
-        res.status(401).send(err.message)
-    }
-})
+// router.get("/cars",async (req,res)=>{
+//     const response=await Cars.find()
+//     const carsArray=[]
+//     response.forEach((respons)=>{
+//         if(respons.image!==null||respons.image!=undefined||respons.image==""){
+//             const imageUrl=carImage.findOne(respons.image)
+//             if(!imageUrl){
+//                 respons.image=""
+//             }
+//             else{
+//                 const carUrl=imageUrl.url
+//                 respons.image=carUrl
+//             }
+//         }
+//         carsArray.push(respons)
+//     })
+//     try{
+//         if(!carsArray){
+//             return res.status(401).send("No Cars found")
+//         }
+//         res.status(200).send(carsArray)
+//     }
+//     catch(err){
+//         console.log(err)
+//         res.status(401).send(err.message)
+//     }
+// })
 
 //Get a specific car
 router.get("cars/:id",async(req,res)=>{
@@ -165,10 +165,6 @@ router.post("/api/filteredCars", async (req, res) => {
         }
         res.status(200).send("Car Deleted")
     })
-
-
-
-
 });
 
 router.post("/carImageUpload", upload.single("image"), async (req, res) => {
@@ -330,16 +326,18 @@ router.get("/cars",async(req,res)=>{
   try {
     const final=await Car.aggregate([
       {$lookup:{
-        from:"carImages",
+        from:"carimages",
         localField:"image",
         foreignField:"_id",
         as:"CI"
-      }},{$unwind:{path:"CI",preserveNullAndEmptyArrays:true}}
+      }},{$unwind:{path:"$CI", preserveNullAndEmptyArrays:true}}
     ])
     if(!final){
+      console.log("no car image or cars ig")
       return res.status(404).send("Not found")
     }
     res.status(200).send(final)
+    console.log("cars outputted successfully ", final)
   } 
   catch (e) {
     res.status(400).send(e)

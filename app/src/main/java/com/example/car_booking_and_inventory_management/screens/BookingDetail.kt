@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,9 +13,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -334,20 +338,45 @@ fun BookingDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(booking.carImage.url),
-                        contentDescription = "Car",
-                        modifier = Modifier
-                            .size(140.dp)
-                            .background(Color.White, shape = RoundedCornerShape(7.dp))
-                    )
-                    Image(
-                        painter = rememberAsyncImagePainter(booking.userImage.url),
-                        contentDescription = "User",
-                        modifier = Modifier
-                            .size(140.dp)
-                            .background(Color.White, shape = RoundedCornerShape(7.dp))
-                    )
+                    Log.v(TAG, booking.carImages.toString())
+                    if(booking.carImages?.url != null){
+                        Log.v(TAG, booking.carImages.url)
+                        Image(
+                            painter = rememberAsyncImagePainter(booking.carImages.url),
+                            contentDescription = "Car",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .background(Color.White, shape = RoundedCornerShape(7.dp))
+                        )
+                    }
+                    else{
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Car",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .background(Color.White, shape = RoundedCornerShape(7.dp))
+                        )
+                    }
+                    if(booking.profilePhotos?.url != null){
+                        Log.v(TAG, booking.profilePhotos.url)
+                        Image(
+                            painter = rememberAsyncImagePainter(booking.profilePhotos.url),
+                            contentDescription = "User",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .background(Color.White, shape = RoundedCornerShape(7.dp))
+                        )
+                    }
+                    else {
+                        Icon(
+                            imageVector = Icons.Default.AccountBox,
+                            contentDescription = "User",
+                            modifier = Modifier
+                                .size(140.dp)
+                                .background(Color.White, shape = RoundedCornerShape(7.dp))
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -432,9 +461,11 @@ fun BookingDetailScreen(
                     }
                     Button(
                         onClick={
-                            viewModel.delete(id)
+                            viewModel.deleteBooking(id)
                         }, 
-                        modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)), 
+                        modifier=Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp)),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFFE36300),
                             contentColor = Color.White,

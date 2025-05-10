@@ -49,6 +49,9 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
     private val _deleteResult=MutableStateFlow<Result<String>?>(null)
     val deleteResult:StateFlow<Result<String>?> = _deleteResult.asStateFlow()
 
+    private val _deleteUserResult = MutableStateFlow<Result<String>?>(null)
+    val deleteUserResult: StateFlow<Result<String>?> = _deleteUserResult.asStateFlow()
+
     fun getBookings(){
         viewModelScope.launch{
             var result=repository.getBookings()
@@ -179,18 +182,48 @@ fun confirm(bookingId: String) {
     }
 }
 
-fun delete(bookingId: String) {
+//fun delete(bookingId: String) {
+//    viewModelScope.launch {
+//        try {
+//            val result = repository.delete(bookingId)
+//            if (result.isSuccessful && result.body() != null) {
+//                _deleteResult.value = Result.success("Booking deleted successfully")
+//            } else {
+//                _deleteResult.value = Result.failure(Exception(result.errorBody()?.string()))
+//            }
+//        } catch (e: Exception) {
+//            _deleteResult.value = Result.failure(e)
+//            Log.v(TAG, "Error deleting booking: ${e.message}")
+//        }
+//    }
+//}
+
+fun deleteBooking(id: String) {
     viewModelScope.launch {
         try {
-            val result = repository.delete(bookingId)
-            if (result.isSuccessful && result.body() != null) {
-                _deleteResult.value = Result.success("Booking deleted successfully")
+            val response = repository.deleteBooking(id)
+            if (response.isSuccessful) {
+                _deleteResult.value = Result.success(response.body() ?: "Deleted successfully")
             } else {
-                _deleteResult.value = Result.failure(Exception(result.errorBody()?.string()))
+                _deleteResult.value = Result.failure(Exception(response.errorBody()?.string() ?: "Unknown error"))
             }
         } catch (e: Exception) {
             _deleteResult.value = Result.failure(e)
-            Log.v(TAG, "Error deleting booking: ${e.message}")
+        }
+    }
+}
+
+fun deleteUser(id: String) {
+    viewModelScope.launch {
+        try {
+            val response = repository.deleteUser(id)
+            if (response.isSuccessful) {
+                _deleteUserResult.value = Result.success(response.body() ?: "User deleted successfully")
+            } else {
+                _deleteUserResult.value = Result.failure(Exception(response.errorBody()?.string() ?: "Unknown error"))
+            }
+        } catch (e: Exception) {
+            _deleteUserResult.value = Result.failure(e)
         }
     }
 }

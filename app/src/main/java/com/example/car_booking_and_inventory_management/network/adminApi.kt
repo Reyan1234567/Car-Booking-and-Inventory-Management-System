@@ -41,4 +41,7 @@ interface adminApi {
 
     @DELETE("booking/{_id}")
     suspend fun deleteBooking(@Path("_id") _id:String): Response<String>
+
+    @DELETE("user/{_id}")
+    suspend fun deleteUser(@Path("_id") _id: String): Response<String>
 }

@@ -33,6 +33,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,11 +59,11 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navController: NavController) {
-    var snackbarHostState = SnackbarHostState()
+    val snackbarHostState = SnackbarHostState()
     var listOfBookings by remember { mutableStateOf(emptyList<BookingCarUser>()) }
-    var message by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf(" ") }
 
-    var result = viewModel.BookingsResponse
+    val result = viewModel.BookingsResponse.collectAsState()
     LaunchedEffect(result.value) {
         val Result = result.value
         Result?.onSuccess {
@@ -76,8 +77,10 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navCo
         }
     }
     LaunchedEffect(Unit) {
+        Log.v(TAG, "At least in the LaunchedEffect")
         viewModel.getBookings()
     }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -126,8 +129,10 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navCo
                                     listOfBookings.mapIndexed { index, booking ->
                                         BookingTableRow(booking, onEditClick = {
                                         navController.navigate("bookingDetail/${booking._id}")
-                                        })
-                                    } }
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

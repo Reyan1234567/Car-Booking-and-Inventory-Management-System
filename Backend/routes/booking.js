@@ -122,6 +122,7 @@ router.patch("/booking/:id", async (req, res) => {
 
 router.get("/bookings", async (req, res) => {
   try {
+    console.log("IN the BOOKING API")
     const final = Booking.aggregate([
       {
         $lookup: {
@@ -160,22 +161,24 @@ router.get("/bookings", async (req, res) => {
       },
       {
         $project: {
-          _id: 0,
+          _id: 1,
           userIds: 0,
           carIds: 0,
         },
       },
     ]);
     if (!final) {
+      console.log("couldn't find bookings")
       return res.status(404).send("Not found!");
     }
     res.sendStatus(200);
+    console.log("bookings found and also images")
   } catch (e) {
     res.status(400).send(e.message);
   }
 });
 
-router.get("/confirm",async(req,res)=>{
+router.patch("/confirm",async(req,res)=>{
   const id=req.query._id
   const body={bookngStatus:"Confirmed"}
   const booking=await Booking.findByIdAndUpdate(id,body,{
@@ -185,10 +188,10 @@ router.get("/confirm",async(req,res)=>{
   if(!booking){
     return res.status(404).send("Booking Not found!")
   }
-  res.status(200).send("Updated sunccessfully")
+  res.status(200).send("Confirm updated sunccessfully")
 })
 
-router.get("/cancel",async(req,res)=>{
+router.patch("/cancel",async(req,res)=>{
   const id=req.query._id
   const body={bookngStatus:"Cancelled"}
   const booking=await Booking.findByIdAndUpdate(id,body,{
@@ -198,7 +201,7 @@ router.get("/cancel",async(req,res)=>{
   if(!booking){
     return res.status(404).send("Booking Not found!")
   }
-  res.status(200).send("Updated sunccessfully")
+  res.status(200).send("Cancel updated sunccessfully")
 })
 
 export default router;
