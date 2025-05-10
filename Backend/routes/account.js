@@ -453,7 +453,7 @@ router.get("bookingHistory", async (req, res) => {
 
 // })
 
-router.get("user/id", async (req, res) => {
+router.get("user/:id", async (req, res) => {
   const id = req.params.id;
   const user = User.findOne({ id: id });
   try {
@@ -477,57 +477,97 @@ router.get("user/id", async (req, res) => {
       const licenseUrl = licenseDoc.url;
       user.licensePhoto = licenseUrl;
     }
-    res.send(user).status(200)
+    res.send(user).status(200);
   } catch (e) {
     console.log(e);
     res.send(e.message).status(404);
   }
 });
 
-router.get("/history",async(req,res)=>{
-  const id=req.params.id
-  try{
-  const final=await User.aggregate([
-    {$match:{_id:ObjectId(id)}},
-    {$unwind:"$history"},
-    {$lookup:{
-      from:"bookings",
-      localField:"history.bookingId",
-      foreignField:"_id",
-      as:"booking"
-    }},
-    {$unwind:"$booking"},
-    {$lookup:{
-      from:"cars",
-      localField:"booking.carId",
-      foreignField:"_id",
-      as:"car"
-    }},
-    {$unwind:"$car"},
-    {$lookup:{
-      from:"carImages",
-      localField:"car.imageId",
-      foreignField:"_id",
-      as:"carImage"
-    }},
-    {$unwind:"$carImage"},
-    {$project:{
-      _id:0,
-      booking:1,
-      carImage:1
-    }}
-  ])
-  if(!final){
-    return res.status(404).send("Booking Not found")
+router.get("/history", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const final = await User.aggregate([
+      { $match: { _id: ObjectId(id) } },
+      { $unwind: "$history" },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "history.bookingId",
+          foreignField: "_id",
+          as: "booking",
+        },
+      },
+      { $unwind: "$booking" },
+      {
+        $lookup: {
+          from: "cars",
+          localField: "booking.carId",
+          foreignField: "_id",
+          as: "car",
+        },
+      },
+      { $unwind: "$car" },
+      {
+        $lookup: {
+          from: "carImages",
+          localField: "car.imageId",
+          foreignField: "_id",
+          as: "carImage",
+        },
+      },
+      { $unwind: { path: "$carImage", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          booking: 1,
+          carImage: 1,
+        },
+      },
+    ]);
+    if (!final) {
+      return res.status(404).send("Booking Not found");
+    }
+    res.status(200).send(final);
+  } catch (e) {
+    res.status(400).send(e.message);
+    console.log(e);
   }
-  res.status(200).send(final)
-}
-catch(e){
-  res.status(400).send(e.message)
-  console.log(e)
-}
 
-  res.status(200).send(history)
-})
+  res.status(200).send(history);
+});
+
+router.get("/users", async (req, res) => {
+  try {
+
+    const final = User.aggregate([
+      {$match:{role:"user"}},
+      {
+        $lookup: {
+          from: "profilePhotos",
+          localField: "profilePhoto",
+          foreignField: "_id",
+          as: "PP",
+        },
+      },
+      {
+        $lookup: {
+          from: "licensePhotos",
+          localField: "licensePhoto",
+          foreignField: "_id",
+          as: "PP",
+        },
+      },
+      { $unwind: { path: "$PP", preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: "$LP", preserveNullAndEmptyArrays: true } },
+    ]);
+    if (!final) {
+      return res.status(404).send("Not found");
+    }
+    res.status(200).send(final);
+  } catch (e) {
+    res.send(e).status(400);
+  }
+});
 
 export default router;

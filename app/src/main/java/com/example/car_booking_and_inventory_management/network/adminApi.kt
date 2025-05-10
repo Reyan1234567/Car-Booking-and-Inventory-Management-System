@@ -4,9 +4,13 @@ import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarResponse
+import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface adminApi {
@@ -14,7 +18,7 @@ interface adminApi {
     suspend fun getBookings(): Response<List<BookingCarUser>>
 
     @GET("users")
-    suspend fun getUsers():Response<List<UsersTable>>
+    suspend fun getUsers():Response<List<UserPPLP>>
 
     @GET("total_bookings")
     suspend fun getTotalBookings():Response<Int>
@@ -33,4 +37,7 @@ interface adminApi {
 
     @GET("cancel")
     suspend fun cancelBooking(@Query("_id") _id:String): Response<String>
+
+    @DELETE("booking/{_id}")
+    suspend fun deleteBooking(@Path("_id") _id:String): Response<String>
 }

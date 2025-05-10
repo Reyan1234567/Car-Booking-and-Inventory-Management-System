@@ -1,9 +1,11 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,9 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingCarUser
+import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
 
 //@OptIn(ExperimentalMaterial3Api::class)
@@ -238,14 +244,52 @@ fun BookingDetailScreen(
     viewModel: AdminViewModel,
     id: String
 ) {
+    val context= LocalContext.current
     val bookingResult = viewModel.BookingsResponse.collectAsState().value
     var bks by remember { mutableStateOf(emptyList<BookingCarUser>()) }
     var booking by remember { mutableStateOf<BookingCarUser?>(null) }
+
+    var clicked by remember { mutableStateOf(false) }
+
+    val cancel=viewModel.cancelResult.collectAsState().value
+    val confirm=viewModel.confirmResult.collectAsState().value
+    val delete=viewModel.deleteResult.collectAsState().value
 
     LaunchedEffect(Unit) {
         bookingResult?.onSuccess {
             bks = it
             booking = bks.firstOrNull { bk -> bk._id == id }
+        }
+    }
+
+    LaunchedEffect(cancel) {
+        cancel?.onSuccess {
+            clicked=true
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }?.onFailure {
+            clicked=false
+            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(confirm) {
+        confirm?.onSuccess {
+            clicked=true
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }?.onFailure {
+            clicked=false
+            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(delete) {
+        delete?.onSuccess {
+            clicked=true
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+        }?.onFailure {
+            clicked=false
+            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -286,7 +330,6 @@ fun BookingDetailScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             booking?.let { booking ->
-                // Display car and user images
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -358,27 +401,46 @@ fun BookingDetailScreen(
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Button(onClick={
-                        viewModel.confirm(id)
-                    },colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFFC107),
-                            contentColor=Color.White
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = false
-                    ){
-                        Text("Approve")
+                    if(!clicked) {
+                        Button(
+                            onClick = {
+                                viewModel.confirm(id)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFFFC107),
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Text("Approve")
+                        }
+                        Button(
+                            onClick = {
+                                viewModel.cancel(id)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFFF4B3E),
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Text("Cancel")
+                        }
                     }
-                    Button(onClick={
-                        viewModel.cancel(id)
-                    },colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF4B3E),
-                        contentColor=Color.White
-                    ),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = false
+                    else{
+                        Text("is Loading ....", style= TextStyle(fontSize = 20.sp, fontFamily= Vold), modifier=Modifier.align(Alignment.CenterHorizontally))
+                    }
+                    Button(
+                        onClick={
+                            viewModel.delete(id)
+                        }, 
+                        modifier=Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)), 
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFE36300),
+                            contentColor = Color.White,
+                        )
                     ){
-                        Text("Cancel")
+                        Text("Delete", style=TextStyle(fontFamily = Vold, fontSize = 16.sp))
                     }
                 }
 

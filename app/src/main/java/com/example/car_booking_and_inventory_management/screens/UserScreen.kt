@@ -50,6 +50,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.BookingTable
+import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
@@ -58,7 +59,7 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 @Composable
 fun UserScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var listOfUsers by remember { mutableStateOf(listOf<UsersTable>()) }
+    var listOfUsers by remember { mutableStateOf(listOf<UserPPLP>()) }
     var message by remember { mutableStateOf("") }
 
     val result = viewModel.UserResponse.collectAsState()
@@ -141,12 +142,12 @@ fun UsersTableHeader(modifier: Modifier = Modifier) {
         Text("First Name", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
         Text("Last Name", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
         Text("Phone", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
-        Spacer(modifier = Modifier.width(120.dp)) // for edit button
+        Text("Edit", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
     }
 }
 
 @Composable
-fun UsersTableRow(user: UsersTable, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
+fun UsersTableRow(user: UserPPLP, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -155,8 +156,8 @@ fun UsersTableRow(user: UsersTable, modifier: Modifier = Modifier, onEditClick: 
     ) {
         Text(user.username, modifier = Modifier.width(120.dp))
         Text(user.email, modifier = Modifier.width(120.dp))
-        Text(user.firstname, modifier = Modifier.width(120.dp))
-        Text(user.lastname, modifier = Modifier.width(120.dp))
+        Text(user.firstName, modifier = Modifier.width(120.dp))
+        Text(user.lastName, modifier = Modifier.width(120.dp))
         Text(user.phoneNumber, modifier = Modifier.width(120.dp))
         IconButton(
             onClick = onEditClick,

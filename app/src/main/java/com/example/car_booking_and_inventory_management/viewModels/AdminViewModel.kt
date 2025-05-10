@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarResponse
+import com.example.car_booking_and_inventory_management.data.User
+import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.repositories.AdminRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,8 +24,8 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
     private val _BookingsResponse= MutableStateFlow<Result<List<BookingCarUser>>?>(null)
     val BookingsResponse: StateFlow<Result<List<BookingCarUser>>?> =_BookingsResponse.asStateFlow()
 
-    private val _UserResponse = MutableStateFlow<Result<List<UsersTable>>?>(null)
-    val UserResponse: StateFlow<Result<List<UsersTable>>?> = _UserResponse.asStateFlow()
+    private val _UserResponse = MutableStateFlow<Result<List<UserPPLP>>?>(null)
+    val UserResponse: StateFlow<Result<List<UserPPLP>>?> = _UserResponse.asStateFlow()
 
     private val _TotalBookingsResponse = MutableStateFlow<Result<Int>?>(null)
     val TotalBookingsResponse: StateFlow<Result<Int>?> = _TotalBookingsResponse.asStateFlow()
@@ -42,6 +44,9 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
 
     private val _confirmResult=MutableStateFlow<Result<String>?>(null)
     val confirmResult:StateFlow<Result<String>?> = _confirmResult.asStateFlow()
+
+    private val _deleteResult=MutableStateFlow<Result<String>?>(null)
+    val deleteResult:StateFlow<Result<String>?> = _deleteResult.asStateFlow()
 
     fun getBookings(){
         viewModelScope.launch{
@@ -160,7 +165,7 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
 fun confirm(bookingId: String) {
     viewModelScope.launch {
         try {
-            val result = repository.confirm(bookingId) // Assuming `confirmBooking` is defined in your repository
+            val result = repository.confirm(bookingId)
             if (result.isSuccessful && result.body() != null) {
                 _confirmResult.value = Result.success("Booking confirmed successfully")
             } else {
@@ -169,6 +174,22 @@ fun confirm(bookingId: String) {
         } catch (e: Exception) {
             _confirmResult.value = Result.failure(e)
             Log.v(TAG, "Error confirming booking: ${e.message}")
+        }
+    }
+}
+
+fun delete(bookingId: String) {
+    viewModelScope.launch {
+        try {
+            val result = repository.delete(bookingId)
+            if (result.isSuccessful && result.body() != null) {
+                _deleteResult.value = Result.success("Booking deleted successfully")
+            } else {
+                _deleteResult.value = Result.failure(Exception(result.errorBody()?.string()))
+            }
+        } catch (e: Exception) {
+            _deleteResult.value = Result.failure(e)
+            Log.v(TAG, "Error deleting booking: ${e.message}")
         }
     }
 }

@@ -5,6 +5,7 @@ import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarResponse
+import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import com.example.car_booking_and_inventory_management.network.adminApi
 import retrofit2.Response
@@ -14,7 +15,7 @@ class AdminRepository(private val api: adminApi, private val tokenManager: Token
         return api.getBookings()
     }
 
-    suspend fun getUsers():Response<List<UsersTable>>{
+    suspend fun getUsers():Response<List<UserPPLP>>{
         return api.getUsers()
     }
 
@@ -40,5 +41,9 @@ class AdminRepository(private val api: adminApi, private val tokenManager: Token
 
     suspend fun cancel(id:String): Response<String>{
         return api.cancelBooking(id)
+    }
+
+    suspend fun delete(id:String): Response<String>{
+        return api.deleteBooking(id)
     }
 }

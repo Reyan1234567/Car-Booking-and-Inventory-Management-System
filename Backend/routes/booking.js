@@ -36,19 +36,19 @@ router.post("/booking", async (req, res) => {
   }
 });
 
-router.delete("/booking/:id", async (req, res) => {
-  const { id } = req.params;
+router.delete("/booking/:_id", async (req, res) => {
+  const { _id } = req.params;
   try {
-    const deletedBooking = await Booking.findByIdAndDelete(id);
+    const deletedBooking = await Booking.findByIdAndDelete(_id);
     if (!deletedBooking) {
       return res.status(404).send("Booking not found");
     }
     res
       .status(200)
-      .send({ message: "Booking deleted successfully", deletedBooking });
+      .send({ message: "Booking deleted successfully" });//deleted Booking
   } catch (err) {
     console.log(err);
-    res.status(500).send(err.message);
+    res.status(400).send(err.message);
   }
 });
 
