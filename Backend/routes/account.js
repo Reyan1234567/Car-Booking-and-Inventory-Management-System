@@ -70,53 +70,53 @@ router.post("/auth/signup", async (req, res) => {
   }
 });
 
-router.get("/users", checkAccessToken, async (req, res) => {
-  try {
-    const usersArray = [];
-    const response = await User.find();
+// router.get("/users", checkAccessToken, async (req, res) => {
+//   try {
+//     const usersArray = [];
+//     const response = await User.find();
 
-    response.forEach(async (respons) => {
-      if (
-        respons.profilePhoto !== null ||
-        respons.profilePhoto !== "" ||
-        respons.profilePhoto !== undefined
-      ) {
-        const profile = respons.profilePhoto;
-        const PP = await profilePhoto.findOne({ id: profile });
-        if (!PP) {
-          respons.profilePhoto = "";
-        } else {
-          const PPurl = PP.url;
-          respons.profilePhoto = PPurl;
-        }
-      }
-      if (
-        respons.licensePhoto !== null &&
-        respons.licensePhoto !== "" &&
-        respons.licensePhoto !== undefined
-      ) {
-        const license = respons.licensePhoto;
-        const licenseDoc = await licensePhoto.findOne({ id: license });
+//     response.forEach(async (respons) => {
+//       if (
+//         respons.profilePhoto !== null ||
+//         respons.profilePhoto !== "" ||
+//         respons.profilePhoto !== undefined
+//       ) {
+//         const profile = respons.profilePhoto;
+//         const PP = await profilePhoto.findOne({ id: profile });
+//         if (!PP) {
+//           respons.profilePhoto = "";
+//         } else {
+//           const PPurl = PP.url;
+//           respons.profilePhoto = PPurl;
+//         }
+//       }
+//       if (
+//         respons.licensePhoto !== null &&
+//         respons.licensePhoto !== "" &&
+//         respons.licensePhoto !== undefined
+//       ) {
+//         const license = respons.licensePhoto;
+//         const licenseDoc = await licensePhoto.findOne({ id: license });
 
-        if (!licenseDoc) {
-          respons.licensePhoto = "";
-        } else {
-          const licenseUrl = licenseDoc.url;
-          respons.licensePhoto = licenseUrl;
-        }
-      }
-      usersArray.push(respons);
-    });
-    if (!usersArray) {
-      return res.status(404).send("No Users found");
-    }
+//         if (!licenseDoc) {
+//           respons.licensePhoto = "";
+//         } else {
+//           const licenseUrl = licenseDoc.url;
+//           respons.licensePhoto = licenseUrl;
+//         }
+//       }
+//       usersArray.push(respons);
+//     });
+//     if (!usersArray) {
+//       return res.status(404).send("No Users found");
+//     }
 
-    res.send(usersArray);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).send("Internal server error");
-  }
-});
+//     res.send(usersArray);
+//   } catch (error) {
+//     console.error("Error fetching users:", error);
+//     res.status(500).send("Internal server error");
+//   }
+// });
 
 //Sign-in
 router.post("/auth/signin", async (req, res) => {
@@ -540,7 +540,7 @@ router.get("/history", async (req, res) => {
 router.get("/users", async (req, res) => {
   try {
 
-    const final = User.aggregate([
+    const final =await User.aggregate([
       {$match:{role:"user"}},
       {
         $lookup: {

@@ -37,3 +37,21 @@ data class CarResponse(
     val dailyRate: Int?, // Reasonable default rate
     )
 
+data class CarCI(
+    val _id:String?,
+    val plate:String?,
+    val name: String ?,
+    val make: String?,
+    val price: Int?,
+    val model: String?,
+    val year: Int?, // Reasonable default year
+    val category: String?,
+    val type: String ?,
+    val transmissionType: String ?,
+    val fuelType: String ?,
+    val passengerCapacity: Int ?, // Typical default
+    val luggageCapacity: String ?,
+    val CI: String ?, // Empty string for no image
+    val dailyRate: Int?, // Reasonable default rate
+)
+

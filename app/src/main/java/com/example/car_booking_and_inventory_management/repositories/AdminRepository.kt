@@ -4,6 +4,7 @@ import com.example.car_booking_and_inventory_management.DataStore.TokenManager
 import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarCI
 import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
@@ -31,7 +32,7 @@ class AdminRepository(private val api: adminApi, private val tokenManager: Token
         return api.getTotalUsers()
     }
 
-    suspend fun getCars(): Response<List<CarResponse>> {
+    suspend fun getCars(): Response<List<CarCI>> {
         return api.getCars()
     }
 

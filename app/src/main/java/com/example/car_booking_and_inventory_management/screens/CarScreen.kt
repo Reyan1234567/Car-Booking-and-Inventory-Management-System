@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarCI
 import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
@@ -53,7 +54,7 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 @Composable
 fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var listOfCars by remember { mutableStateOf(listOf<CarResponse>()) }
+    var listOfCars by remember { mutableStateOf(listOf<CarCI>()) }
     var message by remember { mutableStateOf("") }
     val result = viewModel.CarsResponse.collectAsState()
     LaunchedEffect(result.value) {
@@ -147,7 +148,7 @@ fun CarsTableHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CarsTableRow(car: CarResponse, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
+fun CarsTableRow(car: CarCI, modifier: Modifier = Modifier, onEditClick: () -> Unit = {}) {
     Row(
         modifier = modifier
             .fillMaxWidth()

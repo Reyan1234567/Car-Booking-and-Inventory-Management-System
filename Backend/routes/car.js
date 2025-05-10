@@ -4,6 +4,7 @@ import Bookings from "../models/bookings.js"
 import checkAccessToken from "../middleware/checkAccessToken.js";
 import carImage from "../models/CarImages.js";
 import {upload} from "../middleware/multer.js"
+import Car from "../models/cars.js";
 const router=Router()
 
 
@@ -323,6 +324,27 @@ router.patch("/car",async(req,res)=>{
     }
 
 
+})
+
+router.get("/cars",async(req,res)=>{
+  try {
+    const final=await Car.aggregate([
+      {$lookup:{
+        from:"carImages",
+        localField:"image",
+        foreignField:"_id",
+        as:"CI"
+      }},{$unwind:{path:"CI",preserveNullAndEmptyArrays:true}}
+    ])
+    if(!final){
+      return res.status(404).send("Not found")
+    }
+    res.status(200).send(final)
+  } 
+  catch (e) {
+    res.status(400).send(e)
+    console.log(e)
+  }
 })
 
 

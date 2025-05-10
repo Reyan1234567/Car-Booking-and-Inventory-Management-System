@@ -3,6 +3,7 @@ package com.example.car_booking_and_inventory_management.network
 import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarCI
 import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
@@ -30,7 +31,7 @@ interface adminApi {
     suspend fun getTotalUsers():Response<Int>
 
     @GET("cars")
-    suspend fun getCars(): Response<List<CarResponse>>
+    suspend fun getCars(): Response<List<CarCI>>
 
     @GET("confirm")
     suspend fun confirmBooking(@Query("_id") _id:String): Response<String>

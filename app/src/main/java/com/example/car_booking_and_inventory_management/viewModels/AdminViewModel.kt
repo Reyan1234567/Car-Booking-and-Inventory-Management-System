@@ -8,6 +8,7 @@ import com.example.car_booking_and_inventory_management.data.UsersTable
 import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.Car
+import com.example.car_booking_and_inventory_management.data.CarCI
 import com.example.car_booking_and_inventory_management.data.CarResponse
 import com.example.car_booking_and_inventory_management.data.User
 import com.example.car_booking_and_inventory_management.data.UserPPLP
@@ -36,8 +37,8 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
     private val _TotalUsersResponse = MutableStateFlow<Result<Int>?>(null)
     val TotalUsersResponse: StateFlow<Result<Int>?> = _TotalUsersResponse.asStateFlow()
 
-    private val _CarsResponse = MutableStateFlow<Result<List<CarResponse>>?>(null)
-    val CarsResponse: StateFlow<Result<List<CarResponse>>?> = _CarsResponse.asStateFlow()
+    private val _CarsResponse = MutableStateFlow<Result<List<CarCI>>?>(null)
+    val CarsResponse: StateFlow<Result<List<CarCI>>?> = _CarsResponse.asStateFlow()
 
     private val _cancelResult=MutableStateFlow<Result<String>?>(null)
     val cancelResult:StateFlow<Result<String>?> = _cancelResult.asStateFlow()
