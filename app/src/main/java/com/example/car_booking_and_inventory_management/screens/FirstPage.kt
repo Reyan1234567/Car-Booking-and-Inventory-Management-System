@@ -44,18 +44,25 @@ fun FirstPage(modifier: Modifier = Modifier, navController: NavController,viewMo
 
     LaunchedEffect(checkStatus.value) {
         val result=checkStatus.value
+        var role=viewModel.getRole()
         result?.onSuccess{
-            if(viewModel.role=="user"){
+            if(role=="user"){
                 Log.v(TAG,viewModel.role)
                 navController.navigate("home")
             }
-            else if(viewModel.role=="admin"){
+            else if(role=="admin"){
                 Log.v(TAG,viewModel.role)
                 navController.navigate("admin")
             }
+            else{
+                navController.navigate("login"){
+                    popUpTo(route="login"){inclusive=false}
+                }
+            }
         }?.onFailure {
-            navController.navigate("login")
-        }
+            navController.navigate("login"){
+                popUpTo(route="login"){inclusive=false}
+            }        }
     }
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center

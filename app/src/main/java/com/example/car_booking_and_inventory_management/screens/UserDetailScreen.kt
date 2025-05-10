@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.*
@@ -43,10 +46,12 @@ fun UserDetailScreen(
     var user by remember { mutableStateOf<UserPPLP?>(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.getUser()
         userResult?.onSuccess {
             users = it
             user = users.firstOrNull { usr -> usr._id == id }
+            Log.v(TAG,user.toString())
+        }?.onFailure {
+            Log.v(TAG,user.toString())
         }
     }
 
@@ -88,14 +93,21 @@ fun UserDetailScreen(
 
             user?.let { user ->
                 // Profile Image
-                Image(
-                    painter = rememberAsyncImagePainter(user.PP),
+                if(user.PP?.url!=null){
+                    Image(
+                    painter = rememberAsyncImagePainter(user.PP.url),
                     contentDescription = "Profile",
                     modifier = Modifier
                         .size(140.dp)
                         .align(Alignment.CenterHorizontally)
                         .background(Color.White, shape = RoundedCornerShape(7.dp))
                 )
+                }else{
+                    Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription ="",
+                    modifier=Modifier.size(140.dp).align(Alignment.CenterHorizontally) )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -131,21 +143,30 @@ fun UserDetailScreen(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Image(
-                    painter = rememberAsyncImagePainter(user.LP),
-                    contentDescription = "License",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(horizontal = 16.dp)
-                        .background(Color.White, shape = RoundedCornerShape(7.dp))
-                )
+                if(user.LP?.url!=null){
+                    Image(
+                        painter = rememberAsyncImagePainter(user.LP.url),
+                        contentDescription = "License",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(horizontal = 16.dp)
+                            .background(Color.White, shape = RoundedCornerShape(7.dp))
+                    )
+                }
+                else{
+                    Icon(
+                        imageVector = Icons.Default.AccountBox,
+                        contentDescription ="",
+                        modifier=Modifier.size(140.dp).align(Alignment.CenterHorizontally) )
+                }
+
 
                 Spacer(modifier = Modifier.height(32.dp))
             } ?: run {
                 // Show a loading or error message if user is null
                 Text(
-                    text = "Loading user details...",
+                    text = "${userResult}",
                     fontSize = 16.sp,
                     color = Color.Gray,
                     modifier = Modifier.align(Alignment.CenterHorizontally)

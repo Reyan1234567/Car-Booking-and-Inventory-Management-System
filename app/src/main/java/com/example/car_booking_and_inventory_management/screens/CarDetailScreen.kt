@@ -43,7 +43,6 @@ fun CarDetailScreen(
     var car by remember { mutableStateOf<CarCI?>(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.getCars()
         carResult?.onSuccess {
             cars = it
             car = cars.firstOrNull { cr -> cr._id == id }

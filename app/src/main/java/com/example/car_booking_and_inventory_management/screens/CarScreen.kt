@@ -117,7 +117,7 @@ fun CarScreen(modifier: Modifier = Modifier, viewModel: AdminViewModel, navContr
                     } else {
                         listOfCars.forEach{Car->
                             CarsTableRow(Car,modifier,{
-                                navController.navigate("bookingDetail/${Car._id}")
+                                navController.navigate("carDetail/${Car._id}")
                             })
                         }
                     }

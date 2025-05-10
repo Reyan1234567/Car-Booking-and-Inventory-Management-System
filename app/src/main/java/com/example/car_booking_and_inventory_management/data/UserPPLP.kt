@@ -9,8 +9,16 @@ data class UserPPLP(
     val firstName: String,
     val lastName: String,
     val phoneNumber: String,
-    val LP: String?,
-    val PP: String?,
+    val LP: ImageDocument?,
+    val PP: ImageDocument?,
     val birthDate: String, // Based on schema type String
 )
 
+
+
+data class ImageDocument (
+    val filename: String,
+    val path: String,
+    val size: Number,
+    val url: String
+)

@@ -470,4 +470,8 @@ class AuthViewModel @Inject constructor(private val repository: authRepository):
         repository.logout()
     }
 
+    suspend fun getRole():String?{
+        return repository.getRole()
+    }
+
 }

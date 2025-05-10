@@ -544,7 +544,7 @@ router.get("/users", async (req, res) => {
       {$match:{role:"user"}},
       {
         $lookup: {
-          from: "profilePhotos",
+          from: "profilephotos",
           localField: "profilePhoto",
           foreignField: "_id",
           as: "PP",
@@ -552,10 +552,10 @@ router.get("/users", async (req, res) => {
       },
       {
         $lookup: {
-          from: "licensePhotos",
+          from: "licensephotos",
           localField: "licensePhoto",
           foreignField: "_id",
-          as: "PP",
+          as: "LP",
         },
       },
       { $unwind: { path: "$PP", preserveNullAndEmptyArrays: true } },
@@ -565,6 +565,7 @@ router.get("/users", async (req, res) => {
       return res.status(404).send("Not found");
     }
     res.status(200).send(final);
+    console.log(final)
   } catch (e) {
     res.send(e).status(400);
   }

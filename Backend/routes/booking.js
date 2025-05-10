@@ -143,7 +143,7 @@ router.get("/bookings", async (req, res) => {
       { $unwind: "$carIds" },
       {
         $lookup: {
-          from: "profilePhotos",
+          from: "profilephotos",
           localField: "userIds.profilePhoto",
           foreignField: "_id",
           as: "profilePhotos",
@@ -152,7 +152,7 @@ router.get("/bookings", async (req, res) => {
       { $unwind: "$profilePhotos" },
       {
         $lookup: {
-          from: "carImages",
+          from: "carimages",
           localField: "carIds.image",
           foreignField: "_id",
           as: "carImages",

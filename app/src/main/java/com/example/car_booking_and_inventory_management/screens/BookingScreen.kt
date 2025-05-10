@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.car_booking_and_inventory_management.R
+import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.ui.theme.Vold
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
@@ -58,7 +59,7 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 @Composable
 fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navController: NavController) {
     var snackbarHostState = SnackbarHostState()
-    var listOfBookings by remember { mutableStateOf(emptyList<BookingTable>()) }
+    var listOfBookings by remember { mutableStateOf(emptyList<BookingCarUser>()) }
     var message by remember { mutableStateOf("") }
 
     var result = viewModel.BookingsResponse
@@ -157,7 +158,7 @@ fun BookingScreen(modifier: Modifier = Modifier, viewModel:AdminViewModel, navCo
 
     @Composable
     fun BookingTableRow(
-        booking: BookingTable,
+        booking: BookingCarUser,
         modifier: Modifier = Modifier,
         onEditClick: () -> Unit
     ) {

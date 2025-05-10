@@ -428,7 +428,7 @@ fun BookingDetailScreen(
                         }
                     }
                     else{
-                        Text("is Loading ....", style= TextStyle(fontSize = 20.sp, fontFamily= Vold), modifier=Modifier.align(Alignment.CenterHorizontally))
+                        Text(text="is Loading ....", style= TextStyle(fontSize = 20.sp, fontFamily= Vold))
                     }
                     Button(
                         onClick={

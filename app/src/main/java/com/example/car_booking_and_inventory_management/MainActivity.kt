@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.example.car_booking_and_inventory_management.screens.BookingDetailScreen
 import com.example.car_booking_and_inventory_management.screens.BookingScreen
+import com.example.car_booking_and_inventory_management.screens.CarDetailScreen
 import com.example.car_booking_and_inventory_management.screens.CarScreen
 import com.example.car_booking_and_inventory_management.screens.CarSearchFilter
 import com.example.car_booking_and_inventory_management.screens.DashboardPage
@@ -37,6 +38,7 @@ import com.example.car_booking_and_inventory_management.screens.SearchScreen
 import com.example.car_booking_and_inventory_management.screens.SearchScreen1
 import com.example.car_booking_and_inventory_management.screens.SearchViewScreen
 import com.example.car_booking_and_inventory_management.screens.SingleCarScreen
+import com.example.car_booking_and_inventory_management.screens.UserDetailScreen
 import com.example.car_booking_and_inventory_management.screens.UserScreen
 import com.example.car_booking_and_inventory_management.ui.theme.FrontendTheme
 import com.example.car_booking_and_inventory_management.viewModels.AdminViewModel
@@ -86,30 +88,30 @@ class MainActivity : ComponentActivity() {
                         CarScreen(modifier = Modifier, viewModel, navController)
                     }
 
-                    composable(route="bookingDetails/{id}"){backStackEntry->
+                    composable(route="bookingDetail/{id}"){backStackEntry->
                         val id=backStackEntry.arguments?.getString("id")
                         val parentEntry= remember(backStackEntry){
                             navController.getBackStackEntry("admin")
                         }
-                        val viewModel:AdminViewModel= hiltViewModel()
+                        val viewModel:AdminViewModel= hiltViewModel(parentEntry)
                         BookingDetailScreen(Modifier, navController, viewModel, id?:"")
                     }
 
-                    composable(route="userDetails/{id}"){backStackEntry->
+                    composable(route="userDetail/{id}"){backStackEntry->
                         val id=backStackEntry.arguments?.getString("id")
                         val parentEntry= remember(backStackEntry){
                             navController.getBackStackEntry("admin")
                         }
-                        val viewModel:AdminViewModel= hiltViewModel()
+                        val viewModel:AdminViewModel= hiltViewModel(parentEntry)
                         UserDetailScreen(Modifier, navController, viewModel, id?:"")
                     }
 
-                    composable(route="carDetails/{id}"){backStackEntry->
+                    composable(route="carDetail/{id}"){backStackEntry->
                         val id=backStackEntry.arguments?.getString("id")
                         val parentEntry= remember(backStackEntry){
                             navController.getBackStackEntry("admin")
                         }
-                        val viewModel:AdminViewModel= hiltViewModel()
+                        val viewModel:AdminViewModel= hiltViewModel(parentEntry)
                         CarDetailScreen(Modifier, navController, viewModel, id?:"")
                     }
                 }
