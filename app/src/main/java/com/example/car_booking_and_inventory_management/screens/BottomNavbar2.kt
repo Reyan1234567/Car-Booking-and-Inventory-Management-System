@@ -12,8 +12,10 @@ import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.room.parser.Section
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.car_booking_and_inventory_management.data.BottomNavItem
 
 var bottomNavs=listOf(
@@ -61,43 +63,60 @@ var bottomNavs=listOf(
 
 @Composable
 fun BottomNavbar2(modifier: Modifier = Modifier, navController: NavController) {
-    var selected by remember { mutableIntStateOf(0) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    
+    val selectedIndex = bottomNavs.indexOfFirst { it.route == currentRoute }.takeIf { it != -1 } ?: 0
+
     NavigationBar {
-        bottomNavs.forEachIndexed{index, bottomNav->
+        bottomNavs.forEachIndexed { index, bottomNav ->
             NavigationBarItem(
-                selected=index==selected,
-                onClick={
-                    selected=index
-                    navController.navigate(bottomNav.route)
+                selected = selectedIndex == index,
+                onClick = {
+                    if (currentRoute != bottomNav.route) {
+                        navController.navigate(bottomNav.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 },
-                icon={
+                icon = {
                     BadgedBox(
-                        badge= {
-                            when{
-                                bottomNav.badges!=0->{
-                                    Badge{ Section.Text(bottomNav.badges.toString()) }
+                        badge = {
+                            when {
+                                bottomNav.badges != 0 -> {
+                                    Badge {
+                                        Text(bottomNav.badges.toString())
+                                    }
                                 }
-                                bottomNav.hasNews==true->{
+                                bottomNav.hasNews -> {
                                     Badge()
                                 }
-                                else->{}
+                                else -> {
+                                }
                             }
                         }
-
                     ) {
                         Icon(
-                            imageVector = if(selected==index){
+                            imageVector = if (selectedIndex == index) {
                                 bottomNav.selectedIcon
-                            }
-                            else{
+                            } else {
                                 bottomNav.unselectedIcon
                             },
                             contentDescription = bottomNav.title
                         )
                     }
+                },
+                label = {
+                    Text(
+                        text = bottomNav.title,
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
             )
         }
     }
-
 }

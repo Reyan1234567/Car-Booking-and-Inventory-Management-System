@@ -189,30 +189,56 @@ import com.example.car_booking_and_inventory_management.viewModels.AdminViewMode
 
 @Composable
 fun DetailRow(
-label1: String,
-label2: String,
-value1: String,
-value2: String
+    label1: String,
+    label2: String,
+    value1: String,
+    value2: String
 ) {
-Row(
-modifier = Modifier
-    .fillMaxWidth()
-    .padding(horizontal = 16.dp, vertical = 8.dp),
-horizontalArrangement = Arrangement.SpaceBetween
-) {
-Column(modifier = Modifier.weight(1f)) {
-    Text(text = label1, fontSize = 14.sp, color = Color.Gray)
-    Text(text = value1, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-}
-Spacer(modifier = Modifier.width(40.dp)) // Increased gap
-Column(
-    modifier = Modifier.weight(1f),
-    horizontalAlignment = Alignment.End
-) {
-    Text(text = label2, fontSize = 14.sp, color = Color.Gray)
-    Text(text = value2, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-}
-}
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label1,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontFamily = Vold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+            Text(
+                text = value1,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = Vold,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+        Spacer(modifier = Modifier.width(32.dp))
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = label2,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontFamily = Vold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+            Text(
+                text = value2,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = Vold,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+    }
 }
 
 @Composable
@@ -260,6 +286,7 @@ fun BookingDetailScreen(
     val delete=viewModel.deleteResult.collectAsState().value
 
     LaunchedEffect(Unit) {
+        Log.v(TAG, "in the Booking Detail")
         bookingResult?.onSuccess {
             bks = it
             booking = bks.firstOrNull { bk -> bk._id == id }
@@ -399,11 +426,11 @@ fun BookingDetailScreen(
                 )
 
                 // Booking Details
-                DetailRow("Booking ID", "Username", booking._id, booking.username)
-                DetailRow("Pickup Date", "Dropoff Date", booking.startDate, booking.endDate)
-                DetailRow("Pickup Time", "Dropoff Time", booking.pickupTime, booking.dropoffTime)
-                DetailRow("Pickup Location", "Dropoff Location", booking.pickupLocationName, booking.dropoffLocationName)
-                DetailRow("Total Price", "Payment Status", "${booking.estimatedTotalPrice} ETB", booking.bookingStatus)
+                DetailRow("Booking ID", "Username", booking._id, booking.username?:"")
+                DetailRow("Pickup Date", "Dropoff Date", booking.startDate?:"", booking.endDate?:"")
+                DetailRow("Pickup Time", "Dropoff Time", booking.pickupTime?:"", booking.dropoffTime?:"")
+                DetailRow("Pickup Location", "Dropoff Location", booking.pickupLocationName?:"", booking.dropoffLocationName?:"")
+                DetailRow("Total Price", "Payment Status", "${booking.estimatedTotalPrice} ETB", booking.bookingStatus?:"")
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -417,7 +444,7 @@ fun BookingDetailScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = "Status", fontSize = 14.sp, color = Color.Gray)
-                        Text(text = booking.bookingStatus, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(text = booking.bookingStatus?:"", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 

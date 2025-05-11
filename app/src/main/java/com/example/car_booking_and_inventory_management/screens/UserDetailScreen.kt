@@ -58,7 +58,7 @@ fun UserDetailScreen(
     LaunchedEffect(deleteUser) {
         deleteUser?.onSuccess {
             clicked = true
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "User deleted successfully", Toast.LENGTH_SHORT).show()
             navController.popBackStack()
         }?.onFailure {
             clicked = false
@@ -69,13 +69,23 @@ fun UserDetailScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("") },
+                title = { 
+                    Text(
+                        "User Details",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = Vold,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowLeft,
-                            contentDescription = ""
+                            contentDescription = "Back",
+                            tint = Color.White
                         )
                     }
                 },
@@ -83,13 +93,13 @@ fun UserDetailScreen(
                     IconButton(onClick = {}) {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
-                            contentDescription = ""
+                            contentDescription = "Account",
+                            tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFEA6307),
-                    titleContentColor = Color.Transparent
+                    containerColor = Color(0xFFEA6307)
                 )
             )
         }
@@ -99,131 +109,181 @@ fun UserDetailScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
             user?.let { user ->
-                // Profile Image
-                if(user.PP?.url!=null){
-                    Log.v(TAG, user.PP.url)
-                    Image(
-                    painter = rememberAsyncImagePainter(user.PP.url),
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(140.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .background(Color.White, shape = RoundedCornerShape(7.dp))
-                )
-                }else{
-                    Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription ="",
-                    modifier=Modifier.size(140.dp).align(Alignment.CenterHorizontally) )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // User ID
-                Text(
-                    text = "User ID: ${user._id}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Divider(
-                    color = Color.LightGray,
-                    thickness = 1.dp,
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 12.dp)
-                )
-
-                // User Details
-                DetailRow("Username", "Email", user.username, user.email)
-                DetailRow("First Name", "Last Name", user.firstName, user.lastName)
-                DetailRow("Phone Number", "Role", user.phoneNumber, user.birthDate)
-                
-                // License Image
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "License Photo",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                if(user.LP?.url!=null){
-                    Image(
-                        painter = rememberAsyncImagePainter(user.LP.url),
-                        contentDescription = "License",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(horizontal = 16.dp)
-                            .background(Color.White, shape = RoundedCornerShape(7.dp))
-                    )
-                }
-                else{
-                    Icon(
-                        imageVector = Icons.Default.AccountBox,
-                        contentDescription ="",
-                        modifier=Modifier.size(140.dp).align(Alignment.CenterHorizontally) )
-                }
-                Button(
-                    onClick = {
-                        viewModel.deleteUser(id)
-                    },
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFE36300),
-                        contentColor = Color.White,
-                    ), shape = RoundedCornerShape(12.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    Text("Delete", style = TextStyle(fontFamily = Vold, fontSize = 16.sp))
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Profile Image
+                        if(user.PP?.url != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(user.PP.url),
+                                contentDescription = "Profile",
+                                modifier = Modifier
+                                    .size(140.dp)
+                                    .clip(RoundedCornerShape(70.dp))
+                                    .background(MaterialTheme.colorScheme.surface)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.AccountCircle,
+                                contentDescription = "Profile",
+                                modifier = Modifier
+                                    .size(140.dp)
+                                    .clip(RoundedCornerShape(70.dp))
+                                    .background(MaterialTheme.colorScheme.surface),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // User ID
+                        Text(
+                            text = "User ID: ${user._id}",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = Vold,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Personal Information",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = Vold,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            ),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        // User Details
+                        DetailRow("Username", "Email", user.username, user.email)
+                        DetailRow("First Name", "Last Name", user.firstName, user.lastName)
+                        DetailRow("Phone Number", "Birth Date", user.phoneNumber, user.birthDate)
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "License Photo",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = Vold,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            ),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        if(user.LP?.url != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(user.LP.url),
+                                contentDescription = "License",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surface)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surface),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AccountBox,
+                                    contentDescription = "No License Photo",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Button(
+                            onClick = { viewModel.deleteUser(id) },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "Delete User",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = Vold,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
             } ?: run {
-                Text(
-                    text = "${userResult}",
-                    fontSize = 16.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Loading user details...",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontFamily = Vold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    )
+                }
             }
         }
     }
 }
 
-//@Composable
-//fun DetailUserRow(
-//    label1: String,
-//    label2: String,
-//    value1: String,
-//    value2: String
-//) {
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(horizontal = 16.dp, vertical = 8.dp),
-//        horizontalArrangement = Arrangement.SpaceBetween
-//    ) {
-//        Column(modifier = Modifier.weight(1f)) {
-//            Text(text = label1, fontSize = 14.sp, color = Color.Gray)
-//            Text(text = value1, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-//        }
-//        Spacer(modifier = Modifier.width(40.dp))
-//        Column(
-//            modifier = Modifier.weight(1f),
-//            horizontalAlignment = Alignment.End
-//        ) {
-//            Text(text = label2, fontSize = 14.sp, color = Color.Gray)
-//            Text(text = value2, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-//        }
-//    }
-//}

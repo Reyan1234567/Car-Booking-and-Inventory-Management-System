@@ -12,6 +12,7 @@ import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import com.example.car_booking_and_inventory_management.network.adminApi
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 
 class AdminRepository(private val api: adminApi, private val tokenManager: TokenManager) {
@@ -47,15 +48,19 @@ class AdminRepository(private val api: adminApi, private val tokenManager: Token
         return api.cancelBooking(id)
     }
 
-    suspend fun deleteBooking(id:String): Response<String>{
+    suspend fun deleteBooking(id:String): Response<ResponseBody>{
         return api.deleteBooking(id)
     }
 
-    suspend fun deleteUser(id: String): Response<String> {
+    suspend fun deleteUser(id: String): Response<ResponseBody> {
         return api.deleteUser(id)
     }
 
-    suspend fun uploadCar(uri:MultipartBody.Part):Response<UploadResponse>{
+    suspend fun deleteCar(id: String): Response<ResponseBody> {
+        return api.deleteCar(id)
+    }
+
+    suspend fun uploadCar(uri:MultipartBody.Part?):Response<UploadResponse>{
         return api.uploadCar(uri)
     }
 

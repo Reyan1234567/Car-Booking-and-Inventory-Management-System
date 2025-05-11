@@ -8,7 +8,7 @@ import Car from "../models/cars.js";
 const router=Router()
 
 
-router.use(checkAccessToken)
+// router.use(checkAccessToken)
 //Get All cars
 // router.get("/cars",async (req,res)=>{
 //     const response=await Cars.find()
@@ -62,8 +62,8 @@ router.get("cars/:id",async(req,res)=>{
     }
 })
 
-router.patch("cars/:id",async(req,res)=>{
-    const {id}=req.params
+router.patch("/cars/:id",async(req,res)=>{
+    const id=req.params.id
     const {body}=req
     try{
         const updates={}
@@ -151,21 +151,23 @@ router.post("/api/filteredCars", async (req, res) => {
         console.log(err);
         res.status(500).send(err.message); 
     }
-
-    router.delete("car/:id",async(req,res)=>{
-        const id=req.params.id
-        const carToDelete=Cars.findOne({id:id})
-        if(!carToDelete){
-            return res.status(404).status("Not found")
-        }
-        const deletedCar=Cars.findByIdAndDelete(id)
-
-        if(!deletedCar){
-            return res.status(404).send("Car not found!")
-        }
-        res.status(200).send("Car Deleted")
-    })
-});
+  })
+  
+    router.delete("/car/:id", async (req, res) => {
+      const id = req.params.id;
+      try {
+          const deletedCar = await Cars.findByIdAndDelete(id);
+          if (!deletedCar) {
+              return res.status(404).send("Car not found");
+          }
+          res.status(200).send("Car Deleted");
+      } catch (err) {
+          console.error(err);
+          // Send 500 for server/database errors, 400 for client errors
+          const statusCode = err.name === "CastError" ? 400 : 500;
+          res.status(statusCode).send(err.message);
+      }
+  });
 
 router.post("/carImageUpload", upload.single("image"), async (req, res) => {
     console.log("Car image upload initiated");
@@ -351,7 +353,7 @@ router.get("/cars",async(req,res)=>{
 
 
 
-export default router
+export default router;
 
 
 
@@ -364,11 +366,3 @@ export default router
 
 
 
-// notAvailableOn:{
-//     $not:{
-//         $elemMatch:{
-//             startDate:{$lte:newEndDate},
-//             endDate:{$gte:newStartDate}
-//         }
-//     }
-// }

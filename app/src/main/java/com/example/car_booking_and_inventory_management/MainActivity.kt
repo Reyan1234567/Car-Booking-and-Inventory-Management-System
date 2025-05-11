@@ -23,6 +23,7 @@ import androidx.navigation.navigation
 import com.example.car_booking_and_inventory_management.screens.BookingDetailScreen
 import com.example.car_booking_and_inventory_management.screens.BookingScreen
 import com.example.car_booking_and_inventory_management.screens.CarDetailScreen
+import com.example.car_booking_and_inventory_management.screens.CarEditCreate
 import com.example.car_booking_and_inventory_management.screens.CarScreen
 import com.example.car_booking_and_inventory_management.screens.CarSearchFilter
 import com.example.car_booking_and_inventory_management.screens.DashboardPage
@@ -113,6 +114,23 @@ class MainActivity : ComponentActivity() {
                         }
                         val viewModel:AdminViewModel= hiltViewModel(parentEntry)
                         CarDetailScreen(Modifier, navController, viewModel, id?:"")
+                    }
+
+                    composable(route="carCreate"){backStackEntry->
+                        val parentEntry= remember(backStackEntry){
+                            navController.getBackStackEntry("admin")
+                        }
+                        val viewModel:AdminViewModel= hiltViewModel(parentEntry)
+                        CarEditCreate(Modifier, navController, viewModel)
+                    }
+
+                    composable(route="carEdit/{id}"){backStackEntry->
+                        val id = backStackEntry.arguments?.getString("id")
+                        val parentEntry= remember(backStackEntry){
+                            navController.getBackStackEntry("admin")
+                        }
+                        val viewModel:AdminViewModel= hiltViewModel(parentEntry)
+                        CarEditCreate(Modifier, navController, viewModel, id ?: "")
                     }
                 }
                     navigation(

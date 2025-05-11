@@ -10,6 +10,7 @@ import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -44,21 +45,24 @@ interface adminApi {
     suspend fun confirmBooking(@Query("_id") _id:String): Response<String>
 
     @GET("cancel")
-    suspend fun cancelBooking(@Query("_id") _id:String): Response<String>
+    suspend fun cancelBooking(@Query("id") _id:String): Response<String>
 
-    @DELETE("booking/{_id}")
-    suspend fun deleteBooking(@Path("_id") _id:String): Response<String>
+    @DELETE("booking/{id}")
+    suspend fun deleteBooking(@Path("id") _id:String): Response<ResponseBody>
 
-    @DELETE("user/{_id}")
-    suspend fun deleteUser(@Path("_id") _id: String): Response<String>
+    @DELETE("user/{id}")
+    suspend fun deleteUser(@Path("id") _id: String): Response<ResponseBody>
+
+    @DELETE("car/{id}")
+    suspend fun deleteCar(@Path("id") _id: String): Response<ResponseBody>
 
     @Multipart
-    @POST("carUpload")
+    @POST("carImageUpload")
     suspend fun uploadCar(
-        @Part image: MultipartBody.Part
+        @Part image: MultipartBody.Part?
     ):Response<UploadResponse>
 
-    @POST("car")
+    @POST("cars")
     suspend fun createCar(@Body car: CarPost): Response<CarResponse>
 
     @PATCH("cars/{id}")
@@ -66,4 +70,6 @@ interface adminApi {
         @Path("id") id: String,
         @Body car: CarPost
     ): Response<CarResponse>
+
+
 }

@@ -70,7 +70,7 @@ data class CarPost(
     val fuelType: String = "Gasoline",
     val passengerCapacity: Int = 5, // Typical default
     val luggageCapacity: Int,
-    val imageUrl: Uri?, // Empty string for no image
+    val imageUrl: String="", // Empty string for no image
     val dailyRate: Int = 50, // Reasonable default rate
 )
 

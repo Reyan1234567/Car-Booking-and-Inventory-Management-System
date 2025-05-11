@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,6 +44,8 @@ fun CarDetailScreen(
     val carResult = viewModel.CarsResponse.collectAsState().value
     var cars by remember { mutableStateOf(emptyList<CarCI>()) }
     var car by remember { mutableStateOf<CarCI?>(null) }
+    var clicked by remember { mutableStateOf(false) }
+    val deleteCar = viewModel.deleteCarResult.collectAsState().value
 
     LaunchedEffect(Unit) {
         carResult?.onSuccess {
@@ -50,16 +54,38 @@ fun CarDetailScreen(
         }
     }
 
+    LaunchedEffect(deleteCar) {
+        deleteCar?.onSuccess {
+            clicked = true
+            Toast.makeText(context, "Car deleted successfully", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+        }?.onFailure {
+            clicked = false
+            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+            Log.v(TAG, it.message.toString())
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("") },
+                title = { 
+                    Text(
+                        "Car Details",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = Vold,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowLeft,
-                            contentDescription = ""
+                            contentDescription = "Back",
+                            tint = Color.White
                         )
                     }
                 },
@@ -67,13 +93,13 @@ fun CarDetailScreen(
                     IconButton(onClick = {}) {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
-                            contentDescription = ""
+                            contentDescription = "Account",
+                            tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFEA6307),
-                    titleContentColor = Color.Transparent
+                    containerColor = Color(0xFFEA6307)
                 )
             )
         }
@@ -83,99 +109,185 @@ fun CarDetailScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
             car?.let { car ->
-                // Car Image
-                if(car.CI?.url != null){
-                    Image(
-                        painter = rememberAsyncImagePainter(car.CI.url),
-                        contentDescription = "Car",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(horizontal = 16.dp)
-                            .background(Color.White, shape = RoundedCornerShape(7.dp))
-                    )
-                }
-                else{
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Car",
-                        modifier = Modifier
-                            .size(140.dp)
-                            .background(Color.White, shape = RoundedCornerShape(7.dp))
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Car ID
-                Text(
-                    text = "Car ID: ${car._id}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Divider(
-                    color = Color.LightGray,
-                    thickness = 1.dp,
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 12.dp)
-                )
-
-                // Car Details
-                DetailRow("Plate", "Name", car.plate ?: "", car.name ?: "")
-                DetailRow("Make", "Model", car.make ?: "", car.model ?: "")
-                DetailRow("Year", "Category", car.year.toString(), car.category ?: "")
-                DetailRow("Type", "Transmission", car.type ?: "", car.transmissionType ?: "")
-                DetailRow("Fuel Type", "Passenger Capacity", car.fuelType ?: "", car.passengerCapacity.toString())
-                DetailRow("Luggage Capacity", "Daily Rate", car.luggageCapacity ?: "", "${car.dailyRate} ETB")
-
-                Spacer(modifier = Modifier.height(32.dp))
-                Column{
-                    Button(
-                        onClick = {
-                        },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFE36300),
-                            contentColor = Color.White,
-                        ), shape = RoundedCornerShape(12.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Delete", style = TextStyle(fontFamily = Vold, fontSize = 16.sp))
-                    }
-                    Spacer(modifier=Modifier.padding(8.dp))
-                    Button(
-                        onClick = {
-                        },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFE0C600),
-                            contentColor = Color.White,
-                        ), shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Edit", style = TextStyle(fontFamily = Vold, fontSize = 16.sp))
+                        // Car Image
+                        if(car.CI?.url != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(car.CI.url),
+                                contentDescription = "Car",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surface)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surface),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ShoppingCart,
+                                    contentDescription = "No Car Image",
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Car ID
+                        Text(
+                            text = "Car ID: ${car._id}",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = Vold,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
                     }
                 }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Basic Information",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = Vold,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            ),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        DetailRow("Plate", "Name", car.plate ?: "", car.name ?: "")
+                        DetailRow("Make", "Model", car.make ?: "", car.model ?: "")
+                        DetailRow("Year", "Category", car.year.toString(), car.category ?: "")
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Specifications",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = Vold,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            ),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        DetailRow("Type", "Transmission", car.type ?: "", car.transmissionType ?: "")
+                        DetailRow("Fuel Type", "Passenger Capacity", car.fuelType ?: "", car.passengerCapacity.toString())
+                        DetailRow("Luggage Capacity", "Daily Rate", car.luggageCapacity ?: "", "${car.dailyRate} ETB")
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Button(
+                            onClick = { viewModel.deleteCar(id) },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "Delete Car",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = Vold,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = { navController.navigate("carEdit/${id}") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                "Edit Car",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = Vold,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
             } ?: run {
-                // Show a loading or error message if car is null
-                Text(
-                    text = "Loading car details...",
-                    fontSize = 16.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Loading car details...",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontFamily = Vold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    )
+                }
             }
         }
     }
 }
+
+
 

@@ -6,8 +6,7 @@ import checkAccessToken from "../middleware/checkAccessToken.js";
 
 const router = Router();
 
-router.use(checkAccessToken);
-
+// 
 router.post("/booking", async (req, res) => {
   const { body } = req;
   const id = req.user._id;
@@ -66,18 +65,18 @@ router.get("/booking/:id", async (req, res) => {
   }
 });
 
-router.get("/bookings", async (req, res) => {
-  try {
-    const bookings = await Booking.find();
-    if (!bookings || bookings.length === 0) {
-      return res.status(404).send("can't find bookings");
-    }
-    res.status(200).send(bookings);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(err.message);
-  }
-});
+// router.get("/bookings", async (req, res) => {
+//   try {
+//     const bookings = await Booking.find();
+//     if (!bookings || bookings.length === 0) {
+//       return res.status(404).send("can't find bookings");
+//     }
+//     res.status(200).send(bookings);
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send(err.message);
+//   }
+// });
 
 router.get("/total_bookings", async (req, res) => {
   try {

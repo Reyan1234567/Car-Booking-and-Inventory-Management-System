@@ -539,9 +539,8 @@ router.get("/history", async (req, res) => {
 
 router.get("/users", async (req, res) => {
   try {
-
-    const final =await User.aggregate([
-      {$match:{role:"user"}},
+    const final = await User.aggregate([
+      { $match: { role: "user" } },
       {
         $lookup: {
           from: "profilephotos",
@@ -565,25 +564,24 @@ router.get("/users", async (req, res) => {
       return res.status(404).send("Not found");
     }
     res.status(200).send(final);
-    console.log(final)
+    console.log(final);
   } catch (e) {
     res.send(e).status(400);
   }
 });
 
-router.delete("/user/:id",async(req,res)=>{
-  const id=req.params.id
-  const deletedUser=await User.findByIdAndDelete(id)
-  try{if(!deletedUser){
-    console.log(deletedUser)
-    return res.status(404).send("Not found!")
-  }
-  res.status(200).send("Deleted User")}
-  catch(e){
-    console.log(err);
+router.delete("/user/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).send("User not found!");
+    }
+    res.status(200).send("User Deleted");
+  } catch (err) {
+    console.error(err);
     res.status(400).send(err.message);
   }
-})
-
+});
 
 export default router;

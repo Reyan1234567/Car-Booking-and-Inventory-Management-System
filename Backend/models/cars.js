@@ -11,7 +11,6 @@ const carSchema = new mongoose.Schema({
   fuelType: { type: String, required: true },
   passengerCapacity: { type: Number, required: true },
   luggageCapacity: { type: String, required: true },
-  imageUrl: { type: String, required: true },
   dailyRate: { type: Number, required: true },
   plate:{type:String, requried:true},
   image:{type:mongoose.Schema.Types.ObjectId, ref:"carImage", default:""}

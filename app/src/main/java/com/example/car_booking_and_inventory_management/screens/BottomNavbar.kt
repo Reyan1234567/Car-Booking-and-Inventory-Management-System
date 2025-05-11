@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.car_booking_and_inventory_management.data.BottomNavItem
 
 
@@ -52,39 +54,45 @@ var bottomNavItems=listOf(
 )
 @Composable
 fun BottomNavigationBar(modifier: Modifier = Modifier, navController: NavController) {
-    var selected by remember { mutableIntStateOf(0) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    
+    val selectedIndex = bottomNavItems.indexOfFirst { it.route == currentRoute }.takeIf { it != -1 } ?: 0
 
     NavigationBar {
         bottomNavItems.forEachIndexed { index, bottomNavItem ->
             NavigationBarItem(
-                selected = selected == index,
+                selected = selectedIndex == index,
                 onClick = {
-                    navController.navigate(bottomNavItem.route)
-                    selected = index
+                    if (currentRoute != bottomNavItem.route) {
+                        navController.navigate(bottomNavItem.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 },
                 icon = {
                     BadgedBox(
-                        badge =
-                        {
+                        badge = {
                             when {
                                 bottomNavItem.badges != 0 -> {
                                     Badge {
                                         Text(bottomNavItem.badges.toString())
                                     }
                                 }
-
                                 bottomNavItem.hasNews -> {
                                     Badge()
                                 }
-
                                 else -> {
                                 }
                             }
                         }
                     ) {
                         Icon(
-                            imageVector =
-                            if (index == selected) {
+                            imageVector = if (selectedIndex == index) {
                                 bottomNavItem.selectedIcon
                             } else {
                                 bottomNavItem.unselectedIcon
@@ -92,6 +100,12 @@ fun BottomNavigationBar(modifier: Modifier = Modifier, navController: NavControl
                             contentDescription = bottomNavItem.title
                         )
                     }
+                },
+                label = {
+                    Text(
+                        text = bottomNavItem.title,
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
             )
         }

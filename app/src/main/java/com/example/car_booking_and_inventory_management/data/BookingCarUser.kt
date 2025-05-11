@@ -11,21 +11,21 @@ data class ImageInfo(
 
 data class BookingCarUser(
     val _id: String,
-    val bookingStatus: String , // "Confirmed", "Pending", "Cancelled"
-    val username: String ,
-    val carPlate: String,
+    val bookingStatus: String? , // "Confirmed", "Pending", "Cancelled"
+    val username: String?,
+    val carPlate: String?,
 
-    val startDate: String ,
-    val endDate: String ,
+    val startDate: String?,
+    val endDate: String? ,
 
-    val pickupTime: String ,
-    val dropoffTime: String ,
+    val pickupTime: String? ,
+    val dropoffTime: String? ,
 
-    val pickupLocationName: String,
-    val dropoffLocationName: String ,
-    val estimatedTotalPrice: Double,
+    val pickupLocationName: String?,
+    val dropoffLocationName: String? ,
+    val estimatedTotalPrice: Double?,
 
-    val remark: String,
+    val remark: String?,
 
     val profilePhotos: ImageInfo?,
     val carImages: ImageInfo?

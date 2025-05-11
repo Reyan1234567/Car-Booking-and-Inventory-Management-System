@@ -11,7 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarCI
+import com.example.car_booking_and_inventory_management.data.CarPost
 import com.example.car_booking_and_inventory_management.data.CarResponse
+import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.User
 import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.repositories.AdminRepository
@@ -57,11 +59,17 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
     private val _deleteUserResult = MutableStateFlow<Result<String>?>(null)
     val deleteUserResult: StateFlow<Result<String>?> = _deleteUserResult.asStateFlow()
 
+    private val _deleteCarResult = MutableStateFlow<Result<String>?>(null)
+    val deleteCarResult: StateFlow<Result<String>?> = _deleteCarResult.asStateFlow()
+
     private val _createCarResult = MutableStateFlow<Result<CarResponse>?>(null)
-    val createCarResult: StateFlow<Result<CarResponse>?> = _createCarResult
+    val createCarResult: StateFlow<Result<CarResponse>?> = _createCarResult.asStateFlow()
 
     private val _updateCarResult = MutableStateFlow<Result<CarResponse>?>(null)
-    val updateCarResult: StateFlow<Result<CarResponse>?> = _updateCarResult
+    val updateCarResult: StateFlow<Result<CarResponse>?> = _updateCarResult.asStateFlow()
+
+    private val _uploadCar = MutableStateFlow<Result<UploadResponse>?>(null)
+    val uploadCar: StateFlow<Result<UploadResponse>?> = _uploadCar.asStateFlow()
 
     fun getBookings(){
         viewModelScope.launch{
@@ -214,7 +222,7 @@ fun deleteBooking(id: String) {
         try {
             val response = repository.deleteBooking(id)
             if (response.isSuccessful) {
-                _deleteResult.value = Result.success(response.body() ?: "Deleted successfully")
+                _deleteResult.value = Result.success("Deleted successfully")
             } else {
                 _deleteResult.value = Result.failure(Exception(response.errorBody()?.string() ?: "Unknown error"))
             }
@@ -229,9 +237,10 @@ fun deleteUser(id: String) {
         try {
             val response = repository.deleteUser(id)
             if (response.isSuccessful) {
-                _deleteUserResult.value = Result.success(response.body() ?: "User deleted successfully")
+                _deleteUserResult.value = Result.success("User deleted successfully")
+                getUser() // Refresh the user list after deletion
             } else {
-                _deleteUserResult.value = Result.failure(Exception(response.errorBody()?.string() ?: "Unknown error"))
+                _deleteUserResult.value = Result.failure(Exception("Failed to delete user"))
             }
         } catch (e: Exception) {
             _deleteUserResult.value = Result.failure(e)
@@ -239,19 +248,36 @@ fun deleteUser(id: String) {
     }
 }
 
-fun uploadCar(uri:MultipartBody.Part){
+fun deleteCar(id: String) {
     viewModelScope.launch {
         try {
-            val response=repository.uploadCar(uri)
-            if(response.isSuccessful && response.body()!=null){
+            val response = repository.deleteCar(id)
+            if (response.isSuccessful) {
+                _deleteCarResult.value = Result.success("Car deleted successfully")
+                getCars() // Refresh the car list after deletion
+            } else {
+                _deleteCarResult.value = Result.failure(Exception("Failed to delete car"))
+            }
+        } catch (e: Exception) {
+            _deleteCarResult.value = Result.failure(e)
+        }
+    }
+}
 
+fun uploadCar(context: Context, uri:Uri){
+    viewModelScope.launch {
+        try {
+            val multiPart=createMultipartBody(context,uri)
+            val response=repository.uploadCar(multiPart)
+            if(response.isSuccessful && response.body()!=null){
+                _uploadCar.value=Result.success(response.body()!!)
             }
             else{
-
+                _uploadCar.value=Result.failure(Exception(response.errorBody()?.string()?:"Request Failed"))
             }
         }
         catch (e:Exception){
-
+            _uploadCar.value=Result.failure(e)
         }
     }
 }
