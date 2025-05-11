@@ -218,7 +218,8 @@ fun ProfileScreen(modifier: Modifier = Modifier, navController: NavController, v
             ) {
                 OutlinedTextField(
                     value = state.username,
-                    onValueChange = { viewModel.updateField("username",it) },
+                    onValueChange = {},
+                    readOnly=true,
                     label = { Text("Username") },
                     modifier = Modifier
                         .fillMaxWidth()
