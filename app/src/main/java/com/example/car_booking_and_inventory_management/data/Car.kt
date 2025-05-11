@@ -1,6 +1,7 @@
 package com.example.car_booking_and_inventory_management.data
 
 import android.media.Image
+import android.net.Uri
 import java.util.Date
 
 data class Car(
@@ -54,6 +55,23 @@ data class CarCI(
     val luggageCapacity: String ?,
     val CI: ImageDocument ?, // Empty string for no image
     val dailyRate: Int?, // Reasonable default rate
+)
+
+data class CarPost(
+    val plate:String="00000",
+    val name: String = "Unknown Car",
+    val make: String = "Unknown Make",
+    val price: Int = 0,
+    val model: String = "Unknown Model",
+    val year: Int = 2000, // Reasonable default year
+    val category: String = "Uncategorized",
+    val type: String = "Standard",
+    val transmissionType: String = "Automatic",
+    val fuelType: String = "Gasoline",
+    val passengerCapacity: Int = 5, // Typical default
+    val luggageCapacity: Int,
+    val imageUrl: Uri?, // Empty string for no image
+    val dailyRate: Int = 50, // Reasonable default rate
 )
 
 

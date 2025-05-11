@@ -1,6 +1,8 @@
 package com.example.car_booking_and_inventory_management.viewModels
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.car_booking_and_inventory_management.data.BookingTable
@@ -18,6 +20,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,6 +56,12 @@ class AdminViewModel @Inject constructor(private val repository:AdminRepository)
 
     private val _deleteUserResult = MutableStateFlow<Result<String>?>(null)
     val deleteUserResult: StateFlow<Result<String>?> = _deleteUserResult.asStateFlow()
+
+    private val _createCarResult = MutableStateFlow<Result<CarResponse>?>(null)
+    val createCarResult: StateFlow<Result<CarResponse>?> = _createCarResult
+
+    private val _updateCarResult = MutableStateFlow<Result<CarResponse>?>(null)
+    val updateCarResult: StateFlow<Result<CarResponse>?> = _updateCarResult
 
     fun getBookings(){
         viewModelScope.launch{
@@ -227,4 +238,72 @@ fun deleteUser(id: String) {
         }
     }
 }
+
+fun uploadCar(uri:MultipartBody.Part){
+    viewModelScope.launch {
+        try {
+            val response=repository.uploadCar(uri)
+            if(response.isSuccessful && response.body()!=null){
+
+            }
+            else{
+
+            }
+        }
+        catch (e:Exception){
+
+        }
+    }
+}
+
+    fun createMultipartBody(context: Context, uri: Uri, partName:String="image"):MultipartBody.Part?{
+        return try{
+            val inputStream=context.contentResolver.openInputStream(uri)  //The raw binary data
+            val fileBytes=inputStream?.readBytes()
+            val requestFile=fileBytes?.let{
+                RequestBody.create("image/*".toMediaTypeOrNull(), it)
+            }?: return null
+
+            MultipartBody.Part.createFormData(
+                partName,
+                "image_${System.currentTimeMillis()}.jpg",
+                requestFile
+            )
+        }
+        catch(e:Exception){
+            null
+        }
+    }
+
+    fun createCar(car: CarPost) {
+        viewModelScope.launch {
+            try {
+                val response = repository.createCar(car)
+                if (response.isSuccessful && response.body() != null) {
+                    _createCarResult.value = Result.success(response.body()!!)
+                } else {
+                    _createCarResult.value = Result.failure(Exception(response.errorBody()?.string() ?: "Failed to create car"))
+                }
+            } catch (e: Exception) {
+                _createCarResult.value = Result.failure(e)
+                Log.v(TAG, "Error creating car: ${e.message}")
+            }
+        }
+    }
+
+    fun updateCar(id: String, car: CarPost) {
+        viewModelScope.launch {
+            try {
+                val response = repository.updateCar(id, car)
+                if (response.isSuccessful && response.body() != null) {
+                    _updateCarResult.value = Result.success(response.body()!!)
+                } else {
+                    _updateCarResult.value = Result.failure(Exception(response.errorBody()?.string() ?: "Failed to update car"))
+                }
+            } catch (e: Exception) {
+                _updateCarResult.value = Result.failure(e)
+                Log.v(TAG, "Error updating car: ${e.message}")
+            }
+        }
+    }
 }

@@ -4,15 +4,22 @@ import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarCI
+import com.example.car_booking_and_inventory_management.data.CarPost
 import com.example.car_booking_and_inventory_management.data.CarResponse
+import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Body
+import retrofit2.http.PATCH
 
 interface adminApi {
     @GET("bookings")
@@ -44,4 +51,19 @@ interface adminApi {
 
     @DELETE("user/{_id}")
     suspend fun deleteUser(@Path("_id") _id: String): Response<String>
+
+    @Multipart
+    @POST("carUpload")
+    suspend fun uploadCar(
+        @Part image: MultipartBody.Part
+    ):Response<UploadResponse>
+
+    @POST("car")
+    suspend fun createCar(@Body car: CarPost): Response<CarResponse>
+
+    @PATCH("cars/{id}")
+    suspend fun updateCar(
+        @Path("id") id: String,
+        @Body car: CarPost
+    ): Response<CarResponse>
 }

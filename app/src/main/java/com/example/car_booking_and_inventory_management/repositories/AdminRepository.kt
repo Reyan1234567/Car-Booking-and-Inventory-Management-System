@@ -5,10 +5,13 @@ import com.example.car_booking_and_inventory_management.data.BookingCarUser
 import com.example.car_booking_and_inventory_management.data.BookingTable
 import com.example.car_booking_and_inventory_management.data.Car
 import com.example.car_booking_and_inventory_management.data.CarCI
+import com.example.car_booking_and_inventory_management.data.CarPost
 import com.example.car_booking_and_inventory_management.data.CarResponse
+import com.example.car_booking_and_inventory_management.data.UploadResponse
 import com.example.car_booking_and_inventory_management.data.UserPPLP
 import com.example.car_booking_and_inventory_management.data.UsersTable
 import com.example.car_booking_and_inventory_management.network.adminApi
+import okhttp3.MultipartBody
 import retrofit2.Response
 
 class AdminRepository(private val api: adminApi, private val tokenManager: TokenManager) {
@@ -50,5 +53,17 @@ class AdminRepository(private val api: adminApi, private val tokenManager: Token
 
     suspend fun deleteUser(id: String): Response<String> {
         return api.deleteUser(id)
+    }
+
+    suspend fun uploadCar(uri:MultipartBody.Part):Response<UploadResponse>{
+        return api.uploadCar(uri)
+    }
+
+    suspend fun createCar(car: CarPost): Response<CarResponse> {
+        return api.createCar(car)
+    }
+
+    suspend fun updateCar(id: String, car: CarPost): Response<CarResponse> {
+        return api.updateCar(id, car)
     }
 }
