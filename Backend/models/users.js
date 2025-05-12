@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true, trim:true, unique:true },
   // licenseNumber: { type: String},
   // licenseExpiry: { type: Date },
-  licensePhoto:{type:mongoose.Schema.Types.ObjectId, ref:"licensePhoto", default:""},
-  profilePhoto:{type:mongoose.Schema.Types.ObjectId, ref:"profilePhoto", default:""},
+  licensePhoto:{type:mongoose.Schema.Types.ObjectId, ref:"licensePhoto", },
+  profilePhoto:{type:mongoose.Schema.Types.ObjectId, ref:"profilePhoto", },
   birthDate: { type: String, required :true},
   history: [
     { bookingId:{
