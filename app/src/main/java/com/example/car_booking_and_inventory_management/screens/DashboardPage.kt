@@ -115,7 +115,7 @@ fun DashboardPage(modifier: Modifier = Modifier, navController: NavController, v
                         )
                     }
                 }
-                Card(modifier = Modifier.padding(18.dp)) {
+                Card(modifier = Modifier.padding(20.dp)) {
                     Column(
                         modifier = Modifier.padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -143,7 +143,7 @@ fun DashboardPage(modifier: Modifier = Modifier, navController: NavController, v
                     }
                     Box(
                         modifier = Modifier.padding(vertical = 16.dp)
-                            .height(75.dp)
+                            .height(80.dp)
                             .width(1.dp)
                             .background(Color.Black)
                     )
