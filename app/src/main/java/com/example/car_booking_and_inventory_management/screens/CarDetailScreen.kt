@@ -71,13 +71,14 @@ fun CarDetailScreen(
             CenterAlignedTopAppBar(
                 title = { 
                     Text(
-                        "Car Details",
+                        "Vehicle Details",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontFamily = Vold,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                     )
+
                 },
                 modifier = Modifier.fillMaxWidth(),
                 navigationIcon = {
