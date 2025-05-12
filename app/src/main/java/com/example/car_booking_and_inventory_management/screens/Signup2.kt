@@ -296,7 +296,7 @@ fun Signup2(modifier: Modifier = Modifier,navController: NavController, viewMode
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(6.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFEA6307),
                     contentColor = Color.White
@@ -350,7 +350,7 @@ fun validateRePassword(rePassword:String,Password:String):String{
 
 fun validateUsername(username:String):String {
     return (if (username.isBlank()) {
-        "Username is required"
+        "Username is highly required"
     } else if (username.length < 6) {
         "Username must be above 6 characters"
     }
