@@ -468,7 +468,7 @@ fun BookingDetailScreen(
                             ),
                             shape = RoundedCornerShape(12.dp),
                         ) {
-                            Text("Approve")
+                            Text("Approved")
                         }
                         Button(
                             onClick = {
