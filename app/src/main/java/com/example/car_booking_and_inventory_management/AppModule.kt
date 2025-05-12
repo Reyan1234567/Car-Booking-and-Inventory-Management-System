@@ -32,7 +32,13 @@ object AppModule {
     }
 
 
-    
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor):OkHttpClient{
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .build()
+    }
 
 
     @Provides
