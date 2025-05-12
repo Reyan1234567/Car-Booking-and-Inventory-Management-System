@@ -129,7 +129,7 @@ fun SingleCarScreen(modifier: Modifier = Modifier,navController: NavController,v
 
     LaunchedEffect(bookingResult.value) {
         bookingResult.value?.onSuccess {
-            snackbarHostState.showSnackbar("Your Booking is Pending check booking history for any update")
+            snackbarHostState.showSnackbar("Your Booking is Pending, please check the booking history for any update")
         }?.onFailure {
             snackbarHostState.showSnackbar("Some error happened while trying to create a bookin,${it.message}")
         }
