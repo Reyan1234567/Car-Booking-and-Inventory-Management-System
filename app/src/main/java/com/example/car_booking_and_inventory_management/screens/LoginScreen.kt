@@ -102,7 +102,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .width(200.dp)
                         .height(150.dp)
-                        .padding(16.dp)
+                        .padding(14.dp)
                         .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Fit
 
@@ -208,7 +208,7 @@ fun LoginScreen(
                     horizontalArrangement = Arrangement.End
                 ) {
                     ClickableText(text = AnnotatedString(text = "Forgot Password?"),
-                        style = TextStyle(color = Color.Blue, fontSize = 16.sp),
+                        style = TextStyle(color = Color(0xFF1E88E5), fontSize = 16.sp),
                         onClick = {}
                     )
                 }
