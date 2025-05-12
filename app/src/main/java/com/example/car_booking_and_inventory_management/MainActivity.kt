@@ -229,3 +229,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+@Composable
+fun EmptyScreen(message: String = "Coming Soon") {
+    Text(text = message)
+}
